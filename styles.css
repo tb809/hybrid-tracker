@@ -212,3 +212,12 @@ input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); ou
   body { padding-bottom: 24px; }
   .modal { align-items: center; }
 }
+
+.dual-preview {
+  margin-top: 8px; padding: 8px 10px; border-radius: 10px;
+  background: rgba(61,214,198,.08); border: 1px solid rgba(61,214,198,.2);
+  font-size: 13px; font-weight: 700; line-height: 1.35;
+}
+.dual-preview.muted { background: transparent; border-style: dashed; font-weight: 500; color: var(--muted); }
+.kpi-card .value.dual { font-size: 13px; font-weight: 700; line-height: 1.35; color: var(--kpi); }
+.target-card .pace { word-break: break-word; }

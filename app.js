@@ -1,5 +1,5 @@
 /* Hybrid Tracker v1 — Phase 6 Week 1 — Terry Baggett
-   localStorage persistence; km-first run units (watch default) */
+   localStorage persistence; distances stored as km; display km+mi+paces */
 (function () {
   'use strict';
 
@@ -173,14 +173,14 @@
         {
           id: 'wu_run', title: 'Easy Warm-up + Strides', meta: '20 min easy · 3×20s strides',
           sets: [
-            { id: 'wu20', label: '20 min easy (6:50–7:10/km · HR <145)', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+            { id: 'wu20', label: '20 min easy (6:50–7:10/km · 11:00–11:30/mi · HR <145)', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
             { id: 'str1', label: 'Stride 1 · 20s', fields: ['notes'] },
             { id: 'str2', label: 'Stride 2 · 20s', fields: ['notes'] },
             { id: 'str3', label: 'Stride 3 · 20s', fields: ['notes'] },
           ],
         },
         {
-          id: 'tt', title: '10-min Max Distance TT', meta: 'KPI · target 2.0 km · stretch 2.06 km', kpi: '10min_tt',
+          id: 'tt', title: '10-min Max Distance TT', meta: 'KPI · target 2.0 km / 1.24 mi · stretch 2.06 km / 1.28 mi', kpi: '10min_tt',
           sets: [
             {
               id: 'tt_result', label: 'TT result',
@@ -334,8 +334,7 @@
 
   function defaultState() {
     return {
-      version: 1,
-      unit: 'km', // km default (Garmin watch)
+      version: 2,
       logs: {}, // sessionId -> { modality, blocks: {blockId:{done,sets:{setId:{done,fields}}}}, notes, savedAt }
       todayOverrideSession: null,
       kpis: {},
@@ -347,7 +346,10 @@
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return defaultState();
       const parsed = JSON.parse(raw);
-      return Object.assign(defaultState(), parsed);
+      const merged = Object.assign(defaultState(), parsed);
+      delete merged.unit; // v2: canonical km only; dual display always
+      merged.version = 2;
+      return merged;
     } catch (_) {
       return defaultState();
     }
@@ -378,12 +380,98 @@
     return s.blocks || [];
   }
 
-  // —— Units ——
+  // —— Units (canonical km; always show km + mi + both paces) ——
   const KM_PER_MI = 1.609344;
-  function distLabel() { return state.unit === 'km' ? 'km' : 'mi'; }
-  function paceKmToMi(minPerKm) {
-    // convert pace string roughly for display — we show both in targets
-    return minPerKm;
+
+  function parseNum(v) {
+    if (v == null || v === '') return null;
+    const n = parseFloat(String(v).replace(',', '.'));
+    return Number.isFinite(n) ? n : null;
+  }
+
+  /** Parse mm:ss, m:ss, or decimal minutes → total seconds */
+  function parseTimeToSec(v) {
+    if (v == null || v === '') return null;
+    const s = String(v).trim();
+    if (!s) return null;
+    if (s.includes(':')) {
+      const parts = s.split(':').map((p) => parseFloat(p));
+      if (parts.some((p) => !Number.isFinite(p))) return null;
+      if (parts.length === 2) return parts[0] * 60 + parts[1];
+      if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+      return null;
+    }
+    const n = parseFloat(s);
+    return Number.isFinite(n) ? n * 60 : null; // bare number = minutes
+  }
+
+  function formatPace(secPerUnit) {
+    if (!Number.isFinite(secPerUnit) || secPerUnit <= 0 || secPerUnit > 3600) return null;
+    const m = Math.floor(secPerUnit / 60);
+    const s = Math.round(secPerUnit % 60);
+    const adjM = s === 60 ? m + 1 : m;
+    const adjS = s === 60 ? 0 : s;
+    return adjM + ':' + String(adjS).padStart(2, '0');
+  }
+
+  function fmtDist(n, digits) {
+    if (!Number.isFinite(n)) return null;
+    const d = digits != null ? digits : (Math.abs(n) >= 10 ? 1 : 2);
+    return n.toFixed(d).replace(/\.?0+$/, (m) => (m.startsWith('.') ? '' : m)); // keep meaningful decimals
+  }
+  function fmtDistFixed(n, digits) {
+    if (!Number.isFinite(n)) return null;
+    return Number(n).toFixed(digits);
+  }
+
+  /** From km (+ optional time) → "2.08 km · 4:49/km · 1.29 mi · 7:45/mi" */
+  function formatDualDistance(km, timeStr) {
+    const k = parseNum(km);
+    if (k == null || k <= 0) return null;
+    const mi = k / KM_PER_MI;
+    const kmStr = fmtDistFixed(k, 2);
+    const miStr = fmtDistFixed(mi, 2);
+    const sec = parseTimeToSec(timeStr);
+    let paceKm = null, paceMi = null;
+    if (sec != null && sec > 0) {
+      paceKm = formatPace(sec / k);
+      paceMi = formatPace(sec / mi);
+    }
+    let out = kmStr + ' km';
+    if (paceKm) out += ' · ' + paceKm + '/km';
+    out += ' · ' + miStr + ' mi';
+    if (paceMi) out += ' · ' + paceMi + '/mi';
+    return out;
+  }
+
+  /** Static dual label for a known km value (targets) */
+  function dualKmLabel(km, digits) {
+    const k = parseNum(km);
+    if (k == null) return '';
+    const d = digits != null ? digits : 2;
+    return fmtDistFixed(k, d) + ' km · ' + fmtDistFixed(k / KM_PER_MI, d) + ' mi';
+  }
+
+  /** Pace range dual: "6:50–7:10/km · 11:00–11:30/mi" */
+  function dualPaceRange(paceKmLo, paceKmHi) {
+    function toSec(p) {
+      const [m, s] = p.split(':').map(Number);
+      return m * 60 + s;
+    }
+    function fromSec(sec) {
+      return formatPace(sec);
+    }
+    const lo = toSec(paceKmLo), hi = toSec(paceKmHi);
+    // pace/mi = pace/km * KM_PER_MI
+    const loMi = fromSec(lo * KM_PER_MI);
+    const hiMi = fromSec(hi * KM_PER_MI);
+    return paceKmLo + '–' + paceKmHi + '/km · ' + loMi + '–' + hiMi + '/mi';
+  }
+
+  function dualPace(paceKm) {
+    const [m, s] = paceKm.split(':').map(Number);
+    const sec = m * 60 + s;
+    return paceKm + '/km · ' + formatPace(sec * KM_PER_MI) + '/mi';
   }
 
   // —— Toast ——
@@ -415,7 +503,11 @@
           if (!sLog || !sLog.fields) return;
           const f = sLog.fields;
           if (block.kpi === '10min_tt' && f.distance) {
-            kpis['10min_tt'] = { value: f.distance, unit: distLabel(), extra: f.time || '', avgHr: f.avgHr || '', at: day.date, modality: log.modality };
+            const dual = formatDualDistance(f.distance, f.time || '10:00');
+            kpis['10min_tt'] = {
+              value: f.distance, unit: 'km', extra: f.time || '', avgHr: f.avgHr || '',
+              dual: dual, at: day.date, modality: log.modality
+            };
           } else if (block.kpi === '2k_row' && f.time) {
             kpis['2k_row'] = { value: f.time, unit: 'time', avgHr: f.avgHr || '', at: day.date };
           } else if (f.weight) {
@@ -489,11 +581,7 @@
         <span class="muted" style="margin-right:4px">Modality</span>
         <button type="button" class="chip ${log.modality !== 'row' ? 'active' : ''}" data-mod="run">Run</button>
         <button type="button" class="chip ${log.modality === 'row' ? 'active' : ''}" data-mod="row">Row</button>
-        <span style="flex:1"></span>
-        <div class="unit-toggle">
-          <button type="button" class="chip sm ${state.unit === 'km' ? 'active' : ''}" data-unit="km">km</button>
-          <button type="button" class="chip sm ${state.unit === 'mi' ? 'active' : ''}" data-unit="mi">mi</button>
-        </div>
+        <span class="muted" style="margin-left:auto;font-size:11px">Dist in km · shows mi + paces</span>
       </div>`;
     }
 
@@ -526,18 +614,21 @@
   }
 
   function ttTargetsHtml() {
-    const unit = state.unit;
-    const goal = unit === 'km' ? '2.0 km' : '1.24 mi';
-    const stretch = unit === 'km' ? '2.06 km' : '1.28 mi';
-    const cp = unit === 'km' ? '1.0 km at 5:00' : '~0.62 mi at 5:00';
+    const goal = dualKmLabel(2.0);
+    const stretch = dualKmLabel(2.06);
+    const cp = dualKmLabel(1.0, 1) + ' at 5:00';
+    const easy = dualPaceRange('6:50', '7:10');
+    const first = dualPace('5:00');
+    const mid = dualPaceRange('4:55', '4:58');
+    const avgGoal = dualPaceRange('4:51', '5:00');
     return `<div class="target-card">
-      <h4>Today’s TT targets (watch = km)</h4>
+      <h4>Today’s TT targets</h4>
       <ul>
-        <li><strong>Warm-up:</strong> 20 min easy at <span class="pace">6:50–7:10/km</span> <span class="muted">(~11:00–11:30/mi)</span>, HR under ~145 · then 3×20s strides</li>
-        <li><strong>TT goal:</strong> <span class="pace">${goal}</span> · stretch <span class="pace">${stretch}</span> (${unit === 'km' ? '~4:51–5:00/km avg' : '~7:50–8:00/mi'})</li>
-        <li><strong>Pacing:</strong> first 2 min ~<span class="pace">5:00/km</span> (no faster than 4:58 first min) · middle 4:55–4:58/km · push last 2 min</li>
+        <li><strong>Warm-up:</strong> 20 min easy at <span class="pace">${easy}</span>, HR under ~145 · then 3×20s strides</li>
+        <li><strong>TT goal:</strong> <span class="pace">${goal}</span> · stretch <span class="pace">${stretch}</span> (avg ~${avgGoal})</li>
+        <li><strong>Pacing:</strong> first 2 min ~<span class="pace">${first}</span> (no faster than 4:58/km · ${dualPace('4:58').split(' · ')[1]} first min) · middle <span class="pace">${mid}</span> · push last 2 min</li>
         <li><strong>Checkpoint:</strong> ${cp}</li>
-        <li><strong>HR:</strong> climbs into 180s, 190s at finish · Oct 1 mile was 7:43 but went out ~6:45/mi and faded — stay patient</li>
+        <li><strong>HR:</strong> climbs into 180s, 190s at finish · Oct 1 mile was 7:43/mi (4:48/km) but went out ~6:45/mi (4:12/km) and faded — stay patient</li>
         <li><strong>Cooldown:</strong> 10 min easy</li>
       </ul>
     </div>`;
@@ -568,12 +659,23 @@
           <div class="set-fields ${set.fields.length >= 3 ? 'three' : ''}">
             ${set.fields.map(f => fieldHtml(sessionId, block.id, set.id, f, sLog.fields || {})).join('')}
           </div>
+          ${dualPreviewHtml(set.fields, sLog.fields || {}, block.id, set.id)}
         </div>
       </div>`;
     });
 
     html += `</div></div>`;
     return html;
+  }
+
+  function dualPreviewHtml(fields, values, blockId, setId) {
+    if (!fields.includes('distance')) return '';
+    const dual = formatDualDistance(values.distance, values.time);
+    const id = `dual-${blockId}-${setId}`;
+    if (!dual) {
+      return `<div class="dual-preview muted" id="${id}" data-dual-for="${blockId}|${setId}">Enter km (+ time) → km · /km · mi · /mi</div>`;
+    }
+    return `<div class="dual-preview" id="${id}" data-dual-for="${blockId}|${setId}"><span class="pace">${escapeHtml(dual)}</span></div>`;
   }
 
   function fieldHtml(sessionId, blockId, setId, field, values) {
@@ -583,18 +685,33 @@
       weight: 'Weight (lb)',
       reps: 'Reps',
       rpe: 'RPE',
-      distance: `Dist (${distLabel()})`,
+      distance: 'Dist (km)',
       time: 'Time',
       avgHr: 'Avg HR',
       notes: 'Notes',
     };
-    const inputType = field === 'notes' ? 'text' : (field === 'time' ? 'text' : 'text');
     const inputmode = ['weight', 'reps', 'rpe', 'distance', 'avgHr'].includes(field) ? 'decimal' : 'text';
-    const ph = field === 'time' ? 'mm:ss' : field === 'distance' ? (state.unit === 'km' ? 'e.g. 2.01' : 'e.g. 1.25') : '';
+    const ph = field === 'time' ? 'mm:ss' : field === 'distance' ? 'e.g. 2.08' : '';
+    const dualAttr = (field === 'distance' || field === 'time') ? ` data-dual-input="${blockId}|${setId}"` : '';
     if (field === 'notes') {
       return `<label style="grid-column:1/-1">${labels[field]}<input type="text" data-field="${key}" value="${escapeAttr(val)}" placeholder="optional" /></label>`;
     }
-    return `<label>${labels[field] || field}<input type="${inputType}" inputmode="${inputmode}" data-field="${key}" value="${escapeAttr(val)}" placeholder="${ph}" /></label>`;
+    return `<label>${labels[field] || field}<input type="text" inputmode="${inputmode}" data-field="${key}"${dualAttr} value="${escapeAttr(val)}" placeholder="${ph}" /></label>`;
+  }
+
+  function updateDualPreview(blockId, setId) {
+    const el = document.getElementById(`dual-${blockId}-${setId}`);
+    if (!el) return;
+    const distInp = root.querySelector(`[data-field="${selectedSessionId}|${blockId}|${setId}|distance"]`);
+    const timeInp = root.querySelector(`[data-field="${selectedSessionId}|${blockId}|${setId}|time"]`);
+    const dual = formatDualDistance(distInp && distInp.value, timeInp && timeInp.value);
+    if (!dual) {
+      el.className = 'dual-preview muted';
+      el.textContent = 'Enter km (+ time) → km · /km · mi · /mi';
+    } else {
+      el.className = 'dual-preview';
+      el.innerHTML = '<span class="pace">' + escapeHtml(dual) + '</span>';
+    }
   }
 
   function bindTodayEvents() {
@@ -615,12 +732,14 @@
         render();
       });
     });
-    root.querySelectorAll('[data-unit]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        state.unit = btn.getAttribute('data-unit');
-        saveState();
-        render();
-      });
+    root.querySelectorAll('[data-dual-input]').forEach(inp => {
+      const sync = () => {
+        persistField(inp);
+        const pair = inp.getAttribute('data-dual-input').split('|');
+        updateDualPreview(pair[0], pair[1]);
+      };
+      inp.addEventListener('input', sync);
+      inp.addEventListener('change', sync);
     });
     root.querySelectorAll('[data-toggle-block]').forEach(el => {
       el.addEventListener('click', (e) => {
@@ -744,7 +863,7 @@
       let sub = 'Not logged yet';
       if (k && k.value) {
         if (def.key === '10min_tt') {
-          value = `${k.value} ${k.unit || distLabel()}`;
+          value = k.dual || formatDualDistance(k.value, k.extra || '10:00') || `${k.value} km`;
           sub = [k.extra && `time ${k.extra}`, k.avgHr && `HR ${k.avgHr}`, k.at].filter(Boolean).join(' · ');
         } else if (def.key === '2k_row') {
           value = k.value;
@@ -754,7 +873,8 @@
           sub = [k.reps && `${k.reps} reps`, k.rpe && `RPE ${k.rpe}`, k.at].filter(Boolean).join(' · ');
         }
       }
-      html += `<div class="kpi-card"><div class="label">${escapeHtml(def.label)}</div><div class="value">${escapeHtml(value)}</div><div class="sub">${escapeHtml(sub)}</div></div>`;
+      const valueCls = def.key === '10min_tt' ? 'value dual' : 'value';
+      html += `<div class="kpi-card"><div class="label">${escapeHtml(def.label)}</div><div class="${valueCls}">${escapeHtml(value)}</div><div class="sub">${escapeHtml(sub)}</div></div>`;
     });
     html += `</div>`;
     root.innerHTML = html;
@@ -773,10 +893,12 @@
     } else {
       items.forEach(({ d, log, prog }) => {
         const when = log.savedAt ? formatTime(log.savedAt) : 'in progress';
+        const highlight = historyDualSummary(d.id, log);
         html += `<div class="history-item">
           <div>
             <div style="font-weight:700">${d.dow} ${d.short} · ${escapeHtml(d.title)}</div>
             <div class="muted">${prog.done}/${prog.total} sets · ${when}${log.modality ? ' · ' + log.modality : ''}</div>
+            ${highlight ? `<div class="pace" style="font-size:12px;margin-top:4px">${escapeHtml(highlight)}</div>` : ''}
           </div>
           <button type="button" class="chip sm" data-goto="${d.id}">Open</button>
         </div>`;
@@ -805,16 +927,12 @@
       </div>
     </div>
     <div class="card">
-      <h2>Units</h2>
-      <div class="row">
-        <button type="button" class="chip ${state.unit === 'km' ? 'active' : ''}" data-unit="km">Kilometers</button>
-        <button type="button" class="chip ${state.unit === 'mi' ? 'active' : ''}" data-unit="mi">Miles</button>
-      </div>
-      <p class="muted" style="margin:10px 0 0">Default is km to match your watch. Labels update; existing numbers are not auto-converted.</p>
+      <h2>Distance units</h2>
+      <p class="muted" style="margin:0">Enter run distance in <strong>km</strong> (watch default). The app always shows km, pace/km, miles, and pace/mi together when distance (+ time) is logged.</p>
     </div>
     <div class="card">
       <h2>About</h2>
-      <p class="muted" style="margin:0">Hybrid Phase 6 Week 1 (Oct 11–17, 2026) · Coach Patrick James · Offline-capable PWA · v1</p>
+      <p class="muted" style="margin:0">Hybrid Phase 6 Week 1 (Oct 11–17, 2026) · Coach Patrick James · Offline-capable PWA · v1.1</p>
     </div>`;
 
     document.getElementById('btn-export').addEventListener('click', exportJson);
@@ -827,13 +945,6 @@
         toast('Data reset');
         render();
       }
-    });
-    root.querySelectorAll('[data-unit]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        state.unit = btn.getAttribute('data-unit');
-        saveState();
-        render();
-      });
     });
   }
 
@@ -957,7 +1068,7 @@
     if (timerMode === 'tt' && !checkpointFired && timerRemaining === 300) {
       checkpointFired = true;
       timerDisplay.classList.add('alert');
-      timerStatus.textContent = 'CHECKPOINT · ~1.0 km? Stay on pace.';
+      timerStatus.textContent = 'CHECKPOINT · ~1.0 km / 0.62 mi? Stay on pace.';
       beep();
       setTimeout(() => timerDisplay.classList.remove('alert'), 2000);
     }
