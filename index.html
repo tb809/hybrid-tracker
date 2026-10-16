@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+  <meta name="theme-color" content="#0b0f14" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="description" content="Hybrid Phase 6 Week 1 workout tracker — Coach Patrick James" />
+  <title>Hybrid Tracker — Phase 6</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">H</span>
+        <div>
+          <div class="brand-title">Hybrid Tracker</div>
+          <div class="brand-sub">Phase 6 · Week 1 · Coach PJ</div>
+        </div>
+      </div>
+      <button type="button" id="btn-timer" class="icon-btn" aria-label="Open timer" title="Timer">⏱</button>
+    </header>
+
+    <nav class="tabs" role="tablist">
+      <button type="button" class="tab active" data-view="today" role="tab">Today</button>
+      <button type="button" class="tab" data-view="week" role="tab">Week</button>
+      <button type="button" class="tab" data-view="kpi" role="tab">KPIs</button>
+      <button type="button" class="tab" data-view="history" role="tab">History</button>
+      <button type="button" class="tab" data-view="more" role="tab">More</button>
+    </nav>
+
+    <main id="view-root"></main>
+  </div>
+
+  <!-- Timer modal -->
+  <div id="timer-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="timer-title">
+    <div class="modal-sheet">
+      <div class="modal-head">
+        <h2 id="timer-title">Timer</h2>
+        <button type="button" class="icon-btn" id="timer-close" aria-label="Close">✕</button>
+      </div>
+      <div class="timer-modes">
+        <button type="button" class="chip active" data-tmode="tt">10:00 TT</button>
+        <button type="button" class="chip" data-tmode="tempo">Tempo</button>
+        <button type="button" class="chip" data-tmode="custom">Custom</button>
+      </div>
+      <div class="timer-display" id="timer-display">10:00</div>
+      <div class="timer-status" id="timer-status">Ready · checkpoint at 5:00</div>
+      <div class="timer-controls">
+        <button type="button" class="btn primary lg" id="timer-start">Start</button>
+        <button type="button" class="btn ghost lg" id="timer-reset">Reset</button>
+      </div>
+      <div id="tempo-config" class="tempo-config hidden">
+        <label>Work (min) <input type="number" id="tempo-work" value="6" min="1" max="30" inputmode="numeric" /></label>
+        <label>Rest (min) <input type="number" id="tempo-rest" value="2" min="1" max="15" inputmode="numeric" /></label>
+        <label>Sets <input type="number" id="tempo-sets" value="4" min="1" max="10" inputmode="numeric" /></label>
+      </div>
+      <div id="custom-config" class="tempo-config hidden">
+        <label>Minutes <input type="number" id="custom-min" value="10" min="0" max="120" inputmode="numeric" /></label>
+        <label>Seconds <input type="number" id="custom-sec" value="0" min="0" max="59" inputmode="numeric" /></label>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
