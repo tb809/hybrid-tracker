@@ -221,3 +221,14 @@ input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); ou
 .dual-preview.muted { background: transparent; border-style: dashed; font-weight: 500; color: var(--muted); }
 .kpi-card .value.dual { font-size: 13px; font-weight: 700; line-height: 1.35; color: var(--kpi); }
 .target-card .pace { word-break: break-word; }
+.moderate-banner {
+  background: rgba(245,165,36,.18); border: 2px solid var(--warn); color: var(--warn);
+  border-radius: 12px; padding: 14px; margin-bottom: 10px; text-align: center;
+  font-size: 18px; font-weight: 800; letter-spacing: .02em;
+}
+.hr-card.easy { border-color: rgba(74,222,128,.45); }
+.hr-card.easy h4 { color: var(--ok); }
+.hr-card.tempo { border-color: rgba(245,165,36,.5); }
+.hr-card.tempo h4 { color: var(--warn); }
+.hr-card.hard { border-color: rgba(255,107,107,.5); }
+.hr-card.hard h4 { color: var(--danger); }
