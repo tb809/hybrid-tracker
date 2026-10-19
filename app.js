@@ -1,4 +1,4 @@
-/* Hybrid Tracker v1 — Phase 6 Week 1 — Terry Baggett
+/* Hybrid Tracker v1.3 — Phase 6 Weeks 1–2 — Terry Baggett
    localStorage persistence; distances stored as km; display km+mi+paces */
 (function () {
   'use strict';
@@ -7,7 +7,7 @@
   const TODAY_ISO = '2026-10-15'; // box/user date context
   const REAL_TODAY = (() => {
     try {
-      return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
+      return new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
     } catch (_) {
       return TODAY_ISO;
     }
@@ -23,6 +23,18 @@
     { id: 'fri', date: '2026-10-16', dow: 'Fri', short: '10/16', title: 'Tempo Conditioning', subtitle: 'Run or Row', type: 'conditioning' },
     { id: 'sat', date: '2026-10-17', dow: 'Sat', short: '10/17', title: 'Rest', subtitle: 'Recovery day', type: 'rest' },
   ];
+
+  // Phase 6 Week 2 (Oct 18–24, 2026). Session ids are prefixed w2_ so Week 1 logs (keyed by sun..sat) stay untouched.
+  const WEEK2 = [
+    { id: 'w2_mon', date: '2026-10-19', dow: 'Mon', short: '10/19', title: 'Full Body 1', subtitle: 'Squat Focused · ~45 min', type: 'strength' },
+  ];
+  WEEK.forEach(d => { d.week = 1; });
+  WEEK2.forEach(d => { d.week = 2; });
+  const WEEKS = {
+    1: { label: 'Week 1', range: 'Oct 11–17, 2026', days: WEEK },
+    2: { label: 'Week 2', range: 'Oct 18–24, 2026', days: WEEK2 },
+  };
+  const ALL_DAYS = WEEK.concat(WEEK2);
 
   // Terry shifted: Thu Oct 15 → Interval / TT session (not calendar Deadlift day)
   const DEFAULT_SESSION_FOR_TODAY = 'wed';
@@ -304,6 +316,67 @@
         },
       ],
     },
+    w2_mon: {
+      name: 'Full Body 1 (Squat Focused)',
+      weightUnit: 'kg',
+      duration: '~45 min',
+      blocks: [
+        {
+          id: 'wu', title: 'Warm Up', meta: 'Circuit · repeat 2x · rest as needed',
+          cues: '1 min Bike Erg · 10/10 Split Stance Leaps · 6 reps 90/90 Hip Rotations. Can add med ball load to leaps. Use 20kg plate to increase ROM. Keep knees at 90° on hip rotations.',
+          sets: [
+            { id: 'wu1', label: 'Round 1 · Bike Erg 1 min · Leaps 10/10 · 90/90 x6', fields: ['notes'] },
+            { id: 'wu2', label: 'Round 2 · Bike Erg 1 min · Leaps 10/10 · 90/90 x6', fields: ['notes'] },
+          ],
+        },
+        {
+          id: 'bs', title: 'A. Back Squat', meta: '4 x 6 Barbell Back Squat · 2 min rest · RPE 6/7',
+          cues: 'Keep loads close together across sets, can increase each set. Hotel swap: goblet / DB front squat 4x8–10.',
+          sets: [
+            { id: 'bs1', label: 'Set 1 · 6 reps', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'bs2', label: 'Set 2 · 6 reps', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'bs3', label: 'Set 3 · 6 reps', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'bs4', label: 'Set 4 · 6 reps', fields: ['weight', 'reps', 'rpe'] },
+          ],
+        },
+        {
+          id: 'pp', title: 'B. Pec + Lat Accessory', meta: 'Push + Pull superset · 3 sets · 2 min rest between · 0–1 RIR',
+          cues: 'Progress loads/reps from last week. Push up: bodyweight or plate on back, can push up off DBs for ROM. Row: lat focused, elbow finishes in line with body, neutral grip, straps if you can. Swap: 1-arm DB row. Dual pulley row OK.',
+          sets: [
+            { id: 'pu1', label: 'Weighted Push Up 1 · 10–15', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'csr1', label: 'Cable Seated Row 1 · 8–12', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'pu2', label: 'Weighted Push Up 2 · 10–15', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'csr2', label: 'Cable Seated Row 2 · 8–12', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'pu3', label: 'Weighted Push Up 3 · 10–15', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'csr3', label: 'Cable Seated Row 3 · 8–12', fields: ['weight', 'reps', 'rpe'] },
+          ],
+        },
+        {
+          id: 'gl', title: 'C. Glute Accessory', meta: 'Barbell Hip Thrust · 3 x 8–12 · 2 min rest · 0–1 RIR',
+          cues: 'Ribs tucked, drive hips high. Smith machine OK. Swap: single-leg DB hip thrust.',
+          sets: [
+            { id: 'ht1', label: 'Hip Thrust 1 · 8–12', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'ht2', label: 'Hip Thrust 2 · 8–12', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'ht3', label: 'Hip Thrust 3 · 8–12', fields: ['weight', 'reps', 'rpe'] },
+          ],
+        },
+        {
+          id: 'fin', title: 'D. Bicep, Tricep + Ab Accessory', meta: 'Arms + Abs · repeat 3x · 2 min rest between rounds · 0–1 RIR',
+          cues: 'Ez Bar Preacher Curl: full arm extension at bottom (standing curl if no preacher bench). Cable Rope Push Down: upper arm stays at side. Rope Cable Crunch: move through spine, not hips.',
+          sets: [
+            { id: 'bi1', label: 'R1 · Ez Bar Preacher Curl · 10–15', fields: ['weight', 'reps'] },
+            { id: 'tr1', label: 'R1 · Cable Rope Push Down · 10–15', fields: ['weight', 'reps'] },
+            { id: 'ab1', label: 'R1 · Rope Cable Crunch · 10–15', fields: ['weight', 'reps'] },
+            { id: 'bi2', label: 'R2 · Ez Bar Preacher Curl · 10–15', fields: ['weight', 'reps'] },
+            { id: 'tr2', label: 'R2 · Cable Rope Push Down · 10–15', fields: ['weight', 'reps'] },
+            { id: 'ab2', label: 'R2 · Rope Cable Crunch · 10–15', fields: ['weight', 'reps'] },
+            { id: 'bi3', label: 'R3 · Ez Bar Preacher Curl · 10–15', fields: ['weight', 'reps'] },
+            { id: 'tr3', label: 'R3 · Cable Rope Push Down · 10–15', fields: ['weight', 'reps'] },
+            { id: 'ab3', label: 'R3 · Rope Cable Crunch · 10–15', fields: ['weight', 'reps'] },
+          ],
+        },
+      ],
+    },
     sat: {
       name: 'Rest Day',
       blocks: [
@@ -326,10 +399,19 @@
   // —— State ——
   let state = loadState();
   let view = 'today';
-  let selectedSessionId = state.todayOverrideSession || (
+  const TODAY_DAY = ALL_DAYS.find(d => d.date === REAL_TODAY);
+  let selectedSessionId = (TODAY_DAY && state.todayOverrideDate !== REAL_TODAY) ? TODAY_DAY.id : (
+    (state.todayOverrideSession && SESSIONS[state.todayOverrideSession]) ? state.todayOverrideSession : (
     REAL_TODAY === '2026-10-15' ? DEFAULT_SESSION_FOR_TODAY :
-    (WEEK.find(d => d.date === REAL_TODAY) || {}).id || DEFAULT_SESSION_FOR_TODAY
-  );
+    (TODAY_DAY || {}).id || (REAL_TODAY >= WEEK2[0].date ? WEEK2[0].id : DEFAULT_SESSION_FOR_TODAY)
+  ));
+  function dayFor(id) { return ALL_DAYS.find(d => d.id === id); }
+  let selectedWeek = (dayFor(selectedSessionId) || {}).week || 2;
+  function weightUnitFor(sessionId) { return (SESSIONS[sessionId] && SESSIONS[sessionId].weightUnit) || 'lb'; }
+  function kgToLbLabel(v) {
+    const n = parseNum(v);
+    return n == null ? '' : '= ' + (Math.round(n * 2.20462 * 10) / 10) + ' lb';
+  }
   let openBlocks = new Set();
 
   function defaultState() {
@@ -487,7 +569,7 @@
   // —— KPI extraction ——
   function refreshKpisFromLogs() {
     const kpis = Object.assign({}, state.kpis);
-    WEEK.forEach(day => {
+    ALL_DAYS.forEach(day => {
       const sess = SESSIONS[day.id];
       if (!sess) return;
       const log = state.logs[day.id];
@@ -553,7 +635,8 @@
   }
 
   function renderToday() {
-    const dayMeta = WEEK.find(d => d.id === selectedSessionId) || WEEK[3];
+    const dayMeta = dayFor(selectedSessionId) || WEEK[3];
+    const weekDays = WEEKS[selectedWeek].days;
     const sess = SESSIONS[selectedSessionId];
     const log = ensureLog(selectedSessionId);
     const prog = sessionProgress(selectedSessionId);
@@ -563,14 +646,17 @@
     html += `<div class="card">
       <div class="row space">
         <div>
-          <div class="muted">${formatDateLabel(REAL_TODAY)} · logging as</div>
+          <div class="muted">${formatDateLabel(REAL_TODAY)} · logging as · Wk ${dayMeta.week} ${dayMeta.dow} ${dayMeta.short}${sess.duration ? ' · ' + sess.duration : ''}</div>
           <h2 style="margin:4px 0 0">${escapeHtml(sess.name)}</h2>
         </div>
         ${sess.kpi ? `<span class="badge kpi">KPI</span>` : ''}
       </div>
       ${isShiftedToday ? `<p class="muted" style="margin:8px 0 0">Schedule shifted: doing Interval / 10-min TT today (calendar was Deadlift). Pick any session below.</p>` : ''}
       <div class="session-picker" style="margin-top:12px">
-        ${WEEK.map(d => `<button type="button" class="chip ${d.id === selectedSessionId ? 'active' : ''}" data-pick="${d.id}">${d.dow} · ${d.title.split(' ')[0]}${d.id === 'wed' && REAL_TODAY === '2026-10-15' ? ' ★' : ''}</button>`).join('')}
+        ${Object.keys(WEEKS).map(w => `<button type="button" class="chip ${String(selectedWeek) === w ? 'active' : ''}" data-week="${w}">${WEEKS[w].label}</button>`).join('')}
+      </div>
+      <div class="session-picker" style="margin-top:8px">
+        ${weekDays.map(d => `<button type="button" class="chip ${d.id === selectedSessionId ? 'active' : ''}" data-pick="${d.id}">${d.dow} · ${d.title.split(' ')[0]}${(d.id === 'wed' && REAL_TODAY === '2026-10-15') || (d.date === REAL_TODAY && REAL_TODAY !== '2026-10-15') ? ' ★' : ''}</button>`).join('')}
       </div>
       <div class="progress-bar"><span style="width:${prog.pct}%"></span></div>
       <div class="muted" style="margin-top:6px">${prog.done}/${prog.total} sets · ${prog.pct}%</div>
@@ -685,7 +771,7 @@
         </div>
         <span class="muted">${isOpen ? '▾' : '▸'}</span>
       </div>
-      <div class="block-body">`;
+      <div class="block-body">${block.cues ? `<p class="muted" style="margin:0 0 8px;font-size:12px">${escapeHtml(block.cues)}</p>` : ''}`;
 
     block.sets.forEach(set => {
       const sLog = (bLog.sets || {})[set.id] || { done: false, fields: {} };
@@ -697,6 +783,7 @@
             ${set.fields.map(f => fieldHtml(sessionId, block.id, set.id, f, sLog.fields || {})).join('')}
           </div>
           ${dualPreviewHtml(set.fields, sLog.fields || {}, block.id, set.id)}
+          ${weightUnitFor(sessionId) === 'kg' && set.fields.includes('weight') ? `<div class="dual-preview muted" id="lb-${block.id}-${set.id}">${escapeHtml(kgToLbLabel((sLog.fields || {}).weight))}</div>` : ''}
         </div>
       </div>`;
     });
@@ -719,7 +806,7 @@
     const key = `${sessionId}|${blockId}|${setId}|${field}`;
     const val = values[field] != null ? values[field] : '';
     const labels = {
-      weight: 'Weight (lb)',
+      weight: 'Weight (' + weightUnitFor(sessionId) + ')',
       reps: 'Reps',
       rpe: 'RPE',
       distance: 'Dist (km)',
@@ -752,10 +839,24 @@
   }
 
   function bindTodayEvents() {
+    root.querySelectorAll('[data-week]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedWeek = Number(btn.getAttribute('data-week'));
+        render();
+      });
+    });
+    root.querySelectorAll('[data-field$="|weight"]').forEach(inp => {
+      inp.addEventListener('input', () => {
+        const [sid, bid, setId] = inp.getAttribute('data-field').split('|');
+        const el = document.getElementById(`lb-${bid}-${setId}`);
+        if (el && weightUnitFor(sid) === 'kg') el.textContent = kgToLbLabel(inp.value);
+      });
+    });
     root.querySelectorAll('[data-pick]').forEach(btn => {
       btn.addEventListener('click', () => {
         selectedSessionId = btn.getAttribute('data-pick');
         state.todayOverrideSession = selectedSessionId;
+        state.todayOverrideDate = REAL_TODAY;
         openBlocks = new Set();
         saveState();
         render();
@@ -863,8 +964,9 @@
   }
 
   function renderWeek() {
-    let html = `<div class="card"><h2>Phase 6 · Week 1</h2><p class="muted" style="margin:0">Oct 11–17, 2026 · Coach Patrick James</p></div>`;
-    WEEK.forEach(d => {
+    let html = `<div class="card"><h2>Phase 6 · ${WEEKS[selectedWeek].label}</h2><p class="muted" style="margin:0">${WEEKS[selectedWeek].range} · Coach Patrick James</p>
+      <div class="session-picker" style="margin-top:10px">${Object.keys(WEEKS).map(w => `<button type="button" class="chip ${String(selectedWeek) === w ? 'active' : ''}" data-week="${w}">${WEEKS[w].label}</button>`).join('')}</div></div>`;
+    WEEKS[selectedWeek].days.forEach(d => {
       const prog = sessionProgress(d.id);
       const isToday = d.date === REAL_TODAY;
       const shifted = isToday && REAL_TODAY === '2026-10-15';
@@ -879,10 +981,14 @@
       </button>`;
     });
     root.innerHTML = html;
+    root.querySelectorAll('[data-week]').forEach(btn => {
+      btn.addEventListener('click', () => { selectedWeek = Number(btn.getAttribute('data-week')); render(); });
+    });
     root.querySelectorAll('[data-goto]').forEach(btn => {
       btn.addEventListener('click', () => {
         selectedSessionId = btn.getAttribute('data-goto');
         state.todayOverrideSession = selectedSessionId;
+        state.todayOverrideDate = REAL_TODAY;
         view = 'today';
         setActiveTab('today');
         saveState();
@@ -918,13 +1024,13 @@
   }
 
   function renderHistory() {
-    const items = WEEK.map(d => {
+    const items = ALL_DAYS.map(d => {
       const log = state.logs[d.id];
       const prog = sessionProgress(d.id);
       return { d, log, prog };
     }).filter(x => x.log && (x.prog.done > 0 || x.log.notes || x.log.savedAt));
 
-    let html = `<div class="card"><h2>History</h2><p class="muted" style="margin:0">Logged days this week</p></div><div class="card" style="padding:0">`;
+    let html = `<div class="card"><h2>History</h2><p class="muted" style="margin:0">Logged days · Phase 6 Weeks 1–2</p></div><div class="card" style="padding:0">`;
     if (!items.length) {
       html += `<div class="history-item"><span class="muted">No sessions logged yet</span></div>`;
     } else {
@@ -933,7 +1039,7 @@
         const highlight = historyDualSummary(d.id, log);
         html += `<div class="history-item">
           <div>
-            <div style="font-weight:700">${d.dow} ${d.short} · ${escapeHtml(d.title)}</div>
+            <div style="font-weight:700">Wk${d.week} ${d.dow} ${d.short} · ${escapeHtml(d.title)}</div>
             <div class="muted">${prog.done}/${prog.total} sets · ${when}${log.modality ? ' · ' + log.modality : ''}</div>
             ${highlight ? `<div class="pace" style="font-size:12px;margin-top:4px">${escapeHtml(highlight)}</div>` : ''}
           </div>
@@ -946,6 +1052,7 @@
     root.querySelectorAll('[data-goto]').forEach(btn => {
       btn.addEventListener('click', () => {
         selectedSessionId = btn.getAttribute('data-goto');
+        selectedWeek = (dayFor(selectedSessionId) || {}).week || selectedWeek;
         view = 'today';
         setActiveTab('today');
         render();
@@ -969,7 +1076,7 @@
     </div>
     <div class="card">
       <h2>About</h2>
-      <p class="muted" style="margin:0">Hybrid Phase 6 Week 1 (Oct 11–17, 2026) · Coach Patrick James · Offline-capable PWA · v1.1</p>
+      <p class="muted" style="margin:0">Hybrid Phase 6 Weeks 1–2 (Oct 11–24, 2026) · Coach Patrick James · Offline-capable PWA · v1.3</p>
     </div>`;
 
     document.getElementById('btn-export').addEventListener('click', exportJson);
