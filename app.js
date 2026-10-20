@@ -1,4 +1,4 @@
-/* Hybrid Tracker v1.4 — Phase 6 Weeks 1–2 — Terry Baggett
+/* Hybrid Tracker v1.5 — Phase 6 Weeks 1–2 — Terry Baggett
    localStorage persistence; distances stored as km; display km+mi+paces */
 (function () {
   'use strict';
@@ -27,11 +27,11 @@
   // Phase 6 Week 2 (Mon Oct 19–Sun Oct 25, 2026; same order as Week 1 as executed, starting FB1 Mon). Session ids are prefixed w2_ so Week 1 logs (keyed by sun..sat) stay untouched.
   const WEEK2 = [
     { id: 'w2_mon', date: '2026-10-19', dow: 'Mon', short: '10/19', title: 'Full Body 1', subtitle: 'Squat Focused · ~45 min', type: 'strength' },
-    { id: 'w2_tue', date: '2026-10-20', dow: 'Tue', short: '10/20', title: 'Easy Conditioning', subtitle: 'Run or Row · ~45 min', type: 'conditioning' },
-    { id: 'w2_wed', date: '2026-10-21', dow: 'Wed', short: '10/21', title: 'Full Body 2', subtitle: 'Press Focused · sets/reps pending confirmation', type: 'strength' },
-    { id: 'w2_thu', date: '2026-10-22', dow: 'Thu', short: '10/22', title: 'Interval Conditioning', subtitle: 'Race pace 8×2 min / 8×500m row · ~45 min', type: 'conditioning' },
+    { id: 'w2_tue', date: '2026-10-20', dow: 'Tue', short: '10/20', title: 'Easy Conditioning', subtitle: 'Run or Row', type: 'conditioning' },
+    { id: 'w2_wed', date: '2026-10-21', dow: 'Wed', short: '10/21', title: 'Full Body 2', subtitle: 'Press Focused', type: 'strength' },
+    { id: 'w2_thu', date: '2026-10-22', dow: 'Thu', short: '10/22', title: 'Interval Conditioning', subtitle: 'Race pace 8×2 min / 8×500m row', type: 'conditioning' },
     { id: 'w2_fri', date: '2026-10-23', dow: 'Fri', short: '10/23', title: 'Full Body 3', subtitle: 'Deadlift Focused · optional / usually skipped', type: 'strength' },
-    { id: 'w2_sat', date: '2026-10-24', dow: 'Sat', short: '10/24', title: 'Tempo Conditioning', subtitle: 'Run or Row · ~45 min', type: 'conditioning' },
+    { id: 'w2_sat', date: '2026-10-24', dow: 'Sat', short: '10/24', title: 'Tempo Conditioning', subtitle: 'Run or Row', type: 'conditioning' },
     { id: 'w2_sun', date: '2026-10-25', dow: 'Sun', short: '10/25', title: 'Rest', subtitle: 'Recovery day', type: 'rest' },
   ];
   WEEK.forEach(d => { d.week = 1; });
@@ -386,7 +386,6 @@
     w2_tue: {
       name: 'Easy Conditioning',
       modality: true,
-      duration: '~45 min',
       hrCard: 'easy2',
       blocksRun: [
         {
@@ -399,7 +398,7 @@
           sets: [{ id: 'er10', label: '10 min easy · RPE 3–4', fields: ['distance', 'avgHr', 'rpe', 'notes'] }],
         },
         {
-          id: 'base', title: 'Base Intervals', meta: 'Repeat 3x · 8 min @ base pace · 2 min rest easy jog · RPE 4–5 (high Z2 / low Z3)',
+          id: 'base', title: 'Base Intervals', meta: 'Repeat 3x · 8 min @ base · 2 min easy jog (float) · RPE 4–5 (high Z2 / low Z3)',
           sets: [
             { id: 'b1', label: 'Base 1 · 8 min · RPE 4–5', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
             { id: 'b2', label: 'Base 2 · 8 min · RPE 4–5', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
@@ -417,12 +416,12 @@
           sets: [{ id: 'pogo_r1', label: 'Pogo jumps', fields: ['notes'] }],
         },
         {
-          id: 'easy_row', title: 'Easy Row Warm-up', meta: '10 min easy row · RPE 3–4',
+          id: 'easy_row', title: 'Easy Row Warm-up', meta: '10 min easy row · RPE 3–4 (low Z2)',
           cues: 'Option 1 (Run) or Option 2 (Row), not both.',
           sets: [{ id: 'row10', label: '10 min easy row', fields: ['distance', 'avgHr', 'rpe', 'notes'] }],
         },
         {
-          id: 'base_r', title: 'Base Intervals (Row)', meta: 'Repeat 3x · 8 min row erg @ 20–22 s/m · 2 min rest · RPE 4–5',
+          id: 'base_r', title: 'Base Intervals (Row)', meta: 'Repeat 3x · 8 min row erg @ 20–22 s/m (base) · 2 min complete rest · RPE 4–5 (high Z2 / low Z3)',
           sets: [
             { id: 'rb1', label: 'Base 1 · 8 min · 20–22 s/m', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
             { id: 'rb2', label: 'Base 2 · 8 min · 20–22 s/m', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
@@ -440,47 +439,66 @@
       weightUnit: 'kg',
       blocks: [
         {
-          id: 'sm', title: 'Shoulder Warm-up Circuit', meta: 'Week 2 sets/reps pending confirmation',
-          sets: [{ id: 'sm1', label: 'Warm-up circuit', fields: ['notes'] }],
-        },
-        {
-          id: 'sp', title: 'Strict Press', meta: 'Main lift · Week 2 sets/reps pending confirmation',
+          id: 'sm', title: 'Warm up · Shoulder WU', meta: 'Repeat 2x · 1 min Ski Erg · 5/5 KB Arm Bar · 10–15 Cable Face Pull · 2 min rest between rounds',
+          cues: 'KB Arm Bar: 5 reps on each arm; focus on reaching to the ceiling on each arm. Cable Face Pull: can use a band if this is easier. Rest as much as you need between rounds.',
           sets: [
-            { id: 'sp1', label: 'Set 1', fields: ['weight', 'reps', 'rpe'] },
-            { id: 'sp2', label: 'Set 2', fields: ['weight', 'reps', 'rpe'] },
-            { id: 'sp3', label: 'Set 3', fields: ['weight', 'reps', 'rpe'] },
-            { id: 'sp4', label: 'Set 4', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'sm1', label: 'Round 1 · Ski Erg 1 min · KB Arm Bar 5/5 · Face Pull 10–15', fields: ['notes'] },
+            { id: 'sm2', label: 'Round 2 · Ski Erg 1 min · KB Arm Bar 5/5 · Face Pull 10–15', fields: ['notes'] },
           ],
         },
         {
-          id: 'qg', title: 'Quad + Glute Accessory', meta: 'DB lunge-type · Week 2 sets/reps pending confirmation',
+          id: 'sp', title: 'A. Strict Press', meta: '4 sets x 6 reps Barbell Strict Press · 2 min rest · RPE 6/7',
+          cues: 'Make sure the bar touches the collarbone with each rep. Aim to hit similar loads across all sets or aim to increase from set to set. Rest as much as you need between sets.',
           sets: [
-            { id: 'sl1', label: 'Set 1', fields: ['weight', 'reps', 'rpe'] },
-            { id: 'sl2', label: 'Set 2', fields: ['weight', 'reps', 'rpe'] },
-            { id: 'sl3', label: 'Set 3', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'sp1', label: 'Set 1 · 6 reps', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'sp2', label: 'Set 2 · 6 reps', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'sp3', label: 'Set 3 · 6 reps', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'sp4', label: 'Set 4 · 6 reps', fields: ['weight', 'reps', 'rpe'] },
           ],
         },
         {
-          id: 'pu', title: 'Pull-up / Chin-ups', meta: 'Week 2 sets/reps pending confirmation',
+          id: 'qg', title: 'B. Quad + Glute Accessory', meta: 'DB Lunge · 3 sets x 8–10 reps Deficit DB Reverse Lunge (each leg) · 2 min rest · 0–1 RIR',
+          cues: 'Progress loads or reps from last week where possible. Use a 20kg plate or something to raise the front leg. Allow both the knee and the hip to bend equally. Use straps if you have access. 8–10 on each leg. 2 min programmed but rest as much as you need. Options: Smith machine or barbell instead if more comfortable.',
           sets: [
-            { id: 'pull1', label: 'Set 1', fields: ['weight', 'reps', 'rpe'] },
-            { id: 'pull2', label: 'Set 2', fields: ['weight', 'reps', 'rpe'] },
-            { id: 'pull3', label: 'Set 3', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'sl1', label: 'Set 1 · 8–10 each leg', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'sl2', label: 'Set 2 · 8–10 each leg', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'sl3', label: 'Set 3 · 8–10 each leg', fields: ['weight', 'reps', 'rpe'] },
           ],
         },
         {
-          id: 'dc', title: 'Delt + Core Accessory', meta: 'Week 2 sets/reps pending confirmation',
+          id: 'pu', title: 'C. Pull Up + Dip', meta: 'Chin up + Dip superset · 3 sets · 6–10 Chin Up · 6–10 Strict Dip · 2 min rest between supersets · 0–1 RIR',
+          cues: 'Add weight if you can to either exercise; progress loads or reps from last week. Chin up: palms facing you, straps if you have access, arms fully straight at the bottom and chin over the bar at the top, band if you need assistance. Dip: elbow comes below the line of the shoulder at the bottom, band if you need assistance.',
           sets: [
-            { id: 'dc1', label: 'Set 1', fields: ['weight', 'reps', 'notes'] },
-            { id: 'dc2', label: 'Set 2', fields: ['weight', 'reps', 'notes'] },
-            { id: 'dc3', label: 'Set 3', fields: ['weight', 'reps', 'notes'] },
+            { id: 'chin1', label: 'R1 · Chin Up · 6–10', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'dip1', label: 'R1 · Strict Dip · 6–10', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'chin2', label: 'R2 · Chin Up · 6–10', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'dip2', label: 'R2 · Strict Dip · 6–10', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'chin3', label: 'R3 · Chin Up · 6–10', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'dip3', label: 'R3 · Strict Dip · 6–10', fields: ['weight', 'reps', 'rpe'] },
           ],
         },
         {
-          id: 'arms', title: 'Biceps + Triceps', meta: 'Arms · Week 2 sets/reps pending confirmation',
+          id: 'dc', title: 'D. Delts + Calfs Accessory', meta: 'Superset · 3 sets · 10–15 Single Arm Rear Delt Fly · 10–15 Single Leg Seated Calf Raise · 2 min rest · 0–1 RIR',
+          cues: 'Progress loads or reps from last week. Cable rear delt fly: slight bend in the elbow, drive the arm behind the body, cuffs if you have them. Seated calf raise: calf machine if you have one, if not a DB or sandbag on the knee works well.',
           sets: [
-            { id: 'bi', label: 'Biceps', fields: ['weight', 'reps', 'notes'] },
-            { id: 'tr', label: 'Triceps', fields: ['weight', 'reps', 'notes'] },
+            { id: 'rdf1', label: 'R1 · Single Arm Rear Delt Fly · 10–15', fields: ['weight', 'reps'] },
+            { id: 'calf1', label: 'R1 · Single Leg Seated Calf Raise · 10–15', fields: ['weight', 'reps'] },
+            { id: 'rdf2', label: 'R2 · Single Arm Rear Delt Fly · 10–15', fields: ['weight', 'reps'] },
+            { id: 'calf2', label: 'R2 · Single Leg Seated Calf Raise · 10–15', fields: ['weight', 'reps'] },
+            { id: 'rdf3', label: 'R3 · Single Arm Rear Delt Fly · 10–15', fields: ['weight', 'reps'] },
+            { id: 'calf3', label: 'R3 · Single Leg Seated Calf Raise · 10–15', fields: ['weight', 'reps'] },
+          ],
+        },
+        {
+          id: 'arms', title: 'E. Bicep + Tricep Accessory', meta: 'Arms superset · 3 sets · 10–15 Cable Standing Curl · 10–15 Cable Tricep Pushdown · 2 min rest',
+          cues: 'Progress loads or reps from last week where possible. Curl: palms facing the ceiling, straight bar attachment if you have one. Pushdown: elbows tucked in by your sides, straight bar attachment.',
+          sets: [
+            { id: 'bi1', label: 'R1 · Cable Standing Curl · 10–15', fields: ['weight', 'reps'] },
+            { id: 'tr1', label: 'R1 · Cable Tricep Pushdown · 10–15', fields: ['weight', 'reps'] },
+            { id: 'bi2', label: 'R2 · Cable Standing Curl · 10–15', fields: ['weight', 'reps'] },
+            { id: 'tr2', label: 'R2 · Cable Tricep Pushdown · 10–15', fields: ['weight', 'reps'] },
+            { id: 'bi3', label: 'R3 · Cable Standing Curl · 10–15', fields: ['weight', 'reps'] },
+            { id: 'tr3', label: 'R3 · Cable Tricep Pushdown · 10–15', fields: ['weight', 'reps'] },
           ],
         },
       ],
@@ -488,7 +506,6 @@
     w2_thu: {
       name: 'Interval Conditioning · Race Pace',
       modality: true,
-      duration: '~45 min',
       hrCard: 'hard2',
       blocksRun: [
         {
@@ -497,7 +514,7 @@
         },
         {
           id: 'wu_run', title: 'Easy Run + Strides', meta: '15 min easy · Z2 HR <137 · 3×20s strides',
-          cues: 'Stride = faster run, not an all-out sprint. Option 1 (Run) or Option 2 (Row), not both.',
+          cues: '15 min easy run with some progressive strides to warm up. A stride is a faster run but not an all-out sprint. Option 1 (Run) or Option 2 (Row), not both.',
           sets: [
             { id: 'wu15', label: '15 min easy · Z2 HR <137', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
             { id: 'str1', label: 'Stride 1 · 20s', fields: ['notes'] },
@@ -531,11 +548,12 @@
         },
         {
           id: 'wu_r', title: 'Easy Row Warm-up', meta: '10 min easy row · 18–22 s/m',
-          cues: 'Can be row, ski or bike. Option 1 (Run) or Option 2 (Row), not both.',
+          cues: 'Can be a Row, Ski or Bike (C2 bike: double the distance). Option 1 (Run) or Option 2 (Row), not both.',
           sets: [{ id: 'rwu10', label: '10 min easy · 18–22 s/m', fields: ['distance', 'avgHr', 'notes'] }],
         },
         {
           id: 'r500', title: '500m Intervals', meta: 'HARD · repeat 8x · 500m @ 2k pace +3s · 2 min rest',
+          cues: 'Race pace effort: e.g. if 2k race pace is 1:45/500m, today is 1:48/500m. C2 bike: 1000m.',
           sets: [
             { id: 'r500_1', label: '500m #1 · 2k pace +3s', fields: ['time', 'avgHr', 'rpe', 'notes'] },
             { id: 'r500_2', label: '500m #2 · 2k pace +3s', fields: ['time', 'avgHr', 'rpe', 'notes'] },
@@ -558,52 +576,73 @@
       weightUnit: 'kg',
       blocks: [
         {
-          id: 'wu', title: 'Warm-up Circuit', meta: 'Optional / usually skipped · Week 2 sets/reps pending confirmation',
-          sets: [{ id: 'wu1', label: 'Warm-up circuit', fields: ['notes'] }],
-        },
-        {
-          id: 'dl', title: 'Deadlift', meta: 'Main lift · Week 2 sets/reps pending confirmation',
+          id: 'wu', title: 'Warm up · Circuit', meta: 'Repeat 2x · 1 min Bike Erg · 10–15 DB RDL · 6 Tall Kneeling Around The World Slams',
+          cues: 'Optional / usually skipped. DB RDLs: use a load heavy enough to actually warm up your hinge. Tall kneeling ball slams: done with some intensity. Rest as much as you need between rounds.',
           sets: [
-            { id: 'dl1', label: 'Set 1', fields: ['weight', 'reps', 'rpe'] },
-            { id: 'dl2', label: 'Set 2', fields: ['weight', 'reps', 'rpe'] },
-            { id: 'dl3', label: 'Set 3', fields: ['weight', 'reps', 'rpe'] },
-            { id: 'dl4', label: 'Set 4', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'wu1', label: 'Round 1 · Bike Erg 1 min · DB RDL 10–15 · Slams x6', fields: ['notes'] },
+            { id: 'wu2', label: 'Round 2 · Bike Erg 1 min · DB RDL 10–15 · Slams x6', fields: ['notes'] },
           ],
         },
         {
-          id: 'bp', title: 'Bench Press', meta: 'Week 2 sets/reps pending confirmation',
+          id: 'dl', title: 'A. Deadlift', meta: '3 sets x 5 reps Deficit Barbell Deadlift · 2 min rest · RPE 6/7',
+          cues: 'Make sure you are not touching and going here. Use a 20kg plate as a deficit. Rest as much as you need between sets.',
           sets: [
-            { id: 'bp1', label: 'Set 1', fields: ['weight', 'reps', 'rpe'] },
-            { id: 'bp2', label: 'Set 2', fields: ['weight', 'reps', 'rpe'] },
-            { id: 'bp3', label: 'Set 3', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'dl1', label: 'Set 1 · 5 reps', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'dl2', label: 'Set 2 · 5 reps', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'dl3', label: 'Set 3 · 5 reps', fields: ['weight', 'reps', 'rpe'] },
           ],
         },
         {
-          id: 'qg', title: 'Quad + Glute Accessory', meta: 'Week 2 sets/reps pending confirmation',
+          id: 'bp', title: 'B. Bench Press', meta: 'Bench Maintenance · 4 sets x 5 reps Barbell Bench Press · 2 min rest · RPE 6/7',
+          cues: 'Same as last week, so progress loads from last week on one set or across multiple sets. Goal is to maintain technical efficiency during this phase without pushing the bench hard. Aim for similar or the same load across all sets.',
           sets: [
-            { id: 'qg1', label: 'Set 1', fields: ['weight', 'reps', 'rpe'] },
-            { id: 'qg2', label: 'Set 2', fields: ['weight', 'reps', 'rpe'] },
-            { id: 'qg3', label: 'Set 3', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'bp1', label: 'Set 1 · 5 reps', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'bp2', label: 'Set 2 · 5 reps', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'bp3', label: 'Set 3 · 5 reps', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'bp4', label: 'Set 4 · 5 reps', fields: ['weight', 'reps', 'rpe'] },
           ],
         },
         {
-          id: 'ubd', title: 'Upper Back + Delt Accessory', meta: 'Week 2 sets/reps pending confirmation',
+          id: 'qg', title: 'C. Quad + Glute Accessory', meta: 'Squat Accessory · 3 sets x 8–10 reps Machine Leg Press · 2 min rest · 0–1 RIR',
+          cues: 'Same as last week, progress loads or reps. Feet around squat stance width. Hit similar depth to your squat. No leg press: barbell front squat instead.',
           sets: [
-            { id: 'ubd1', label: 'Set 1', fields: ['weight', 'reps', 'notes'] },
-            { id: 'ubd2', label: 'Set 2', fields: ['weight', 'reps', 'notes'] },
-            { id: 'ubd3', label: 'Set 3', fields: ['weight', 'reps', 'notes'] },
+            { id: 'lp1', label: 'Set 1 · 8–10 reps', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'lp2', label: 'Set 2 · 8–10 reps', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'lp3', label: 'Set 3 · 8–10 reps', fields: ['weight', 'reps', 'rpe'] },
           ],
         },
         {
-          id: 'fin', title: 'Arms + Abs', meta: 'Week 2 sets/reps pending confirmation',
-          sets: [{ id: 'f1', label: 'Arms + abs', fields: ['notes', 'rpe'] }],
+          id: 'ubd', title: 'D. Upper Back + Delt Accessory', meta: 'Superset · 3 sets · 8–12 Plate Loaded Chest Supported Row · 10–15 DB Seated Lateral Raise · 2 min rest · 0–1 RIR',
+          cues: 'Same as last week, progress loads or reps. Chest supported row: hands and elbows around 45°, big reach at the bottom, drive elbows back behind the body at the top, machine row if possible. Seated lateral raise: knuckles facing the ceiling, arms out and away from you.',
+          sets: [
+            { id: 'csr1', label: 'R1 · Chest Supported Row · 8–12', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'lat1', label: 'R1 · DB Seated Lateral Raise · 10–15', fields: ['weight', 'reps'] },
+            { id: 'csr2', label: 'R2 · Chest Supported Row · 8–12', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'lat2', label: 'R2 · DB Seated Lateral Raise · 10–15', fields: ['weight', 'reps'] },
+            { id: 'csr3', label: 'R3 · Chest Supported Row · 8–12', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'lat3', label: 'R3 · DB Seated Lateral Raise · 10–15', fields: ['weight', 'reps'] },
+          ],
+        },
+        {
+          id: 'fin', title: 'E. Arms + Abs', meta: '3 rounds · 10–15 Cable Crossover Tricep Extensions · 10–15 Barbell Curls · 5–20 Roll Out · 2 min rest · 0–1 RIR',
+          cues: 'Same as last week, progress loads or reps. Tricep extension: cuffs if you have them, fully straighten the arm at the bottom. Curl: supinated grip (palms up). Ab wheel roll out: start on the knees, progress to standing if able (very hard); a band around the waist tied behind you can assist. No ab wheel: short bar or EZ bar.',
+          sets: [
+            { id: 'tri1', label: 'R1 · Cable Crossover Tricep Ext · 10–15', fields: ['weight', 'reps'] },
+            { id: 'bbc1', label: 'R1 · Barbell Curl · 10–15', fields: ['weight', 'reps'] },
+            { id: 'ro1', label: 'R1 · Roll Out · 5–20', fields: ['reps', 'notes'] },
+            { id: 'tri2', label: 'R2 · Cable Crossover Tricep Ext · 10–15', fields: ['weight', 'reps'] },
+            { id: 'bbc2', label: 'R2 · Barbell Curl · 10–15', fields: ['weight', 'reps'] },
+            { id: 'ro2', label: 'R2 · Roll Out · 5–20', fields: ['reps', 'notes'] },
+            { id: 'tri3', label: 'R3 · Cable Crossover Tricep Ext · 10–15', fields: ['weight', 'reps'] },
+            { id: 'bbc3', label: 'R3 · Barbell Curl · 10–15', fields: ['weight', 'reps'] },
+            { id: 'ro3', label: 'R3 · Roll Out · 5–20', fields: ['reps', 'notes'] },
+          ],
         },
       ],
     },
     w2_sat: {
       name: 'Tempo Conditioning',
       modality: true,
-      duration: '~45 min',
       hrCard: 'tempo',
       blocksRun: [
         {
@@ -1392,7 +1431,7 @@
     </div>
     <div class="card">
       <h2>About</h2>
-      <p class="muted" style="margin:0">Hybrid Phase 6 Weeks 1–2 (Oct 11–25, 2026) · Coach Patrick James · Offline-capable PWA · v1.4</p>
+      <p class="muted" style="margin:0">Hybrid Phase 6 Weeks 1–2 (Oct 11–25, 2026) · Coach Patrick James · Offline-capable PWA · v1.5</p>
     </div>`;
 
     document.getElementById('btn-export').addEventListener('click', exportJson);
