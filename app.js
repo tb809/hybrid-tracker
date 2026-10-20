@@ -1,4 +1,4 @@
-/* Hybrid Tracker v1.3 — Phase 6 Weeks 1–2 — Terry Baggett
+/* Hybrid Tracker v1.4 — Phase 6 Weeks 1–2 — Terry Baggett
    localStorage persistence; distances stored as km; display km+mi+paces */
 (function () {
   'use strict';
@@ -24,15 +24,21 @@
     { id: 'sat', date: '2026-10-17', dow: 'Sat', short: '10/17', title: 'Rest', subtitle: 'Recovery day', type: 'rest' },
   ];
 
-  // Phase 6 Week 2 (Oct 18–24, 2026). Session ids are prefixed w2_ so Week 1 logs (keyed by sun..sat) stay untouched.
+  // Phase 6 Week 2 (Mon Oct 19–Sun Oct 25, 2026; same order as Week 1 as executed, starting FB1 Mon). Session ids are prefixed w2_ so Week 1 logs (keyed by sun..sat) stay untouched.
   const WEEK2 = [
     { id: 'w2_mon', date: '2026-10-19', dow: 'Mon', short: '10/19', title: 'Full Body 1', subtitle: 'Squat Focused · ~45 min', type: 'strength' },
+    { id: 'w2_tue', date: '2026-10-20', dow: 'Tue', short: '10/20', title: 'Easy Conditioning', subtitle: 'Run or Row · ~45 min', type: 'conditioning' },
+    { id: 'w2_wed', date: '2026-10-21', dow: 'Wed', short: '10/21', title: 'Full Body 2', subtitle: 'Press Focused · sets/reps pending confirmation', type: 'strength' },
+    { id: 'w2_thu', date: '2026-10-22', dow: 'Thu', short: '10/22', title: 'Interval Conditioning', subtitle: 'Race pace 8×2 min / 8×500m row · ~45 min', type: 'conditioning' },
+    { id: 'w2_fri', date: '2026-10-23', dow: 'Fri', short: '10/23', title: 'Full Body 3', subtitle: 'Deadlift Focused · optional / usually skipped', type: 'strength' },
+    { id: 'w2_sat', date: '2026-10-24', dow: 'Sat', short: '10/24', title: 'Tempo Conditioning', subtitle: 'Run or Row · ~45 min', type: 'conditioning' },
+    { id: 'w2_sun', date: '2026-10-25', dow: 'Sun', short: '10/25', title: 'Rest', subtitle: 'Recovery day', type: 'rest' },
   ];
   WEEK.forEach(d => { d.week = 1; });
   WEEK2.forEach(d => { d.week = 2; });
   const WEEKS = {
     1: { label: 'Week 1', range: 'Oct 11–17, 2026', days: WEEK },
-    2: { label: 'Week 2', range: 'Oct 18–24, 2026', days: WEEK2 },
+    2: { label: 'Week 2', range: 'Oct 19–25, 2026', days: WEEK2 },
   };
   const ALL_DAYS = WEEK.concat(WEEK2);
 
@@ -377,6 +383,294 @@
         },
       ],
     },
+    w2_tue: {
+      name: 'Easy Conditioning',
+      modality: true,
+      duration: '~45 min',
+      hrCard: 'easy2',
+      blocksRun: [
+        {
+          id: 'pogo', title: 'Pogo Jump Series', meta: '1 set of 1–2 reps · take yourself through 1–2 full rounds',
+          sets: [{ id: 'pogo1', label: 'Pogo jumps', fields: ['notes'] }],
+        },
+        {
+          id: 'easy_run', title: 'Easy Run Warm-up', meta: '10 min easy · RPE 3–4 (low Z2) · HR <137',
+          cues: 'Option 1 (Run) or Option 2 (Row), not both.',
+          sets: [{ id: 'er10', label: '10 min easy · RPE 3–4', fields: ['distance', 'avgHr', 'rpe', 'notes'] }],
+        },
+        {
+          id: 'base', title: 'Base Intervals', meta: 'Repeat 3x · 8 min @ base pace · 2 min rest easy jog · RPE 4–5 (high Z2 / low Z3)',
+          sets: [
+            { id: 'b1', label: 'Base 1 · 8 min · RPE 4–5', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+            { id: 'b2', label: 'Base 2 · 8 min · RPE 4–5', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+            { id: 'b3', label: 'Base 3 · 8 min · RPE 4–5', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          ],
+        },
+        {
+          id: 'cd', title: 'Cool Down', meta: '5 min easy',
+          sets: [{ id: 'cd5', label: '5 min cool down', fields: ['distance', 'avgHr', 'notes'] }],
+        },
+      ],
+      blocksRow: [
+        {
+          id: 'pogo_r', title: 'Pogo Jump Series', meta: '1 set of 1–2 reps · 1–2 full rounds',
+          sets: [{ id: 'pogo_r1', label: 'Pogo jumps', fields: ['notes'] }],
+        },
+        {
+          id: 'easy_row', title: 'Easy Row Warm-up', meta: '10 min easy row · RPE 3–4',
+          cues: 'Option 1 (Run) or Option 2 (Row), not both.',
+          sets: [{ id: 'row10', label: '10 min easy row', fields: ['distance', 'avgHr', 'rpe', 'notes'] }],
+        },
+        {
+          id: 'base_r', title: 'Base Intervals (Row)', meta: 'Repeat 3x · 8 min row erg @ 20–22 s/m · 2 min rest · RPE 4–5',
+          sets: [
+            { id: 'rb1', label: 'Base 1 · 8 min · 20–22 s/m', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+            { id: 'rb2', label: 'Base 2 · 8 min · 20–22 s/m', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+            { id: 'rb3', label: 'Base 3 · 8 min · 20–22 s/m', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          ],
+        },
+        {
+          id: 'cd_r', title: 'Cool Down', meta: '5 min easy row',
+          sets: [{ id: 'rcd5', label: '5 min cool down', fields: ['distance', 'avgHr', 'notes'] }],
+        },
+      ],
+    },
+    w2_wed: {
+      name: 'Full Body 2 (Press Focused)',
+      weightUnit: 'kg',
+      blocks: [
+        {
+          id: 'sm', title: 'Shoulder Warm-up Circuit', meta: 'Week 2 sets/reps pending confirmation',
+          sets: [{ id: 'sm1', label: 'Warm-up circuit', fields: ['notes'] }],
+        },
+        {
+          id: 'sp', title: 'Strict Press', meta: 'Main lift · Week 2 sets/reps pending confirmation',
+          sets: [
+            { id: 'sp1', label: 'Set 1', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'sp2', label: 'Set 2', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'sp3', label: 'Set 3', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'sp4', label: 'Set 4', fields: ['weight', 'reps', 'rpe'] },
+          ],
+        },
+        {
+          id: 'qg', title: 'Quad + Glute Accessory', meta: 'DB lunge-type · Week 2 sets/reps pending confirmation',
+          sets: [
+            { id: 'sl1', label: 'Set 1', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'sl2', label: 'Set 2', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'sl3', label: 'Set 3', fields: ['weight', 'reps', 'rpe'] },
+          ],
+        },
+        {
+          id: 'pu', title: 'Pull-up / Chin-ups', meta: 'Week 2 sets/reps pending confirmation',
+          sets: [
+            { id: 'pull1', label: 'Set 1', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'pull2', label: 'Set 2', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'pull3', label: 'Set 3', fields: ['weight', 'reps', 'rpe'] },
+          ],
+        },
+        {
+          id: 'dc', title: 'Delt + Core Accessory', meta: 'Week 2 sets/reps pending confirmation',
+          sets: [
+            { id: 'dc1', label: 'Set 1', fields: ['weight', 'reps', 'notes'] },
+            { id: 'dc2', label: 'Set 2', fields: ['weight', 'reps', 'notes'] },
+            { id: 'dc3', label: 'Set 3', fields: ['weight', 'reps', 'notes'] },
+          ],
+        },
+        {
+          id: 'arms', title: 'Biceps + Triceps', meta: 'Arms · Week 2 sets/reps pending confirmation',
+          sets: [
+            { id: 'bi', label: 'Biceps', fields: ['weight', 'reps', 'notes'] },
+            { id: 'tr', label: 'Triceps', fields: ['weight', 'reps', 'notes'] },
+          ],
+        },
+      ],
+    },
+    w2_thu: {
+      name: 'Interval Conditioning · Race Pace',
+      modality: true,
+      duration: '~45 min',
+      hrCard: 'hard2',
+      blocksRun: [
+        {
+          id: 'pogo', title: 'Pogo Jump Series', meta: '1 set of 1–2 reps · 1–2 full rounds',
+          sets: [{ id: 'pogo1', label: 'Pogo jumps', fields: ['notes'] }],
+        },
+        {
+          id: 'wu_run', title: 'Easy Run + Strides', meta: '15 min easy · Z2 HR <137 · 3×20s strides',
+          cues: 'Stride = faster run, not an all-out sprint. Option 1 (Run) or Option 2 (Row), not both.',
+          sets: [
+            { id: 'wu15', label: '15 min easy · Z2 HR <137', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+            { id: 'str1', label: 'Stride 1 · 20s', fields: ['notes'] },
+            { id: 'str2', label: 'Stride 2 · 20s', fields: ['notes'] },
+            { id: 'str3', label: 'Stride 3 · 20s', fields: ['notes'] },
+          ],
+        },
+        {
+          id: 'rpi', title: 'Race Pace Intervals', meta: 'HARD · repeat 8x · 2 min @ race pace · 2 min rest easy jog',
+          cues: 'Race pace = what you held for 10 min, now held for 2 min. Oct 15 TT: 2.08 km · 4:49/km · 1.29 mi · 7:45/mi → ~0.41 km / 0.26 mi per 2 min rep.',
+          sets: [
+            { id: 'i1', label: 'Rep 1 · 2 min @ race pace (~4:49/km · 7:45/mi)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+            { id: 'i2', label: 'Rep 2 · 2 min @ race pace (~4:49/km · 7:45/mi)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+            { id: 'i3', label: 'Rep 3 · 2 min @ race pace (~4:49/km · 7:45/mi)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+            { id: 'i4', label: 'Rep 4 · 2 min @ race pace (~4:49/km · 7:45/mi)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+            { id: 'i5', label: 'Rep 5 · 2 min @ race pace (~4:49/km · 7:45/mi)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+            { id: 'i6', label: 'Rep 6 · 2 min @ race pace (~4:49/km · 7:45/mi)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+            { id: 'i7', label: 'Rep 7 · 2 min @ race pace (~4:49/km · 7:45/mi)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+            { id: 'i8', label: 'Rep 8 · 2 min @ race pace (~4:49/km · 7:45/mi)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          ],
+        },
+        {
+          id: 'cd', title: 'Cool Down', meta: '15 min easy · Z2 HR <137',
+          sets: [{ id: 'cd15', label: '15 min easy jog', fields: ['distance', 'avgHr', 'notes'] }],
+        },
+      ],
+      blocksRow: [
+        {
+          id: 'pogo_r', title: 'Pogo Jump Series', meta: '1 set of 1–2 reps · 1–2 full rounds',
+          sets: [{ id: 'pogo_r1', label: 'Pogo jumps', fields: ['notes'] }],
+        },
+        {
+          id: 'wu_r', title: 'Easy Row Warm-up', meta: '10 min easy row · 18–22 s/m',
+          cues: 'Can be row, ski or bike. Option 1 (Run) or Option 2 (Row), not both.',
+          sets: [{ id: 'rwu10', label: '10 min easy · 18–22 s/m', fields: ['distance', 'avgHr', 'notes'] }],
+        },
+        {
+          id: 'r500', title: '500m Intervals', meta: 'HARD · repeat 8x · 500m @ 2k pace +3s · 2 min rest',
+          sets: [
+            { id: 'r500_1', label: '500m #1 · 2k pace +3s', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+            { id: 'r500_2', label: '500m #2 · 2k pace +3s', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+            { id: 'r500_3', label: '500m #3 · 2k pace +3s', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+            { id: 'r500_4', label: '500m #4 · 2k pace +3s', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+            { id: 'r500_5', label: '500m #5 · 2k pace +3s', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+            { id: 'r500_6', label: '500m #6 · 2k pace +3s', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+            { id: 'r500_7', label: '500m #7 · 2k pace +3s', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+            { id: 'r500_8', label: '500m #8 · 2k pace +3s', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+          ],
+        },
+        {
+          id: 'cd_r', title: 'Cool Down', meta: '5 min easy',
+          sets: [{ id: 'rcd5', label: '5 min easy', fields: ['distance', 'avgHr', 'notes'] }],
+        },
+      ],
+    },
+    w2_fri: {
+      name: 'Full Body 3 (Deadlift Focused) · optional / usually skipped',
+      weightUnit: 'kg',
+      blocks: [
+        {
+          id: 'wu', title: 'Warm-up Circuit', meta: 'Optional / usually skipped · Week 2 sets/reps pending confirmation',
+          sets: [{ id: 'wu1', label: 'Warm-up circuit', fields: ['notes'] }],
+        },
+        {
+          id: 'dl', title: 'Deadlift', meta: 'Main lift · Week 2 sets/reps pending confirmation',
+          sets: [
+            { id: 'dl1', label: 'Set 1', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'dl2', label: 'Set 2', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'dl3', label: 'Set 3', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'dl4', label: 'Set 4', fields: ['weight', 'reps', 'rpe'] },
+          ],
+        },
+        {
+          id: 'bp', title: 'Bench Press', meta: 'Week 2 sets/reps pending confirmation',
+          sets: [
+            { id: 'bp1', label: 'Set 1', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'bp2', label: 'Set 2', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'bp3', label: 'Set 3', fields: ['weight', 'reps', 'rpe'] },
+          ],
+        },
+        {
+          id: 'qg', title: 'Quad + Glute Accessory', meta: 'Week 2 sets/reps pending confirmation',
+          sets: [
+            { id: 'qg1', label: 'Set 1', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'qg2', label: 'Set 2', fields: ['weight', 'reps', 'rpe'] },
+            { id: 'qg3', label: 'Set 3', fields: ['weight', 'reps', 'rpe'] },
+          ],
+        },
+        {
+          id: 'ubd', title: 'Upper Back + Delt Accessory', meta: 'Week 2 sets/reps pending confirmation',
+          sets: [
+            { id: 'ubd1', label: 'Set 1', fields: ['weight', 'reps', 'notes'] },
+            { id: 'ubd2', label: 'Set 2', fields: ['weight', 'reps', 'notes'] },
+            { id: 'ubd3', label: 'Set 3', fields: ['weight', 'reps', 'notes'] },
+          ],
+        },
+        {
+          id: 'fin', title: 'Arms + Abs', meta: 'Week 2 sets/reps pending confirmation',
+          sets: [{ id: 'f1', label: 'Arms + abs', fields: ['notes', 'rpe'] }],
+        },
+      ],
+    },
+    w2_sat: {
+      name: 'Tempo Conditioning',
+      modality: true,
+      duration: '~45 min',
+      hrCard: 'tempo',
+      blocksRun: [
+        {
+          id: 'pogo', title: 'Pogo Jump Series', meta: '1 set of 1–2 reps · 1–2 full rounds',
+          sets: [{ id: 'pogo1', label: 'Pogo jumps', fields: ['notes'] }],
+        },
+        {
+          id: 'wu', title: 'Easy Run Warm-up', meta: '10 min easy · Z2 HR <137',
+          cues: 'Option 1 (Run) or Option 2 (Row), not both.',
+          sets: [{ id: 'wu10', label: '10 min easy · Z2 HR <137', fields: ['distance', 'avgHr', 'notes'] }],
+        },
+        {
+          id: 'tempo', title: 'Tempo Run', meta: 'MODERATE · repeat 4x · 1 km @ tempo (Z3 HR ~140–155, cap ~155–158) · 2 min rest easy jog',
+          cues: 'Aim for consistency across sets; choice of 3–4 sets.',
+          sets: [
+            { id: 't1', label: 'Tempo 1 · 1 km / 0.62 mi · HR 140–155', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+            { id: 'tr1', label: 'Easy jog 2 min', fields: ['notes'] },
+            { id: 't2', label: 'Tempo 2 · 1 km / 0.62 mi · HR 140–155', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+            { id: 'tr2', label: 'Easy jog 2 min', fields: ['notes'] },
+            { id: 't3', label: 'Tempo 3 · 1 km / 0.62 mi · HR 140–155', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+            { id: 'tr3', label: 'Easy jog 2 min', fields: ['notes'] },
+            { id: 't4', label: 'Tempo 4 · 1 km / 0.62 mi · HR 140–155 (optional)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          ],
+        },
+        {
+          id: 'cd', title: 'Cool Down', meta: '5 min easy · Z2 HR <137',
+          sets: [{ id: 'cd5', label: '5 min cool down', fields: ['distance', 'avgHr', 'notes'] }],
+        },
+      ],
+      blocksRow: [
+        {
+          id: 'pogo_r', title: 'Pogo Jump Series', meta: '1 set of 1–2 reps · 1–2 full rounds',
+          sets: [{ id: 'pogo_r1', label: 'Pogo jumps', fields: ['notes'] }],
+        },
+        {
+          id: 'wu_r', title: 'Easy Row Warm-up', meta: '10 min easy row · 18–20 s/m',
+          cues: 'Option 1 (Run) or Option 2 (Row), not both.',
+          sets: [{ id: 'rwu10', label: '10 min easy · 18–20 s/m', fields: ['distance', 'avgHr', 'notes'] }],
+        },
+        {
+          id: 'tempo_r', title: 'Tempo Row', meta: 'MODERATE · repeat 4x · 1.5 km row @ tempo 20–24 s/m · HR ~140–155 (cap ~155–158) · 2 min rest',
+          cues: 'Aim for consistency across sets; choice of 3–4 sets.',
+          sets: [
+            { id: 'rt1', label: 'Tempo 1 · 1.5 km · 20–24 s/m', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+            { id: 'rtr1', label: 'Rest 2 min', fields: ['notes'] },
+            { id: 'rt2', label: 'Tempo 2 · 1.5 km · 20–24 s/m', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+            { id: 'rtr2', label: 'Rest 2 min', fields: ['notes'] },
+            { id: 'rt3', label: 'Tempo 3 · 1.5 km · 20–24 s/m', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+            { id: 'rtr3', label: 'Rest 2 min', fields: ['notes'] },
+            { id: 'rt4', label: 'Tempo 4 · 1.5 km · 20–24 s/m (optional)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          ],
+        },
+        {
+          id: 'cd_r', title: 'Cool Down', meta: '5 min easy row · 18–20 s/m',
+          sets: [{ id: 'rcd5', label: '5 min easy · 18–20 s/m', fields: ['distance', 'avgHr', 'notes'] }],
+        },
+      ],
+    },
+    w2_sun: {
+      name: 'Rest Day',
+      blocks: [
+        {
+          id: 'rest', title: 'Rest / Recovery', meta: 'Walk, stretch, sleep — optional notes',
+          sets: [{ id: 'rest1', label: 'How you feel', fields: ['notes', 'rpe'] }],
+        },
+      ],
+    },
     sat: {
       name: 'Rest Day',
       blocks: [
@@ -671,7 +965,7 @@
       </div>`;
     }
 
-    if (log.modality !== 'row' || !sess.modality || selectedSessionId === 'fri') html += hrTargetsHtml(selectedSessionId);
+    if (log.modality !== 'row' || !sess.modality || selectedSessionId === 'fri' || sess.hrCard === 'tempo') html += hrTargetsHtml(selectedSessionId);
     if (sess.showTtTargets && log.modality !== 'row') {
       html += ttTargetsHtml();
     }
@@ -692,7 +986,7 @@
     if (sess.showTtTargets && log.modality !== 'row') {
       html += `<div class="card"><button type="button" class="btn lg" id="btn-open-tt-timer" style="width:100%">⏱ Start 10:00 TT Timer</button></div>`;
     }
-    if (selectedSessionId === 'fri') {
+    if (selectedSessionId === 'fri' || sess.hrCard === 'tempo') {
       html += `<div class="card"><button type="button" class="btn lg" id="btn-open-tempo-timer" style="width:100%">⏱ Start Tempo Timer</button></div>`;
     }
 
@@ -702,6 +996,28 @@
 
   function hrTargetsHtml(id) {
     const z2 = dualPaceRange('7:30', '8:15');
+    const card = (SESSIONS[id] || {}).hrCard;
+    if (card === 'tempo') id = 'fri';
+    if (card === 'easy2') {
+      return `<div class="target-card hr-card easy">
+        <h4>HR target · EASY / BASE (Z2)</h4>
+        <ul>
+          <li><strong>Easy (warm-up, cooldown): RPE 3–4, low Z2, HR under ~137 bpm</strong> (~<span class="pace">${z2}</span>)</li>
+          <li><strong>Base intervals: RPE 4–5</strong>, high Z2 — may touch low Z3 (~140)</li>
+          <li>If HR drifts well above that: slow down. Don't chase pace.</li>
+        </ul>
+      </div>`;
+    }
+    if (card === 'hard2') {
+      return `<div class="target-card hr-card hard">
+        <h4>HR target · RACE PACE INTERVALS (HARD)</h4>
+        <ul>
+          <li><strong>Warm-up + cooldown: Z2, HR under ~137</strong> (~<span class="pace">${z2}</span>)</li>
+          <li><strong>8 × 2 min @ race pace: HARD</strong> — ~<span class="pace">${dualPace('4:49')}</span> (Oct 15 TT pace) · ~${dualKmLabel(0.415)} per rep</li>
+          <li>2 min easy jog between efforts. Strides = faster run, not all-out sprint.</li>
+        </ul>
+      </div>`;
+    }
     if (id === 'mon') {
       return `<div class="target-card hr-card easy">
         <h4>HR target · EASY / BASE (Z2)</h4>
@@ -1076,7 +1392,7 @@
     </div>
     <div class="card">
       <h2>About</h2>
-      <p class="muted" style="margin:0">Hybrid Phase 6 Weeks 1–2 (Oct 11–24, 2026) · Coach Patrick James · Offline-capable PWA · v1.3</p>
+      <p class="muted" style="margin:0">Hybrid Phase 6 Weeks 1–2 (Oct 11–25, 2026) · Coach Patrick James · Offline-capable PWA · v1.4</p>
     </div>`;
 
     document.getElementById('btn-export').addEventListener('click', exportJson);
