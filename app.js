@@ -1,4 +1,4 @@
-/* Hybrid Tracker v1.5 — Phase 6 Weeks 1–2 — Terry Baggett
+/* Hybrid Tracker v1.6 — Phase 6 Weeks 1–2 — Terry Baggett
    localStorage persistence; distances stored as km; display km+mi+paces */
 (function () {
   'use strict';
@@ -29,8 +29,9 @@
     { id: 'w2_mon', date: '2026-10-19', dow: 'Mon', short: '10/19', title: 'Full Body 1', subtitle: 'Squat Focused · ~45 min', type: 'strength' },
     { id: 'w2_tue', date: '2026-10-20', dow: 'Tue', short: '10/20', title: 'Easy Conditioning', subtitle: 'Run or Row', type: 'conditioning' },
     { id: 'w2_wed', date: '2026-10-21', dow: 'Wed', short: '10/21', title: 'Full Body 2', subtitle: 'Press Focused', type: 'strength' },
-    { id: 'w2_thu', date: '2026-10-22', dow: 'Thu', short: '10/22', title: 'Interval Conditioning', subtitle: 'Race pace 8×2 min / 8×500m row', type: 'conditioning' },
-    { id: 'w2_fri', date: '2026-10-23', dow: 'Fri', short: '10/23', title: 'Full Body 3', subtitle: 'Deadlift Focused · optional / usually skipped', type: 'strength' },
+    // 10/22 schedule change (tentative): Thu = rest (NYC conference) / FB3 optional; Interval moved to Fri. Ids unchanged so logs stay keyed.
+    { id: 'w2_fri', date: '2026-10-22', dow: 'Thu', short: '10/22', title: 'Rest / Full Body 3', subtitle: 'Likely rest (conference) · FB3 Deadlift optional / usually skipped', type: 'strength' },
+    { id: 'w2_thu', date: '2026-10-23', dow: 'Fri', short: '10/23', title: 'Interval Conditioning', subtitle: 'Race pace 8×2 min / 8×500m row · moved from Thu (tentative)', type: 'conditioning' },
     { id: 'w2_sat', date: '2026-10-24', dow: 'Sat', short: '10/24', title: 'Tempo Conditioning', subtitle: 'Run or Row', type: 'conditioning' },
     { id: 'w2_sun', date: '2026-10-25', dow: 'Sun', short: '10/25', title: 'Rest', subtitle: 'Recovery day', type: 'rest' },
   ];
@@ -1431,7 +1432,7 @@
     </div>
     <div class="card">
       <h2>About</h2>
-      <p class="muted" style="margin:0">Hybrid Phase 6 Weeks 1–2 (Oct 11–25, 2026) · Coach Patrick James · Offline-capable PWA · v1.5</p>
+      <p class="muted" style="margin:0">Hybrid Phase 6 Weeks 1–2 (Oct 11–25, 2026) · Coach Patrick James · Offline-capable PWA · v1.6</p>
     </div>`;
 
     document.getElementById('btn-export').addEventListener('click', exportJson);
