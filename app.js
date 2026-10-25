@@ -1,7 +1,12 @@
-/* Hybrid Tracker v1.6 — Phase 6 Weeks 1–2 — Terry Baggett
-   localStorage persistence; distances stored as km; display km+mi+paces */
+/* Hybrid Tracker v2.0 — Phase 6 Weeks 1–2 — Terry Baggett
+   Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
+   queued in an outbox and synced to Supabase when configured (sync.js).
+   Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
+  const APP_VERSION = '2.0.0';
+
+  function start(BOOT) {
 
   const STORAGE_KEY = 'hybrid-tracker-v1';
   const TODAY_ISO = '2026-10-15'; // box/user date context
@@ -722,6 +727,29 @@
     },
   };
 
+  // —— v2: normalize set fields ——
+  // RIR blocks log RIR (not RPE); every run/row segment gets a time field; fixed-distance
+  // row pieces (500m, 2000m) get a distance field so pace shows in /km and /mi.
+  Object.keys(SESSIONS).forEach(sid => {
+    const s = SESSIONS[sid];
+    const lists = s.modality ? [s.blocksRun || [], s.blocksRow || []] : [s.blocks || []];
+    lists.forEach(list => list.forEach(block => {
+      const rir = /\bRIR\b/.test(block.meta || '');
+      (block.sets || []).forEach(set => {
+        let f = set.fields.slice();
+        if (!s.modality && rir && f.includes('rpe')) { f = f.map(x => (x === 'rpe' ? 'rir' : x)); set.legacyRpe = true; }
+        if (s.modality) {
+          if (!f.includes('time') && (f.includes('distance') || f.includes('avgHr'))) {
+            const i = f.indexOf('distance');
+            f.splice(i >= 0 ? i + 1 : 0, 0, 'time');
+          }
+          if (!f.includes('distance') && f.includes('time') && (labelDistanceKm(set.label) != null || labelDistanceKm(block.meta) != null)) f.unshift('distance');
+        }
+        set.fields = f;
+      });
+    }));
+  });
+
   const KPI_DEFS = [
     { key: '3rm_back_squat', label: '3RM Back Squat', unit: 'lb', session: 'sun' },
     { key: '3rm_strict_press', label: '3RM Strict Press', unit: 'lb', session: 'tue' },
@@ -751,32 +779,271 @@
   function defaultState() {
     return {
       version: 2,
-      logs: {}, // sessionId -> { modality, blocks: {blockId:{done,sets:{setId:{done,fields}}}}, notes, savedAt }
+      logs: {}, // sessionId -> { modality, blocks: {blockId:{done,sets:{setId:{done,fields,updatedAt}}}}, notes, savedAt, updatedAt }
       todayOverrideSession: null,
       kpis: {},
+      weighins: [], // [{id, measuredAt, weightLb, notes, deleted, updatedAt}]
+      updatedAt: 0,
     };
   }
 
   function loadState() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return defaultState();
-      const parsed = JSON.parse(raw);
-      const merged = Object.assign(defaultState(), parsed);
-      delete merged.unit; // v2: canonical km only; dual display always
-      merged.version = 2;
-      return merged;
-    } catch (_) {
-      return defaultState();
+    let parsed = BOOT && BOOT.state ? BOOT.state : null;
+    if (!parsed) {
+      try { const raw = localStorage.getItem(STORAGE_KEY); parsed = raw ? JSON.parse(raw) : null; } catch (_) { parsed = null; }
     }
+    if (!parsed || typeof parsed !== 'object') return defaultState();
+    const merged = Object.assign(defaultState(), parsed);
+    delete merged.unit; // v2: canonical km only; dual display always
+    merged.version = 2;
+    if (!merged.logs || typeof merged.logs !== 'object') merged.logs = {};
+    if (!Array.isArray(merged.weighins)) merged.weighins = [];
+    return merged;
   }
 
+  /** Give every legacy (v1.x) log/set a timestamp so cloud merges are deterministic. */
+  function stampMissingTimestamps() {
+    const fallback = Date.parse(state.migratedAt || '') || Date.now();
+    let stamped = 0;
+    Object.keys(state.logs || {}).forEach(sid => {
+      const log = state.logs[sid];
+      if (!log || typeof log !== 'object') return;
+      const base = Date.parse(log.savedAt || '') || fallback;
+      if (!log.updatedAt) { log.updatedAt = base; stamped++; }
+      Object.keys(log.blocks || {}).forEach(bid => {
+        const sets = (log.blocks[bid] && log.blocks[bid].sets) || {};
+        Object.keys(sets).forEach(k => { if (sets[k] && !sets[k].updatedAt) { sets[k].updatedAt = base; stamped++; } });
+      });
+    });
+    (state.weighins || []).forEach(w => { if (!w.updatedAt) { w.updatedAt = Date.parse(w.measuredAt) || fallback; stamped++; } });
+    return stamped;
+  }
+
+  // —— Change tracking → outbox rows ——
+  const rowSigs = new Map();   // row key -> JSON signature of last saved/synced content
+  const remoteTs = new Map();  // row key -> cloud client_updated_at (ms), learned on pull
+  let syncStatus = { state: 'local-only', pending: 0 };
+
   function saveState() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch (e) {
-      toast('Could not save — storage full?');
+    const now = Date.now();
+    state.updatedAt = now;
+    const changed = [];
+    collectRows().forEach(r => {
+      if (rowSigs.get(r.key) !== r.sig) {
+        rowSigs.set(r.key, r.sig);
+        if (r.obj) r.obj.updatedAt = now;
+        changed.push(r);
+      }
+    });
+    const syncing = !!(window.HTSync && window.HTSync.configured);
+    const items = syncing ? changed.map(outboxItem) : [];
+    let p;
+    if (window.HTStore) p = window.HTStore.commit(state, items);
+    else {
+      p = new Promise((resolve, reject) => {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); resolve(); } catch (e) { reject(e); }
+      });
     }
+    p.catch(() => toast('Could not save — storage full?'));
+    if (items.length) window.HTSync.kick();
+    paintSyncMarks();
+    return p;
+  }
+
+  function outboxItem(r) {
+    const ts = (r.obj && r.obj.updatedAt) || Date.now();
+    return { key: r.key, table: r.table, row: Object.assign({}, r.row, { client_updated_at: new Date(ts).toISOString() }) };
+  }
+
+  function num(v, lo, hi, digits) {
+    const n = parseNum(v);
+    if (n == null) return null;
+    if (lo != null && n < lo) return null;
+    if (hi != null && n > hi) return null;
+    const f = Math.pow(10, digits == null ? 2 : digits);
+    return Math.round(n * f) / f;
+  }
+
+  function findBlockSet(sid, bid, setId) {
+    const s = SESSIONS[sid];
+    if (!s) return {};
+    let lists = s.modality ? [['run', s.blocksRun || []], ['row', s.blocksRow || []]] : [[null, s.blocks || []]];
+    const log = state.logs[sid];
+    if (s.modality && log && log.modality === 'row') lists = lists.slice().reverse();
+    for (const [mod, list] of lists) {
+      const b = list.find(x => x.id === bid);
+      if (b) return { block: b, set: (b.sets || []).find(x => x.id === setId), modality: mod };
+    }
+    return {};
+  }
+
+  function setRow(sid, bid, setId, sLog) {
+    const { block, set } = findBlockSet(sid, bid, setId);
+    const f = sLog.fields || {};
+    const unit = weightUnitFor(sid);
+    const w = num(f.weight, 0, 9999);
+    const tgt = sLog.target || {};
+    return {
+      table: 'set_logs',
+      row: {
+        session_key: sid, block_id: bid, set_id: setId,
+        block_title: block ? block.title : null, set_label: set ? set.label : null,
+        done: !!sLog.done,
+        weight: w, weight_unit: w != null ? unit : null,
+        weight_lb: w != null ? (unit === 'kg' ? Math.round(w * 2.20462 * 100) / 100 : w) : null,
+        reps: num(f.reps, 0, 9999, 1), rpe: num(f.rpe, 0, 10, 1), rir: num(f.rir, 0, 10, 1),
+        target_reps: (set && targetReps(set)) || (tgt.reps ? String(tgt.reps) : null),
+        target_load: tgt.weight ? String(tgt.weight) + ' ' + unit : null,
+        notes: f.notes || null,
+        fields: f,
+      },
+    };
+  }
+
+  function segmentRow(sid, bid, setId, sLog) {
+    const { block, set, modality } = findBlockSet(sid, bid, setId);
+    const f = sLog.fields || {};
+    const km = num(f.distance, 0, 9999, 3);
+    const sec = parseTimeToSec(f.time);
+    const dur = sec != null && sec >= 0 && sec < 864000 ? Math.round(sec) : null;
+    const pace = km && dur ? Math.round((dur / km) * 100) / 100 : null;
+    const hr = num(f.avgHr, 30, 250, 0);
+    return {
+      table: 'segment_logs',
+      row: {
+        session_key: sid, block_id: bid, segment_id: setId,
+        modality: modality || ((state.logs[sid] || {}).modality === 'row' ? 'row' : 'run'),
+        block_title: block ? block.title : null, segment_label: set ? set.label : null,
+        done: !!sLog.done,
+        distance_km: km, time_text: f.time || null, duration_sec: dur,
+        pace_sec_per_km: pace != null && pace < 999999 ? pace : null,
+        avg_hr: hr, hr_target: set ? (hrTarget(set, block) || null) : null,
+        rpe: num(f.rpe, 0, 10, 1), notes: f.notes || null,
+        fields: f,
+      },
+    };
+  }
+
+  function mkRow(table, key, row, obj) { return { table, key, row, obj, sig: JSON.stringify(row) }; }
+
+  function collectRows() {
+    const out = [];
+    Object.keys(state.logs || {}).forEach(sid => {
+      const sess = SESSIONS[sid];
+      const day = dayFor(sid);
+      const log = state.logs[sid];
+      if (!log || typeof log !== 'object') return;
+      const blocks = log.blocks || {};
+      const blocksDone = {};
+      Object.keys(blocks).forEach(b => { if (blocks[b] && blocks[b].done) blocksDone[b] = true; });
+      // set/segment rows carry their own data; a session row only when it holds something of its own
+      const hasContent = log.notes || log.savedAt || Object.keys(blocksDone).length || log.modality === 'row';
+      if (hasContent) {
+        out.push(mkRow('sessions', 'sessions|' + sid, {
+          session_key: sid,
+          week: day ? day.week : null,
+          session_date: day ? day.date : null,
+          title: sess ? sess.name : (day ? day.title : null),
+          modality: sess && sess.modality ? (log.modality === 'row' ? 'row' : 'run') : null,
+          notes: log.notes || null,
+          saved_at: log.savedAt || null,
+          blocks_done: blocksDone,
+        }, log));
+      }
+      Object.keys(blocks).forEach(bid => {
+        const sets = (blocks[bid] && blocks[bid].sets) || {};
+        Object.keys(sets).forEach(setId => {
+          const sLog = sets[setId];
+          if (!sLog || typeof sLog !== 'object') return;
+          const r = sess && sess.modality ? segmentRow(sid, bid, setId, sLog) : setRow(sid, bid, setId, sLog);
+          out.push(mkRow(r.table, r.table + '|' + sid + '|' + bid + '|' + setId, r.row, sLog));
+        });
+      });
+    });
+    (state.weighins || []).forEach(w => {
+      if (!w || !w.id) return;
+      out.push(mkRow('weigh_ins', 'weigh_ins|' + w.id, {
+        id: w.id, measured_at: w.measuredAt, weight_lb: num(w.weightLb, 50.01, 699.99), notes: w.notes || null, deleted: !!w.deleted,
+      }, w));
+    });
+    return out.filter(r => !(r.table === 'weigh_ins' && r.row.weight_lb == null));
+  }
+
+  /** After sign-in: queue every local row the cloud doesn't already have a newer copy of. */
+  function backfill() {
+    const items = [];
+    collectRows().forEach(r => {
+      rowSigs.set(r.key, r.sig);
+      const localT = (r.obj && r.obj.updatedAt) || 0;
+      const remoteT = remoteTs.get(r.key);
+      if (remoteT == null || localT > remoteT) items.push(outboxItem(r));
+    });
+    if (!items.length) return Promise.resolve();
+    return window.HTStore.commit(state, items);
+  }
+
+  /** Merge rows pulled from Supabase (last write wins on client_updated_at). */
+  function mergeRemote(table, rows) {
+    const merged = [];
+    rows.forEach(row => {
+      const t = Date.parse(row.client_updated_at) || 0;
+      if (table === 'sessions') {
+        const key = 'sessions|' + row.session_key;
+        remoteTs.set(key, t);
+        const cur = state.logs[row.session_key];
+        if (cur && (cur.updatedAt || 0) >= t) return;
+        const L = ensureLog(row.session_key);
+        L.notes = row.notes || '';
+        L.savedAt = row.saved_at || null;
+        if (row.modality) L.modality = row.modality;
+        L.blocks = L.blocks || {};
+        const bd = row.blocks_done || {};
+        Object.keys(L.blocks).forEach(b => { L.blocks[b].done = !!bd[b]; });
+        Object.keys(bd).forEach(b => { if (!L.blocks[b]) L.blocks[b] = { done: true, sets: {} }; });
+        L.updatedAt = t;
+        merged.push(key);
+      } else if (table === 'set_logs' || table === 'segment_logs') {
+        const setId = row.set_id || row.segment_id;
+        const key = table + '|' + row.session_key + '|' + row.block_id + '|' + setId;
+        remoteTs.set(key, t);
+        const cur = ((((state.logs[row.session_key] || {}).blocks || {})[row.block_id] || {}).sets || {})[setId];
+        if (cur && (cur.updatedAt || 0) >= t) return;
+        const L = ensureLog(row.session_key);
+        if (!L.updatedAt) L.updatedAt = t;
+        L.blocks = L.blocks || {};
+        if (!L.blocks[row.block_id]) L.blocks[row.block_id] = { done: false, sets: {} };
+        if (!L.blocks[row.block_id].sets) L.blocks[row.block_id].sets = {};
+        L.blocks[row.block_id].sets[setId] = { done: !!row.done, fields: row.fields || {}, updatedAt: t };
+        merged.push(key);
+      } else if (table === 'weigh_ins') {
+        const key = 'weigh_ins|' + row.id;
+        remoteTs.set(key, t);
+        const list = state.weighins || (state.weighins = []);
+        const cur = list.find(w => w.id === row.id);
+        if (cur && (cur.updatedAt || 0) >= t) return;
+        const w = { id: row.id, measuredAt: row.measured_at, weightLb: Number(row.weight_lb), notes: row.notes || '', deleted: !!row.deleted, updatedAt: t };
+        if (cur) Object.assign(cur, w); else list.push(w);
+        merged.push(key);
+      }
+    });
+    if (!merged.length) return;
+    const set = new Set(merged);
+    collectRows().forEach(r => { if (set.has(r.key)) rowSigs.set(r.key, r.sig); });
+    window.HTStore.outboxDrop(merged);
+    window.HTStore.commit(state, []);
+    softRender();
+  }
+
+  /** Re-render unless the user is typing (then retry shortly). */
+  let softTimer = null;
+  function softRender() {
+    clearTimeout(softTimer);
+    const active = document.activeElement;
+    if (active && /INPUT|TEXTAREA/.test(active.tagName) && root.contains(active)) {
+      softTimer = setTimeout(softRender, 1500);
+      return;
+    }
+    render();
   }
 
   function ensureLog(sessionId) {
@@ -966,6 +1233,7 @@
     else if (view === 'kpi') renderKpi();
     else if (view === 'history') renderHistory();
     else renderMore();
+    paintSyncMarks();
   }
 
   function renderToday() {
@@ -993,8 +1261,9 @@
         ${weekDays.map(d => `<button type="button" class="chip ${d.id === selectedSessionId ? 'active' : ''}" data-pick="${d.id}">${d.dow} · ${d.title.split(' ')[0]}${(d.id === 'wed' && REAL_TODAY === '2026-10-15') || (d.date === REAL_TODAY && REAL_TODAY !== '2026-10-15') ? ' ★' : ''}</button>`).join('')}
       </div>
       <div class="progress-bar"><span style="width:${prog.pct}%"></span></div>
-      <div class="muted" style="margin-top:6px">${prog.done}/${prog.total} sets · ${prog.pct}%</div>
+      <div class="muted" style="margin-top:6px" data-prog-text>${prog.done}/${prog.total} sets · ${prog.pct}%</div>
     </div>`;
+    html += weighinCardHtml();
 
     if (sess.modality) {
       html += `<div class="card row" style="gap:8px">
@@ -1120,26 +1389,34 @@
     const doneCls = bLog.done ? 'done' : '';
     let html = `<div class="block ${openCls} ${doneCls}" data-block="${block.id}">
       <div class="block-head" data-toggle-block="${block.id}">
-        <div class="check" data-block-done="${block.id}">${bLog.done ? '✓' : ''}</div>
+        <button type="button" class="check" data-block-done="${block.id}" aria-label="Mark block done">${bLog.done ? '✓' : ''}</button>
         <div style="flex:1">
           <div class="block-title">${escapeHtml(block.title)} ${block.kpi ? '<span class="badge kpi">KPI</span>' : ''}</div>
-          <div class="block-meta">${escapeHtml(block.meta || '')}</div>
+          <div class="block-meta">${escapeHtml(withUnits(block.meta || ''))}</div>
         </div>
-        <span class="muted">${isOpen ? '▾' : '▸'}</span>
+        <span class="muted chev">${isOpen ? '▾' : '▸'}</span>
       </div>
-      <div class="block-body">${block.cues ? `<p class="muted" style="margin:0 0 8px;font-size:12px">${escapeHtml(block.cues)}</p>` : ''}`;
+      <div class="block-body">${block.cues ? `<p class="muted" style="margin:0 0 8px;font-size:12px">${escapeHtml(withUnits(block.cues))}</p>` : ''}`;
 
     block.sets.forEach(set => {
       const sLog = (bLog.sets || {})[set.id] || { done: false, fields: {} };
-      html += `<div class="set-row">
-        <button type="button" class="set-check ${sLog.done ? 'on' : ''}" data-set-done="${block.id}|${set.id}" aria-label="Toggle set">${sLog.done ? '✓' : ''}</button>
-        <div>
-          <div class="set-label">${escapeHtml(set.label)}</div>
-          <div class="set-fields ${set.fields.length >= 3 ? 'three' : ''}">
-            ${set.fields.map(f => fieldHtml(sessionId, block.id, set.id, f, sLog.fields || {})).join('')}
+      const vals = sLog.fields || {};
+      let fields = set.fields.slice();
+      if (set.legacyRpe && vals.rpe != null && vals.rpe !== '' && !fields.includes('rpe')) fields.push('rpe'); // show RPE typed before v2
+      const hr = fields.includes('avgHr') || (SESSIONS[sessionId] || {}).modality ? hrChip(set, block) : '';
+      const isSeg = !!(SESSIONS[sessionId] || {}).modality;
+      const tKey = (isSeg ? 'segment_logs' : 'set_logs') + '|' + sessionId + '|' + block.id + '|' + set.id;
+      const numericCount = fields.filter(f => f !== 'notes').length;
+      html += `<div class="set-row ${sLog.done ? 'is-done' : ''}" data-set-row="${block.id}|${set.id}">
+        <button type="button" class="set-check ${sLog.done ? 'on' : ''}" data-set-done="${block.id}|${set.id}" aria-label="${sLog.done ? 'Undo set' : 'Log set'}">${sLog.done ? '✓' : ''}</button>
+        <div class="set-main">
+          <div class="set-label">${escapeHtml(withUnits(set.label))}${hr ? ` <span class="hr-chip">HR ${escapeHtml(hr)}</span>` : ''}</div>
+          <div class="set-fields n${numericCount}">
+            ${fields.map(f => fieldHtml(sessionId, block, set, f, vals)).join('')}
           </div>
-          ${dualPreviewHtml(set.fields, sLog.fields || {}, block.id, set.id)}
-          ${weightUnitFor(sessionId) === 'kg' && set.fields.includes('weight') ? `<div class="dual-preview muted" id="lb-${block.id}-${set.id}">${escapeHtml(kgToLbLabel((sLog.fields || {}).weight))}</div>` : ''}
+          ${dualPreviewHtml(fields, displayValues(sessionId, block, set, vals), block.id, set.id, sessionId)}
+          ${weightUnitFor(sessionId) === 'kg' && fields.includes('weight') ? `<div class="lb-line" id="lb-${block.id}-${set.id}">${escapeHtml(kgToLbLabel(displayValues(sessionId, block, set, vals).weight))}</div>` : ''}
+          <div class="sync-mark" data-sync-key="${escapeAttr(tKey)}"></div>
         </div>
       </div>`;
     });
@@ -1148,35 +1425,74 @@
     return html;
   }
 
-  function dualPreviewHtml(fields, values, blockId, setId) {
+  /** Logged values, falling back to prefilled targets for display/preview. */
+  function displayValues(sessionId, block, set, vals) {
+    const out = Object.assign({}, vals);
+    set.fields.forEach(f => {
+      if (out[f] == null || String(out[f]) === '') {
+        const pre = prefillFor(sessionId, block, set, f);
+        if (pre) out[f] = pre;
+      }
+    });
+    return out;
+  }
+
+  function dualPreviewHtml(fields, values, blockId, setId, sessionId) {
     if (!fields.includes('distance')) return '';
     const dual = formatDualDistance(values.distance, values.time);
     const id = `dual-${blockId}-${setId}`;
+    const split = rowSplit(sessionId, values.distance, values.time);
     if (!dual) {
       return `<div class="dual-preview muted" id="${id}" data-dual-for="${blockId}|${setId}">Enter km (+ time) → km · /km · mi · /mi</div>`;
     }
-    return `<div class="dual-preview" id="${id}" data-dual-for="${blockId}|${setId}"><span class="pace">${escapeHtml(dual)}</span></div>`;
+    return `<div class="dual-preview" id="${id}" data-dual-for="${blockId}|${setId}"><span class="pace">${escapeHtml(dual + split)}</span></div>`;
   }
 
-  function fieldHtml(sessionId, blockId, setId, field, values) {
+  /** Rowing: also show the /500m split. */
+  function rowSplit(sessionId, km, time) {
+    const log = state.logs[sessionId];
+    if (!log || log.modality !== 'row' || !(SESSIONS[sessionId] || {}).modality) return '';
+    const k = parseNum(km), sec = parseTimeToSec(time);
+    if (!k || !sec) return '';
+    const sp = formatPace(sec / (k * 2));
+    return sp ? ' · ' + sp + '/500m' : '';
+  }
+
+  const FIELD_LABELS = {
+    reps: 'Reps', rpe: 'RPE', rir: 'RIR', distance: 'Dist (km)', time: 'Time', avgHr: 'Avg HR', notes: 'Notes',
+  };
+
+  function fieldHtml(sessionId, block, set, field, values) {
+    const blockId = block.id, setId = set.id;
     const key = `${sessionId}|${blockId}|${setId}|${field}`;
-    const val = values[field] != null ? values[field] : '';
-    const labels = {
-      weight: 'Weight (' + weightUnitFor(sessionId) + ')',
-      reps: 'Reps',
-      rpe: 'RPE',
-      distance: 'Dist (km)',
-      time: 'Time',
-      avgHr: 'Avg HR',
-      notes: 'Notes',
-    };
-    const inputmode = ['weight', 'reps', 'rpe', 'distance', 'avgHr'].includes(field) ? 'decimal' : 'text';
-    const ph = field === 'time' ? 'mm:ss' : field === 'distance' ? 'e.g. 2.08' : '';
+    const logged = values[field] != null && String(values[field]) !== '';
+    const pre = logged ? '' : prefillFor(sessionId, block, set, field);
+    const val = logged ? values[field] : pre;
+    const unit = weightUnitFor(sessionId);
+    const label = field === 'weight' ? 'Load (' + unit + ')' : (FIELD_LABELS[field] || field);
+    const inputmode = ['weight', 'reps', 'rpe', 'rir', 'distance', 'avgHr'].includes(field) ? (field === 'reps' || field === 'avgHr' ? 'numeric' : 'decimal') : 'text';
+    let ph = '';
+    if (field === 'time') ph = 'mm:ss';
+    else if (field === 'distance') ph = 'km';
+    else if (field === 'avgHr') ph = hrTarget(set, block) || 'bpm';
+    else if (field === 'rpe') { const m = (block.meta || '').match(/RPE\s*([\d\/–-]+)/); ph = m ? m[1] : '1–10'; }
+    else if (field === 'rir') { const m = (block.meta || '').match(/([\d–-]+)\s*RIR/); ph = m ? m[1] : '0–3'; }
     const dualAttr = (field === 'distance' || field === 'time') ? ` data-dual-input="${blockId}|${setId}"` : '';
+    const preAttr = pre ? ` data-prefill="${escapeAttr(pre)}"` : '';
+    const cls = pre ? ' class="prefill"' : '';
     if (field === 'notes') {
-      return `<label style="grid-column:1/-1">${labels[field]}<input type="text" data-field="${key}" value="${escapeAttr(val)}" placeholder="optional" /></label>`;
+      return `<label class="fld fld-notes">${label}<input type="text" data-field="${key}" value="${escapeAttr(val)}" placeholder="optional" autocomplete="off" /></label>`;
     }
-    return `<label>${labels[field] || field}<input type="text" inputmode="${inputmode}" data-field="${key}"${dualAttr} value="${escapeAttr(val)}" placeholder="${ph}" /></label>`;
+    const input = `<input type="text" inputmode="${inputmode}" data-field="${key}"${dualAttr}${preAttr}${cls} value="${escapeAttr(val)}" placeholder="${escapeAttr(ph)}" autocomplete="off" aria-label="${escapeAttr(label)}" />`;
+    if (field === 'weight' || field === 'reps') {
+      const step = field === 'reps' ? 1 : (unit === 'kg' ? 2.5 : 5);
+      return `<div class="fld fld-step"><span class="fld-label">${label}</span><div class="stepper">
+        <button type="button" class="step" data-step="${key}" data-delta="${-step}" aria-label="${label} minus ${step}">−</button>
+        ${input}
+        <button type="button" class="step" data-step="${key}" data-delta="${step}" aria-label="${label} plus ${step}">+</button>
+      </div></div>`;
+    }
+    return `<label class="fld">${label}${input}</label>`;
   }
 
   function updateDualPreview(blockId, setId) {
@@ -1190,8 +1506,256 @@
       el.textContent = 'Enter km (+ time) → km · /km · mi · /mi';
     } else {
       el.className = 'dual-preview';
-      el.innerHTML = '<span class="pace">' + escapeHtml(dual) + '</span>';
+      el.innerHTML = '<span class="pace">' + escapeHtml(dual + rowSplit(selectedSessionId, distInp && distInp.value, timeInp && timeInp.value)) + '</span>';
     }
+  }
+
+  // —— Targets / prefill ——
+  // Week 2 sessions → the Week 1 session they repeat (for "last week's load" prefill)
+  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri' };
+
+  function setStem(setId) { return String(setId).replace(/\d+$/, ''); }
+
+  function targetReps(set) {
+    const l = set.label || '';
+    let m = l.match(/(\d+)\s*reps?\b/i);
+    if (m) return m[1];
+    m = l.match(/·\s*(\d+)\s*[–-]\s*(\d+)(?!\s*(?:s\/m|min|km|m\b|s\b))/);
+    if (m) return m[1];
+    return '';
+  }
+
+  function labelDistanceKm(text) {
+    const t = String(text || '');
+    let m = t.match(/(\d+(?:\.\d+)?)\s*km\b/i);
+    if (m) return parseFloat(m[1]);
+    m = t.match(/(?:^|[^\/\d.:])(\d{3,5})\s?m\b(?![\/\w])/);
+    if (m) return parseInt(m[1], 10) / 1000;
+    return null;
+  }
+
+  function targetTimeText(set, block) {
+    let m = String(set.label || '').match(/(\d+)\s*min\b/);
+    if (m) return m[1] + ':00';
+    if (block.kpi) { m = String(block.title || '').match(/(\d+)-min/); if (m) return m[1] + ':00'; }
+    return '';
+  }
+
+  const HR_RE = /HR\s*~?\s*(<\s*~?\s*\d{2,3}|\d{2,3}\s*[–-]\s*\d{2,3})/;
+  function hrFrom(text) {
+    const m = String(text || '').match(HR_RE);
+    return m ? m[1].replace(/\s+/g, '').replace('-', '–').replace('~', '') : '';
+  }
+  /** HR target for a segment: from its own label, else the block's (not for jogs/strides/rest). */
+  function hrTarget(set, block) {
+    const own = hrFrom(set.label);
+    if (own) return own;
+    if (/jog|stride|rest|cool/i.test(set.label || '')) return '';
+    return hrFrom(block && block.meta);
+  }
+  /** Chip only when the label doesn't already say the HR target. */
+  function hrChip(set, block) { return hrFrom(set.label) ? '' : hrTarget(set, block); }
+
+  function loggedField(sid, bid, setId, f) {
+    const v = (((((state.logs[sid] || {}).blocks || {})[bid] || {}).sets || {})[setId] || {}).fields;
+    return v && v[f] != null && String(v[f]).trim() !== '' ? String(v[f]) : null;
+  }
+
+  function convertLoad(v, from, to) {
+    const n = parseNum(v);
+    if (n == null || from === to) return v;
+    const out = from === 'lb' ? n / 2.20462 : n * 2.20462;
+    return String(Math.round(out * 10) / 10);
+  }
+
+  /** Target value to prefill (reps/load for lifts; time/distance for segments). Never HR/RPE. */
+  function prefillFor(sid, block, set, field) {
+    if (block.kpi === '10min_tt' && field === 'distance') return '';
+    if (block.kpi === '2k_row' && field === 'time') return '';
+    const stem = setStem(set.id);
+    if (field === 'weight' || field === 'reps') {
+      if (field === 'reps') { const t = targetReps(set); if (t) return t; }
+      const idx = block.sets.indexOf(set);
+      for (let i = idx - 1; i >= 0; i--) {
+        const s2 = block.sets[i];
+        if (setStem(s2.id) !== stem) continue;
+        const v = loggedField(sid, block.id, s2.id, field);
+        if (v) return v;
+      }
+      if (field === 'weight' && !block.kpi) {
+        const prev = PREV_SESSION[sid];
+        const pb = prev && SESSIONS[prev] ? (SESSIONS[prev].blocks || []).find(b => b.id === block.id) : null;
+        if (pb && !pb.kpi) {
+          let v = loggedField(prev, pb.id, set.id, 'weight');
+          for (let i = pb.sets.length - 1; !v && i >= 0; i--) {
+            if (setStem(pb.sets[i].id) === stem) v = loggedField(prev, pb.id, pb.sets[i].id, 'weight');
+          }
+          if (v) return convertLoad(v, weightUnitFor(prev), weightUnitFor(sid));
+        }
+      }
+      return '';
+    }
+    if (field === 'time') return targetTimeText(set, block);
+    if (field === 'distance') { const km = labelDistanceKm(set.label); return km != null ? String(km) : ''; }
+    return '';
+  }
+
+  /** Append mi / min-per-mi to any km, m, or /km value in plan text that lacks them. */
+  function withUnits(text) {
+    if (!text) return text || '';
+    let s = String(text);
+    const toSec = p => { const [m, x] = p.split(':').map(Number); return m * 60 + x; };
+    s = s.replace(/(\d{1,2}:\d{2})(?:\s*[–-]\s*(\d{1,2}:\d{2}))?\s*\/km(?!\s*(?:·|\/|\(|,)\s*~?\d{1,2}:\d{2}(?:\s*[–-]\s*\d{1,2}:\d{2})?\s*\/mi)/g,
+      (m, a, b) => m + ' (' + formatPace(toSec(a) * KM_PER_MI) + (b ? '–' + formatPace(toSec(b) * KM_PER_MI) : '') + '/mi)');
+    s = s.replace(/(\d+(?:\.\d+)?)\s?km\b(?!\s*(?:\/|·|\(|,)\s*~?\d+(?:\.\d+)?\s*mi\b)/g,
+      (m, n) => m + ' (' + fmtDistFixed(parseFloat(n) / KM_PER_MI, 2) + ' mi)');
+    s = s.replace(/(^|[^\/\d.:])(\d{3,5})\s?m\b(?![\/\w])/g,
+      (m, pre, n) => { const km = parseInt(n, 10) / 1000; return pre + n + 'm (' + fmtDistFixed(km, 2) + ' km · ' + fmtDistFixed(km / KM_PER_MI, 2) + ' mi)'; });
+    return s;
+  }
+
+  function secToTime(sec) {
+    sec = Math.round(sec);
+    const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), x = sec % 60;
+    return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(x).padStart(2, '0');
+  }
+
+  function historyDualSummary(sid, log) {
+    const sess = SESSIONS[sid];
+    if (!sess || !log) return '';
+    const blocks = getBlocksForLog(sid, log);
+    const fieldsOf = (b, st) => ((((log.blocks || {})[b.id] || {}).sets || {})[st.id] || {}).fields || {};
+    if (sess.modality) {
+      let km = 0, sec = 0, timed = true, any = false;
+      blocks.forEach(b => b.sets.forEach(st => {
+        const f = fieldsOf(b, st);
+        const k = parseNum(f.distance);
+        if (k && k > 0) {
+          any = true; km += k;
+          const t = parseTimeToSec(f.time);
+          if (t) sec += t; else timed = false;
+        }
+      }));
+      if (!any) return '';
+      return 'Total ' + formatDualDistance(km, timed && sec ? secToTime(sec) : '');
+    }
+    let best = null;
+    blocks.forEach(b => b.sets.forEach(st => {
+      const f = fieldsOf(b, st);
+      const w = parseNum(f.weight);
+      if (w != null && (!best || w > best.w)) best = { w, reps: f.reps, title: b.title };
+    }));
+    if (!best) return '';
+    const unit = weightUnitFor(sid);
+    return 'Top: ' + best.title.replace(/^[A-Z]\.\s*/, '') + ' ' + best.w + ' ' + unit +
+      (unit === 'kg' ? ' (' + Math.round(best.w * 2.20462 * 10) / 10 + ' lb)' : '') + (best.reps ? ' × ' + best.reps : '');
+  }
+
+  // —— Weigh-in ——
+  function activeWeighins() {
+    return (state.weighins || []).filter(w => !w.deleted).sort((a, b) => String(b.measuredAt).localeCompare(String(a.measuredAt)));
+  }
+  function weighinCardHtml() {
+    const last = activeWeighins()[0];
+    const v = last ? String(last.weightLb) : '';
+    return `<div class="card weigh-card">
+      <div class="row space"><h3 style="margin:0">Weigh-in</h3><span class="muted" id="weigh-last">${last ? 'Last ' + escapeHtml(v) + ' lb · ' + escapeHtml(formatTime(last.measuredAt)) : 'No weigh-ins yet'}</span></div>
+      <div class="weigh-row">
+        <div class="stepper">
+          <button type="button" class="step" data-wstep="-0.2" aria-label="minus 0.2 lb">−</button>
+          <input type="text" inputmode="decimal" id="weigh-input" value="${escapeAttr(v)}" placeholder="lb" aria-label="Body weight (lb)" autocomplete="off" />
+          <button type="button" class="step" data-wstep="0.2" aria-label="plus 0.2 lb">+</button>
+        </div>
+        <span class="unit">lb</span>
+        <button type="button" class="btn primary" id="btn-weigh">Log</button>
+      </div>
+      <div class="muted weigh-kg" id="weigh-kg">${v ? '= ' + (Math.round(parseNum(v) / 2.20462 * 10) / 10) + ' kg' : ''}</div>
+    </div>`;
+  }
+  function newId() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = (Math.random() * 16) | 0; return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+    });
+  }
+  function bindWeighin() {
+    const inp = document.getElementById('weigh-input');
+    if (!inp) return;
+    const kg = document.getElementById('weigh-kg');
+    const paint = () => { const n = parseNum(inp.value); kg.textContent = n ? '= ' + (Math.round(n / 2.20462 * 10) / 10) + ' kg' : ''; };
+    inp.addEventListener('input', paint);
+    inp.addEventListener('focus', () => inp.select());
+    root.querySelectorAll('[data-wstep]').forEach(b => b.addEventListener('click', () => {
+      const n = parseNum(inp.value) || (activeWeighins()[0] || {}).weightLb || 0;
+      inp.value = String(Math.round((n + Number(b.getAttribute('data-wstep'))) * 10) / 10);
+      paint();
+    }));
+    document.getElementById('btn-weigh').addEventListener('click', () => {
+      const n = parseNum(inp.value);
+      if (n == null || n <= 50 || n >= 700) { toast('Enter weight in lb'); inp.focus(); return; }
+      state.weighins = state.weighins || [];
+      state.weighins.push({ id: newId(), measuredAt: new Date().toISOString(), weightLb: Math.round(n * 10) / 10, notes: '', deleted: false, updatedAt: Date.now() });
+      saveState();
+      toast('Weigh-in saved · ' + (Math.round(n * 10) / 10) + ' lb');
+      const last = document.getElementById('weigh-last');
+      if (last) last.textContent = 'Last ' + (Math.round(n * 10) / 10) + ' lb · ' + formatTime(new Date().toISOString());
+      inp.blur();
+    });
+  }
+
+  // —— Sync status UI ——
+  function syncKeyHasData(key) {
+    const parts = key.split('|');
+    const sLog = ((((state.logs[parts[1]] || {}).blocks || {})[parts[2]] || {}).sets || {})[parts[3]];
+    if (!sLog) return false;
+    return !!sLog.done || Object.keys(sLog.fields || {}).some(k => String(sLog.fields[k] || '') !== '');
+  }
+  function paintSyncMarks() {
+    const configured = !!(window.HTSync && window.HTSync.configured);
+    const pending = window.HTStore ? window.HTStore.pendingKeys : new Set();
+    const signedIn = !!(window.HTSync && window.HTSync.signedIn);
+    root.querySelectorAll('[data-sync-key]').forEach(el => {
+      const key = el.getAttribute('data-sync-key');
+      if (!syncKeyHasData(key)) { el.textContent = ''; el.className = 'sync-mark'; return; }
+      if (configured && signedIn && !pending.has(key)) { el.textContent = '✓ synced'; el.className = 'sync-mark synced'; }
+      else { el.textContent = '● saved on phone'; el.className = 'sync-mark local'; }
+    });
+    paintSyncPill();
+  }
+  function paintSyncPill() {
+    const pill = document.getElementById('sync-pill');
+    if (!pill) return;
+    const st = (window.HTSync && window.HTSync.status) || { state: 'local-only' };
+    const n = st.pending || 0;
+    const map = {
+      'local-only': ['On phone', 'local'],
+      'starting': ['Saved', 'local'],
+      'signed-out': [n ? n + ' on phone · sign in' : 'Sign in to sync', 'warn'],
+      'offline': [n ? 'Offline · ' + n + ' queued' : 'Offline · saved', 'warn'],
+      'syncing': [n ? 'Syncing ' + n + '…' : 'Syncing…', 'busy'],
+      'synced': ['✓ Synced', 'ok'],
+      'error': [n ? 'Retrying · ' + n + ' queued' : 'Sync error', 'err'],
+    };
+    const [txt, cls] = map[st.state] || ['Saved', 'local'];
+    pill.textContent = txt;
+    pill.className = 'sync-pill ' + cls;
+    pill.title = st.error ? 'Last error: ' + st.error : 'Every tap is saved on this phone first';
+  }
+
+  // re-apply prefills in a block after an earlier set changed
+  function refreshPrefills(blockId) {
+    const sid = selectedSessionId;
+    const { block } = findBlockSet(sid, blockId, '');
+    if (!block) return;
+    root.querySelectorAll(`[data-block="${blockId}"] input.prefill[data-field]`).forEach(inp => {
+      const [, , setId, field] = inp.getAttribute('data-field').split('|');
+      const set = block.sets.find(x => x.id === setId);
+      if (!set) return;
+      const pre = prefillFor(sid, block, set, field);
+      inp.value = pre;
+      inp.setAttribute('data-prefill', pre);
+      if (field === 'weight') { const el = document.getElementById(`lb-${blockId}-${setId}`); if (el && weightUnitFor(sid) === 'kg') el.textContent = kgToLbLabel(pre); }
+    });
   }
 
   function bindTodayEvents() {
@@ -1265,28 +1829,76 @@
         const [blockId, setId] = el.getAttribute('data-set-done').split('|');
         const log = ensureLog(selectedSessionId);
         if (!log.blocks[blockId]) log.blocks[blockId] = { done: false, sets: {} };
+        if (!log.blocks[blockId].sets) log.blocks[blockId].sets = {};
         if (!log.blocks[blockId].sets[setId]) log.blocks[blockId].sets[setId] = { done: false, fields: {} };
-        log.blocks[blockId].sets[setId].done = !log.blocks[blockId].sets[setId].done;
+        const sLog = log.blocks[blockId].sets[setId];
+        sLog.fields = sLog.fields || {};
+        const row = el.closest('.set-row');
+        // write whatever is in the row (typed values + confirmed prefills) in the same save
+        row.querySelectorAll('input[data-field]').forEach(inp => {
+          const field = inp.getAttribute('data-field').split('|')[3];
+          if (inp.classList.contains('prefill')) {
+            if (!sLog.done && inp.value !== '') {
+              sLog.fields[field] = inp.value;
+              sLog.target = sLog.target || {};
+              if (field === 'weight' || field === 'reps') sLog.target[field] = inp.getAttribute('data-prefill');
+              inp.classList.remove('prefill');
+              inp.removeAttribute('data-prefill');
+            }
+          } else if (inp.value !== (sLog.fields[field] || '')) {
+            sLog.fields[field] = inp.value;
+          }
+        });
+        sLog.done = !sLog.done;
         saveState();
-        // light update
-        el.classList.toggle('on');
-        el.textContent = el.classList.contains('on') ? '✓' : '';
-        // refresh progress without full re-render to keep keyboard
+        el.classList.toggle('on', sLog.done);
+        el.textContent = sLog.done ? '✓' : '';
+        el.setAttribute('aria-label', sLog.done ? 'Undo set' : 'Log set');
+        row.classList.toggle('is-done', sLog.done);
+        if (sLog.done && navigator.vibrate) { try { navigator.vibrate(15); } catch (_) {} }
+        refreshPrefills(blockId);
         const prog = sessionProgress(selectedSessionId);
         const bar = root.querySelector('.progress-bar > span');
         if (bar) bar.style.width = prog.pct + '%';
+        const pt = root.querySelector('[data-prog-text]');
+        if (pt) pt.textContent = `${prog.done}/${prog.total} sets · ${prog.pct}%`;
+      });
+    });
+    root.querySelectorAll('[data-step]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const inp = root.querySelector(`[data-field="${btn.getAttribute('data-step')}"]`);
+        if (!inp) return;
+        const delta = Number(btn.getAttribute('data-delta'));
+        const cur = parseNum(inp.value);
+        const next = Math.max(0, Math.round(((cur == null ? 0 : cur) + delta) * 100) / 100);
+        inp.value = String(next);
+        inp.classList.remove('prefill');
+        inp.removeAttribute('data-prefill');
+        persistField(inp);
+        const [sid, bid, setId, field] = inp.getAttribute('data-field').split('|');
+        if (field === 'weight') { const el = document.getElementById(`lb-${bid}-${setId}`); if (el && weightUnitFor(sid) === 'kg') el.textContent = kgToLbLabel(inp.value); }
       });
     });
     root.querySelectorAll('[data-field]').forEach(inp => {
-      inp.addEventListener('change', () => persistField(inp));
-      inp.addEventListener('blur', () => persistField(inp));
+      let t = null;
+      inp.addEventListener('focus', () => { try { inp.select(); } catch (_) {} });
+      inp.addEventListener('input', () => {
+        inp.classList.remove('prefill');
+        inp.removeAttribute('data-prefill');
+        clearTimeout(t);
+        t = setTimeout(() => persistField(inp), 300);
+      });
+      inp.addEventListener('change', () => { clearTimeout(t); persistField(inp); });
+      inp.addEventListener('blur', () => { clearTimeout(t); persistField(inp); });
     });
+    bindWeighin();
     const notes = document.getElementById('session-notes');
     if (notes) {
-      notes.addEventListener('change', () => {
-        ensureLog(selectedSessionId).notes = notes.value;
-        saveState();
-      });
+      let nt = null;
+      const saveNotes = () => { clearTimeout(nt); const log = ensureLog(selectedSessionId); if (log.notes !== notes.value) { log.notes = notes.value; saveState(); } };
+      notes.addEventListener('input', () => { clearTimeout(nt); nt = setTimeout(saveNotes, 400); });
+      notes.addEventListener('change', saveNotes);
+      notes.addEventListener('blur', saveNotes);
     }
     const saveBtn = document.getElementById('btn-save');
     if (saveBtn) {
@@ -1311,12 +1923,20 @@
   function persistField(inp) {
     const key = inp.getAttribute('data-field');
     if (!key) return;
+    if (inp.classList.contains('prefill')) return; // untouched target — only saved when the set is confirmed
     const [sessionId, blockId, setId, field] = key.split('|');
     const log = ensureLog(sessionId);
     if (!log.blocks[blockId]) log.blocks[blockId] = { done: false, sets: {} };
-    if (!log.blocks[blockId].sets[setId]) log.blocks[blockId].sets[setId] = { done: false, fields: {} };
-    log.blocks[blockId].sets[setId].fields[field] = inp.value;
+    if (!log.blocks[blockId].sets) log.blocks[blockId].sets = {};
+    const existing = log.blocks[blockId].sets[setId];
+    if (!existing && inp.value === '') return;
+    if (!existing) log.blocks[blockId].sets[setId] = { done: false, fields: {} };
+    const sLog = log.blocks[blockId].sets[setId];
+    sLog.fields = sLog.fields || {};
+    if ((sLog.fields[field] == null ? '' : String(sLog.fields[field])) === inp.value) return;
+    sLog.fields[field] = inp.value;
     saveState();
+    if (field === 'weight' || field === 'reps') refreshPrefills(blockId);
   }
 
   function renderWeek() {
@@ -1404,7 +2024,25 @@
       });
     }
     html += `</div>`;
+    const wis = activeWeighins();
+    html += `<div class="card"><h2>Weigh-ins</h2>${wis.length ? '' : '<p class="muted" style="margin:0">None yet — log one on Today.</p>'}</div>`;
+    if (wis.length) {
+      html += `<div class="card" style="padding:0">` + wis.map(w => `<div class="history-item">
+          <div><div style="font-weight:700">${escapeHtml(String(w.weightLb))} lb <span class="muted" style="font-weight:400">· ${Math.round(w.weightLb / 2.20462 * 10) / 10} kg</span></div>
+          <div class="muted">${escapeHtml(formatTime(w.measuredAt))}</div></div>
+          <button type="button" class="chip sm" data-del-weigh="${escapeAttr(w.id)}" aria-label="Delete weigh-in">Delete</button>
+        </div>`).join('') + `</div>`;
+    }
     root.innerHTML = html;
+    root.querySelectorAll('[data-del-weigh]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const w = (state.weighins || []).find(x => x.id === btn.getAttribute('data-del-weigh'));
+        if (!w || !confirm('Delete weigh-in ' + w.weightLb + ' lb?')) return;
+        w.deleted = true;
+        saveState();
+        render();
+      });
+    });
     root.querySelectorAll('[data-goto]').forEach(btn => {
       btn.addEventListener('click', () => {
         selectedSessionId = btn.getAttribute('data-goto');
@@ -1416,14 +2054,75 @@
     });
   }
 
+  function cloudCardHtml() {
+    const S = window.HTSync;
+    if (!S || !S.configured) {
+      return `<div class="card" id="cloud-card"><h2>Cloud sync</h2>
+        <p class="muted" style="margin:0">Local-only mode — nothing leaves this phone. To back up and sync to Supabase, add <code>SUPABASE_URL</code> and the anon key to <code>config.js</code> (see README).</p></div>`;
+    }
+    const st = S.status;
+    if (S.signedIn) {
+      return `<div class="card" id="cloud-card"><h2>Cloud sync</h2>
+        <p class="muted" style="margin:0 0 10px">Signed in as <strong>${escapeHtml(st.email || '')}</strong> · ${escapeHtml(st.state)}${st.pending ? ' · ' + st.pending + ' queued' : ''}${st.lastSyncAt ? ' · last sync ' + escapeHtml(formatTime(st.lastSyncAt)) : ''}</p>
+        ${st.error && st.state === 'error' ? `<p class="muted" style="margin:0 0 10px;color:var(--warn)">Last error: ${escapeHtml(st.error)} — will retry automatically.</p>` : ''}
+        <div class="stack"><button type="button" class="btn primary" id="btn-sync-now">Sync now</button>
+        <button type="button" class="btn ghost" id="btn-signout">Sign out (keeps data on phone)</button></div></div>`;
+    }
+    return `<div class="card" id="cloud-card"><h2>Cloud sync</h2>
+      <p class="muted" style="margin:0 0 10px">Optional. Logging works without signing in; sign in to back up to Supabase. We email you a one-time code${st.pending ? ' · ' + st.pending + ' changes waiting on this phone' : ''}.</p>
+      <div class="stack">
+        <input type="email" id="auth-email" placeholder="you@example.com" autocomplete="email" inputmode="email" autocapitalize="off" value="${escapeAttr(localStorage.getItem('hybrid-tracker-auth-email') || '')}" />
+        <button type="button" class="btn primary" id="btn-send-code">Email me a sign-in code</button>
+        <div id="code-step" class="${localStorage.getItem('hybrid-tracker-auth-email') ? '' : 'hidden'} stack">
+          <input type="text" id="auth-code" placeholder="6-digit code" inputmode="numeric" autocomplete="one-time-code" maxlength="10" />
+          <button type="button" class="btn primary" id="btn-verify">Verify code &amp; sign in</button>
+          <p class="muted" style="margin:0;font-size:12px">On iPhone, type the code here rather than tapping the email link — links open in Safari, which can't sign in the home-screen app.</p>
+        </div>
+      </div></div>`;
+  }
+
+  function bindCloudCard() {
+    const S = window.HTSync;
+    if (!S || !S.configured) return;
+    const again = () => { if (view === 'more') renderMore(); };
+    const syncNow = document.getElementById('btn-sync-now');
+    if (syncNow) syncNow.addEventListener('click', async () => { await S.pull(); S.kick(0); toast('Syncing…'); });
+    const so = document.getElementById('btn-signout');
+    if (so) so.addEventListener('click', async () => { try { await S.signOut(); toast('Signed out — logs stay on this phone'); } catch (e) { toast('Sign-out failed'); } again(); });
+    const send = document.getElementById('btn-send-code');
+    if (send) send.addEventListener('click', async () => {
+      const email = document.getElementById('auth-email').value.trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { toast('Enter your email'); return; }
+      if (navigator.onLine === false) { toast('Offline — try again when connected'); return; }
+      send.disabled = true; send.textContent = 'Sending…';
+      try {
+        await S.sendCode(email);
+        localStorage.setItem('hybrid-tracker-auth-email', email);
+        document.getElementById('code-step').classList.remove('hidden');
+        toast('Code sent — check your email');
+        const c = document.getElementById('auth-code'); if (c) c.focus();
+      } catch (e) { toast('Could not send: ' + String(e.message || e).slice(0, 80)); }
+      send.disabled = false; send.textContent = 'Email me a sign-in code';
+    });
+    const verify = document.getElementById('btn-verify');
+    if (verify) verify.addEventListener('click', async () => {
+      const email = document.getElementById('auth-email').value.trim();
+      const code = document.getElementById('auth-code').value.replace(/\s+/g, '');
+      if (!code) { toast('Enter the code from the email'); return; }
+      verify.disabled = true; verify.textContent = 'Verifying…';
+      try { await S.verifyCode(email, code); toast('Signed in — syncing'); setTimeout(again, 300); }
+      catch (e) { toast('Code rejected: ' + String(e.message || e).slice(0, 80)); verify.disabled = false; verify.textContent = 'Verify code & sign in'; }
+    });
+  }
+
   function renderMore() {
-    root.innerHTML = `<div class="card">
+    root.innerHTML = cloudCardHtml() + `<div class="card">
       <h2>Data</h2>
-      <p class="muted">Stored on this phone (localStorage). Export a backup before clearing browser data.</p>
+      <p class="muted">Every tap is saved on this phone first (IndexedDB, plus a localStorage copy) and works offline. <span id="persist-status"></span> Export a backup before clearing browser data.</p>
       <div class="stack">
         <button type="button" class="btn primary" id="btn-export">Export JSON</button>
         <label class="btn file-btn">Import JSON<input type="file" id="import-file" accept="application/json,.json" /></label>
-        <button type="button" class="btn danger" id="btn-reset">Reset all data</button>
+        <button type="button" class="btn danger" id="btn-reset">Reset all data on this phone</button>
       </div>
     </div>
     <div class="card">
@@ -1431,14 +2130,23 @@
       <p class="muted" style="margin:0">Enter run distance in <strong>km</strong> (watch default). The app always shows km, pace/km, miles, and pace/mi together when distance (+ time) is logged.</p>
     </div>
     <div class="card">
+      <h2>Install on iPhone</h2>
+      <p class="muted" style="margin:0">Safari → Share → <strong>Add to Home Screen</strong>. Open it from the home-screen icon so logs stay in the app's own storage.</p>
+    </div>
+    <div class="card">
       <h2>About</h2>
-      <p class="muted" style="margin:0">Hybrid Phase 6 Weeks 1–2 (Oct 11–25, 2026) · Coach Patrick James · Offline-capable PWA · v1.6</p>
+      <p class="muted" style="margin:0">Hybrid Phase 6 Weeks 1–2 (Oct 11–25, 2026) · Coach Patrick James · Offline-first PWA · v${APP_VERSION}</p>
     </div>`;
 
+    bindCloudCard();
+    const ps = document.getElementById('persist-status');
+    if (ps && navigator.storage && navigator.storage.persisted) {
+      navigator.storage.persisted().then(p => { ps.textContent = p ? 'Persistent storage: on.' : 'Persistent storage: not granted yet (installing to the home screen helps).'; }).catch(() => {});
+    }
     document.getElementById('btn-export').addEventListener('click', exportJson);
     document.getElementById('import-file').addEventListener('change', importJson);
     document.getElementById('btn-reset').addEventListener('click', () => {
-      if (confirm('Erase all logged workouts on this device?')) {
+      if (confirm('Erase all logged workouts on this device? (Cloud copies, if any, are not deleted.)')) {
         state = defaultState();
         saveState();
         selectedSessionId = DEFAULT_SESSION_FOR_TODAY;
@@ -1453,7 +2161,8 @@
     const payload = {
       exportedAt: new Date().toISOString(),
       app: 'hybrid-tracker',
-      version: 1,
+      version: 2,
+      appVersion: APP_VERSION,
       state,
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -1475,6 +2184,8 @@
         const incoming = data.state || data;
         if (!incoming.logs) throw new Error('Invalid file');
         state = Object.assign(defaultState(), incoming);
+        if (!Array.isArray(state.weighins)) state.weighins = [];
+        stampMissingTimestamps();
         saveState();
         toast('Imported');
         render();
@@ -1671,12 +2382,63 @@
     } catch (_) { return iso; }
   }
 
-  // —— SW ——
+  // —— Service worker: offline + reliable updates ——
+  function showUpdateBanner() {
+    if (document.getElementById('update-banner')) return;
+    const b = document.createElement('button');
+    b.id = 'update-banner'; b.type = 'button'; b.className = 'update-banner';
+    b.textContent = 'New version ready — tap to reload (your logs are saved)';
+    b.addEventListener('click', () => location.reload());
+    document.body.appendChild(b);
+  }
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    const bootAt = Date.now();
+    const hadController = !!navigator.serviceWorker.controller;
+    let reloading = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!hadController || reloading) return; // first install: nothing to refresh
+      const typing = document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName);
+      if (Date.now() - bootAt < 10000 && !typing) { reloading = true; location.reload(); }
+      else showUpdateBanner();
     });
+    navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(reg => {
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update().catch(() => {}); });
+    }).catch(() => {});
   }
 
+  // —— Boot ——
+  if (BOOT && BOOT.migrated) state.migratedAt = state.migratedAt || new Date().toISOString();
+  const stamped = stampMissingTimestamps();
+  collectRows().forEach(r => rowSigs.set(r.key, r.sig));
+  if (stamped || (BOOT && BOOT.source !== 'idb')) {
+    // persist migration stamps (no outbox: the sign-in backfill pushes everything)
+    if (window.HTStore) window.HTStore.commit(state, []).catch(() => {});
+  }
+  if (window.HTStore) window.HTStore.requestPersist();
+  if (window.HTSync) {
+    window.HTSync.init({
+      onStatus: (st) => { syncStatus = st; paintSyncMarks(); },
+      onPull: mergeRemote,
+      onSignedIn: backfill,
+    });
+  }
+  const pill = document.getElementById('sync-pill');
+  if (pill) pill.addEventListener('click', () => { view = 'more'; setActiveTab('more'); render(); window.scrollTo(0, 0); });
+  window.__HT = {
+    get state() { return state; }, boot: BOOT, version: APP_VERSION,
+    open(sid) { selectedSessionId = sid; selectedWeek = (dayFor(sid) || {}).week || selectedWeek; view = 'today'; setActiveTab('today'); render(); },
+  };
+  if (BOOT && BOOT.migrated) setTimeout(() => toast('Logs moved to on-phone database ✓'), 400);
   render();
+  } // end start()
+
+  function go(boot) {
+    try { start(boot); } catch (e) {
+      console.error(e);
+      const r = document.getElementById('view-root');
+      if (r) r.innerHTML = '<div class="card"><h2>Startup error</h2><p class="muted">' + String((e && e.message) || e).replace(/</g, '&lt;') + '</p></div>';
+    }
+  }
+  if (window.HTStore) window.HTStore.init().then(go, () => go(null));
+  else go(null);
 })();
