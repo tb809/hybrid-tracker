@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.2 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.3 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.2';
+  const APP_VERSION = '2.1.3';
 
   function start(BOOT) {
 
@@ -51,7 +51,7 @@
   const WEEK3 = [
     { id: 'w3_mon', date: '2026-10-26', dow: 'Mon', short: '10/26', title: 'Full Body 1', subtitle: 'Squat Focused · done 10/26 · squat 4×6 @ 100 kg', type: 'strength' },
     { id: 'w3_tue', date: '2026-10-27', dow: 'Tue', short: '10/27', title: 'Easy Conditioning', subtitle: 'Run 50 min progressive easy or Row 3×10 min @ 18/20/22 s/m', type: 'conditioning' },
-    { id: 'w3_wed', date: '2026-10-28', dow: 'Wed', short: '10/28', title: 'Full Body 2', subtitle: 'Press Focused · strict press 4×6 @ 55–57.5 kg', type: 'strength' },
+    { id: 'w3_wed', date: '2026-10-28', dow: 'Wed', short: '10/28', title: 'Full Body 2', subtitle: 'Press Focused · press 4×6 @ 55–57.5 kg · lunge 15.9 kg', type: 'strength' },
     { id: 'w3_thu', date: '2026-10-29', dow: 'Thu', short: '10/29', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
     { id: 'w3_fri', date: '2026-10-30', dow: 'Fri', short: '10/30', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
     { id: 'w3_sat', date: '2026-10-31', dow: 'Sat', short: '10/31', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
@@ -823,6 +823,8 @@
     const b = id => s.blocks.find(x => x.id === id);
     b('sp').meta += ' · start 55 kg (121 lb) → 57.5 kg (127 lb)';
     b('sp').cues = 'Target (based on last week\'s 4×6 @ 52.2 kg / 115 lb): start at 55 kg (121 lb); if 3–4 reps in reserve, go to 57.5 kg (127 lb); 60 kg (132 lb) only on the last set if 57.5 felt easy. 3RM 83.9 kg / 185 lb. ' + b('sp').cues;
+    b('qg').meta += ' · 15.9 kg (35 lb) DBs 3×8/leg';
+    b('qg').cues = 'Target (based on last week\'s 3×8 @ 13.6 kg / 30 lb DBs): 15.9 kg (35 lb) DBs, 3×8 each leg; push sets 2–3 toward 10 reps if easy. If form breaks before 8, drop to 13.6 kg (30 lb) for 3×10. ' + (b('qg').cues || '');
     b('dc').meta += ' · time tip: 60–75 s rest';
     b('arms').meta += ' · 0–1 RIR · time tip: 60–75 s rest';
     s.blocks.push(coreBlock('As on Monday.'));
@@ -832,6 +834,11 @@
   (function () {
     const sp = SESSIONS.w2_wed.blocks.find(x => x.id === 'sp');
     sp.cues = 'Actual: 4 sets × 6 reps @ 52.2 kg (115 lb) (old app history). ' + sp.cues;
+    const qg = SESSIONS.w2_wed.blocks.find(x => x.id === 'qg');
+    qg.cues = 'Actual: 3 sets × 8 reps each leg @ 13.6 kg (30 lb) DBs (old app history). ' + (qg.cues || '');
+    // Week 1 FB2 (app history dated 14 Oct)
+    const qg1 = SESSIONS.tue.blocks.find(x => x.id === 'qg');
+    qg1.cues = 'Actual: Deficit DB reverse lunge 3 × 8 each leg @ 9.1 / 11.3 / 13.6 kg (20 / 25 / 30 lb) DBs (old app history). ' + (qg1.cues || '');
   })();
 
   ['w3_thu', 'w3_fri', 'w3_sat', 'w3_sun'].forEach(id => {
