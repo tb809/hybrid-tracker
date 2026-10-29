@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.0 — Phase 6 Weeks 1–2 — Terry Baggett
+/* Hybrid Tracker v2.1 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.0.0';
+  const APP_VERSION = '2.1.0';
 
   function start(BOOT) {
 
@@ -40,13 +40,25 @@
     { id: 'w2_sat', date: '2026-10-24', dow: 'Sat', short: '10/24', title: 'Tempo Conditioning', subtitle: 'Run or Row', type: 'conditioning' },
     { id: 'w2_sun', date: '2026-10-25', dow: 'Sun', short: '10/25', title: 'Rest', subtitle: 'Recovery day', type: 'rest' },
   ];
+  // Phase 6 Week 3 (Mon Oct 26–Sun Nov 1, 2026). Ids prefixed w3_. Thu–Sun are placeholders until the app screenshots come in.
+  const WEEK3 = [
+    { id: 'w3_mon', date: '2026-10-26', dow: 'Mon', short: '10/26', title: 'Full Body 1', subtitle: 'Squat Focused · done 10/26 · squat 4×6 @ 100 kg', type: 'strength' },
+    { id: 'w3_tue', date: '2026-10-27', dow: 'Tue', short: '10/27', title: 'Easy Conditioning', subtitle: 'Run 50 min progressive easy or Row 3×10 min @ 18/20/22 s/m', type: 'conditioning' },
+    { id: 'w3_wed', date: '2026-10-28', dow: 'Wed', short: '10/28', title: 'Full Body 2', subtitle: 'Press Focused · strict press 4×6 @ 60–65 kg', type: 'strength' },
+    { id: 'w3_thu', date: '2026-10-29', dow: 'Thu', short: '10/29', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
+    { id: 'w3_fri', date: '2026-10-30', dow: 'Fri', short: '10/30', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
+    { id: 'w3_sat', date: '2026-10-31', dow: 'Sat', short: '10/31', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
+    { id: 'w3_sun', date: '2026-11-01', dow: 'Sun', short: '11/01', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
+  ];
   WEEK.forEach(d => { d.week = 1; });
   WEEK2.forEach(d => { d.week = 2; });
+  WEEK3.forEach(d => { d.week = 3; });
   const WEEKS = {
     1: { label: 'Week 1', range: 'Oct 11–17, 2026', days: WEEK },
     2: { label: 'Week 2', range: 'Oct 19–25, 2026', days: WEEK2 },
+    3: { label: 'Week 3', range: 'Oct 26–Nov 1, 2026', days: WEEK3 },
   };
-  const ALL_DAYS = WEEK.concat(WEEK2);
+  const ALL_DAYS = WEEK.concat(WEEK2, WEEK3);
 
   // Terry shifted: Thu Oct 15 → Interval / TT session (not calendar Deadlift day)
   const DEFAULT_SESSION_FOR_TODAY = 'wed';
@@ -727,6 +739,98 @@
     },
   };
 
+  // —— Week 3 sessions ——
+  // FB1 / FB2 repeat the Week 2 prescriptions (same block + set ids, so last week's loads prefill); deep-cloned before normalization.
+  const cloneSession = sid => JSON.parse(JSON.stringify(SESSIONS[sid]));
+  const coreBlock = (note) => ({
+    id: 'core', title: 'Added · Core', meta: 'Hanging Knee Raise · 3 sets x 8–12 · added by Terry',
+    cues: note,
+    sets: [
+      { id: 'kr1', label: 'Set 1 · Hanging Knee Raise · 8–12', fields: ['reps', 'notes'] },
+      { id: 'kr2', label: 'Set 2 · Hanging Knee Raise · 8–12', fields: ['reps', 'notes'] },
+      { id: 'kr3', label: 'Set 3 · Hanging Knee Raise · 8–12', fields: ['reps', 'notes'] },
+    ],
+  });
+
+  SESSIONS.w3_mon = cloneSession('w2_mon');
+  (function () {
+    const s = SESSIONS.w3_mon;
+    const b = id => s.blocks.find(x => x.id === id);
+    b('bs').cues = 'Done 10/26: 4 × 6 @ 100 kg (220 lb) on the Nautilus Freedom Rack (its own 20 kg / 44 lb bar that moves vertically and horizontally, so not directly comparable to a free bar or Smith). RPE not reported. ' + b('bs').cues;
+    b('pp').cues = 'Done 10/26: weighted push-up 3 × 10 @ +20 kg (44 lb); no cable available, so the cable seated row was subbed with a DB 3-point bench row 3 × 8 @ 22.7 kg (50 lb) DB. ' + b('pp').cues;
+    b('gl').meta = 'Skipped 10/26 (time) · ' + b('gl').meta;
+    b('fin').meta = 'Skipped 10/26 (time) · ' + b('fin').meta;
+    s.blocks.push(coreBlock('Done 10/26: 3 sets; set 1 = 8 reps, sets 2–3 counts not reported (~8).'));
+  })();
+
+  SESSIONS.w3_tue = {
+    name: 'Easy Conditioning',
+    modality: true,
+    hrCard: 'easy3',
+    duration: '~45 min',
+    blocksRun: [
+      {
+        id: 'pogo', title: 'Warm up · Pogo Warm Up', meta: '1 set · 1–2 reps Pogo Jump Series',
+        cues: 'Take yourself through 1–2 full rounds of the pogo jump series.',
+        sets: [{ id: 'pogo1', label: 'Pogo jumps', fields: ['notes'] }],
+      },
+      {
+        id: 'prog', title: 'A. Easy Conditioning (Run Option)', meta: 'Progressive Easy Run · 50 min @ Easy run · continuous, no rest between stages',
+        cues: 'Choose Option 1 or Option 2, not both. First 20 min easy; next 20 min comfortable aerobic effort; final 10 min slightly quicker, still conversational. Target: Z2, keep under ~137 bpm for the first 40 min; last 10 min may drift slightly but stay conversational and below Z3 (<139). Est. total 6.06 km–6.67 km at 7:30–8:15/km.',
+        sets: [
+          { id: 'pr1', label: '0–20 min · 20 min easy · HR <137', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'pr2', label: '20–40 min · 20 min comfortable aerobic · HR <137', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'pr3', label: '40–50 min · 10 min slightly quicker, conversational · HR <139', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+        ],
+      },
+    ],
+    blocksRow: [
+      {
+        id: 'pogo_r', title: 'Warm up · Pogo Warm Up', meta: '1 set · 1–2 reps Pogo Jump Series',
+        cues: 'Take yourself through 1–2 full rounds of the pogo jump series.',
+        sets: [{ id: 'pogo_r1', label: 'Pogo jumps', fields: ['notes'] }],
+      },
+      {
+        id: 'easy_row', title: 'B. Warm Up (Row Option)', meta: '10 min Row Erg · easy · 18 s/m',
+        cues: 'Choose Option 1 or Option 2, not both.',
+        sets: [{ id: 'row10', label: '10 min easy row · 18 s/m', fields: ['distance', 'avgHr', 'rpe', 'notes'] }],
+      },
+      {
+        id: 'base_r', title: 'Base Intervals', meta: 'Repeat 3x continuous · 10 min Row Erg: 4 min @ 18 · 4 min @ 20 · 2 min @ 22 s/m · no rest between stages or rounds',
+        sets: [
+          { id: 'rb1', label: 'Round 1 · 10 min · 4/4/2 min @ 18/20/22 s/m', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'rb2', label: 'Round 2 · 10 min · 4/4/2 min @ 18/20/22 s/m', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'rb3', label: 'Round 3 · 10 min · 4/4/2 min @ 18/20/22 s/m', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+        ],
+      },
+      {
+        id: 'cd_r', title: 'Cool Down', meta: '10 min Row Erg · easy · 18 s/m',
+        sets: [{ id: 'rcd10', label: '10 min easy row · 18 s/m', fields: ['distance', 'avgHr', 'notes'] }],
+      },
+    ],
+  };
+
+  SESSIONS.w3_wed = cloneSession('w2_wed');
+  (function () {
+    const s = SESSIONS.w3_wed;
+    const b = id => s.blocks.find(x => x.id === id);
+    b('sp').meta += ' · target 60–65 kg (132–143 lb)';
+    b('sp').cues = 'Target: start set 1 at 60 kg (132 lb); go to 62.5–65 kg (138–143 lb) if 3–4 reps in reserve (3RM 83.9 kg / 185 lb; Week 2 loads not reported). Same reps as last week, so progress loads. ' + b('sp').cues;
+    b('dc').meta += ' · time tip: 60–75 s rest';
+    b('arms').meta += ' · 0–1 RIR · time tip: 60–75 s rest';
+    s.blocks.push(coreBlock('As on Monday.'));
+  })();
+
+  ['w3_thu', 'w3_fri', 'w3_sat', 'w3_sun'].forEach(id => {
+    SESSIONS[id] = {
+      name: 'Awaiting screenshots',
+      blocks: [{
+        id: 'tbd', title: 'Session not added yet', meta: 'Added once the coach app screenshot comes in · notes only for now',
+        sets: [{ id: 'tbd1', label: 'Notes', fields: ['notes'] }],
+      }],
+    };
+  });
+
   // —— v2: normalize set fields ——
   // RIR blocks log RIR (not RPE); every run/row segment gets a time field; fixed-distance
   // row pieces (500m, 2000m) get a distance field so pace shows in /km and /mi.
@@ -765,10 +869,10 @@
   let selectedSessionId = (TODAY_DAY && state.todayOverrideDate !== REAL_TODAY) ? TODAY_DAY.id : (
     (state.todayOverrideSession && SESSIONS[state.todayOverrideSession]) ? state.todayOverrideSession : (
     REAL_TODAY === '2026-10-15' ? DEFAULT_SESSION_FOR_TODAY :
-    (TODAY_DAY || {}).id || (REAL_TODAY >= WEEK2[0].date ? WEEK2[0].id : DEFAULT_SESSION_FOR_TODAY)
+    (TODAY_DAY || {}).id || (REAL_TODAY >= WEEK3[0].date ? WEEK3[0].id : REAL_TODAY >= WEEK2[0].date ? WEEK2[0].id : DEFAULT_SESSION_FOR_TODAY)
   ));
   function dayFor(id) { return ALL_DAYS.find(d => d.id === id); }
-  let selectedWeek = (dayFor(selectedSessionId) || {}).week || 2;
+  let selectedWeek = (dayFor(selectedSessionId) || {}).week || 3;
   function weightUnitFor(sessionId) { return (SESSIONS[sessionId] && SESSIONS[sessionId].weightUnit) || 'lb'; }
   function kgToLbLabel(v) {
     const n = parseNum(v);
@@ -1317,6 +1421,16 @@
         </ul>
       </div>`;
     }
+    if (card === 'easy3') {
+      return `<div class="target-card hr-card easy">
+        <h4>HR target · PROGRESSIVE EASY RUN (Z2)</h4>
+        <ul>
+          <li><strong>0–40 min: Z2, HR under ~137 bpm</strong> (~<span class="pace">${z2}</span>)</li>
+          <li><strong>40–50 min: slightly quicker</strong>, HR may drift but stays conversational and below Z3 (<139)</li>
+          <li>Est. 6.06–6.67 km · 3.77–4.14 mi for the 50 min. Don't chase pace.</li>
+        </ul>
+      </div>`;
+    }
     if (card === 'hard2') {
       return `<div class="target-card hr-card hard">
         <h4>HR target · RACE PACE INTERVALS (HARD)</h4>
@@ -1512,7 +1626,7 @@
 
   // —— Targets / prefill ——
   // Week 2 sessions → the Week 1 session they repeat (for "last week's load" prefill)
-  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri' };
+  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed' };
 
   function setStem(setId) { return String(setId).replace(/\d+$/, ''); }
 
@@ -2006,7 +2120,7 @@
       return { d, log, prog };
     }).filter(x => x.log && (x.prog.done > 0 || x.log.notes || x.log.savedAt));
 
-    let html = `<div class="card"><h2>History</h2><p class="muted" style="margin:0">Logged days · Phase 6 Weeks 1–2</p></div><div class="card" style="padding:0">`;
+    let html = `<div class="card"><h2>History</h2><p class="muted" style="margin:0">Logged days · Phase 6 Weeks 1–3</p></div><div class="card" style="padding:0">`;
     if (!items.length) {
       html += `<div class="history-item"><span class="muted">No sessions logged yet</span></div>`;
     } else {
@@ -2135,7 +2249,7 @@
     </div>
     <div class="card">
       <h2>About</h2>
-      <p class="muted" style="margin:0">Hybrid Phase 6 Weeks 1–2 (Oct 11–25, 2026) · Coach Patrick James · Offline-first PWA · v${APP_VERSION}</p>
+      <p class="muted" style="margin:0">Hybrid Phase 6 Weeks 1–3 (Oct 11–Nov 1, 2026) · Coach Patrick James · Offline-first PWA · v${APP_VERSION}</p>
     </div>`;
 
     bindCloudCard();

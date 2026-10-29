@@ -136,7 +136,7 @@ with sync_playwright() as p:
     # --- offline: SW installed, reload with network off ---
     page.wait_for_function("navigator.serviceWorker && navigator.serviceWorker.controller", timeout=10000)
     caches = page.evaluate("caches.keys()")
-    check('SW cache v2-0-0 installed', 'hybrid-tracker-v2-0-0' in caches, caches)
+    check('SW cache v2-1-0 installed', 'hybrid-tracker-v2-1-0' in caches, caches)
     ctx.set_offline(True)
     page.reload()
     page.wait_for_function("window.__HT && window.__HT.boot", timeout=10000)
