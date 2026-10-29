@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.6 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.7 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.6';
+  const APP_VERSION = '2.1.7';
 
   function start(BOOT) {
 
@@ -824,7 +824,7 @@
     blocksRun: [
       {
         id: 'wu_p', title: 'A. Warm Up (Run Option)', meta: '15 min easy run incl. 3 × 20 s progressive strides · 40 s easy jog after each',
-        cues: 'Choose Option 1 or Option 2, not both. Z2, HR under ~137 bpm (~7:30–8:15/km · 12:04–13:17/mi). Strides build to about rep pace.',
+        cues: 'Choose Option 1 or Option 2, not both. Z2, HR under ~137 bpm (~7:30–8:15/km · 12:04–13:17/mi). Strides build to about rep pace. Treadmill (1% incline): warm-up 4.5–5.0 mph (7.3–8.0 km/h); strides build 6.0 → ~7.7 mph (9.7 → 12.4 km/h; 10:00 → 7:45/mi, 6:13 → 4:49/km), 40 s jog at ~4.5 mph (7.2 km/h).',
         sets: [
           { id: 'wup15', label: '15 min easy · HR <137', fields: ['distance', 'avgHr', 'notes'] },
           { id: 'strides', label: '3 × 20 s progressive strides', fields: ['notes'] },
@@ -832,7 +832,7 @@
       },
       {
         id: 'p400', title: 'Race Pace Intervals', meta: 'repeat 8x · 400m @ race / test pace · 1:30 easy jog rest',
-        cues: 'Test pace 4:49/km (7:45/mi) from the Oct 15 test → each 400m ≈ 1:56. Hold 1:54–1:58; back off if rep 1 is under 1:52. Jog the full 90 s, slowly.',
+        cues: 'Test pace 4:49/km (7:45/mi) from the Oct 15 test → each 400m ≈ 1:56. Hold 1:54–1:58; back off if rep 1 is under 1:52. Jog the full 90 s, slowly. Treadmill (1% incline): reps 7.7 mph (12.4 km/h) = 7:45/mi, 4:49/km, ~1:56/rep; band 7.6–7.9 mph (12.2–12.7 km/h) = 7:36–7:54/mi, 4:43–4:55/km, ~1:53–1:58/rep. Recovery jog 4.0–4.5 mph (6.4–7.2 km/h; 13:20–15:00/mi, 8:17–9:19/km). Press the speed change ~5 s before each change.',
         sets: [
           { id: 'p400_1', label: '400m #1 · target ~1:56 (1:54–1:58)', fields: ['time', 'avgHr', 'rpe', 'notes'] },
           { id: 'p400_2', label: '400m #2 · target ~1:56 (1:54–1:58)', fields: ['time', 'avgHr', 'rpe', 'notes'] },
@@ -846,7 +846,7 @@
       },
       {
         id: 'cd_p', title: 'Cool Down', meta: '15 min easy run',
-        cues: 'Z2, HR under ~137 bpm.',
+        cues: 'Z2, HR under ~137 bpm. Treadmill (1% incline): 4.5–5.0 mph (7.3–8.0 km/h; 12:04–13:17/mi, 7:30–8:15/km).',
         sets: [{ id: 'cdp15', label: '15 min easy · HR <137', fields: ['distance', 'avgHr', 'notes'] }],
       },
     ],
@@ -1513,6 +1513,14 @@
           <li><strong>Each 400m ≈ 1:56</strong> (hold 1:54–1:58) — test pace ~<span class="pace">${dualPace('4:49')}</span> (Oct 15 test)</li>
           <li>Back off if rep 1 is under 1:52. Jog the full 90 s, slowly.</li>
           <li><strong>Warm-up + cooldown: Z2, HR under ~137</strong> (~<span class="pace">${z2}</span>). Strides build to about rep pace.</li>
+        </ul>
+        <h4>TREADMILL · 1% INCLINE</h4>
+        <ul>
+          <li><strong>Warm-up / cool-down: 4.5–5.0 mph</strong> (7.3–8.0 km/h) · 12:04–13:17/mi · 7:30–8:15/km · HR &lt;137</li>
+          <li><strong>Strides: build 6.0 → ~7.7 mph</strong> (9.7 → 12.4 km/h) · 10:00 → 7:45/mi · 40 s jog ~4.5 mph (7.2 km/h)</li>
+          <li><strong>400m reps: 7.7 mph (12.4 km/h)</strong> = 7:45/mi · 4:49/km · ~1:56/rep · band 7.6–7.9 mph (12.2–12.7 km/h) = 7:36–7:54/mi, ~1:53–1:58/rep</li>
+          <li><strong>Recovery jog: 4.0–4.5 mph</strong> (6.4–7.2 km/h) · 13:20–15:00/mi · 8:17–9:19/km</li>
+          <li>Tip: press the speed change ~5 s before each change.</li>
         </ul>
       </div>`;
     }
