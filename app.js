@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.1 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.2 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.1';
+  const APP_VERSION = '2.1.2';
 
   function start(BOOT) {
 
@@ -51,7 +51,7 @@
   const WEEK3 = [
     { id: 'w3_mon', date: '2026-10-26', dow: 'Mon', short: '10/26', title: 'Full Body 1', subtitle: 'Squat Focused · done 10/26 · squat 4×6 @ 100 kg', type: 'strength' },
     { id: 'w3_tue', date: '2026-10-27', dow: 'Tue', short: '10/27', title: 'Easy Conditioning', subtitle: 'Run 50 min progressive easy or Row 3×10 min @ 18/20/22 s/m', type: 'conditioning' },
-    { id: 'w3_wed', date: '2026-10-28', dow: 'Wed', short: '10/28', title: 'Full Body 2', subtitle: 'Press Focused · strict press 4×6 @ 60–65 kg', type: 'strength' },
+    { id: 'w3_wed', date: '2026-10-28', dow: 'Wed', short: '10/28', title: 'Full Body 2', subtitle: 'Press Focused · strict press 4×6 @ 55–57.5 kg', type: 'strength' },
     { id: 'w3_thu', date: '2026-10-29', dow: 'Thu', short: '10/29', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
     { id: 'w3_fri', date: '2026-10-30', dow: 'Fri', short: '10/30', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
     { id: 'w3_sat', date: '2026-10-31', dow: 'Sat', short: '10/31', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
@@ -821,11 +821,17 @@
   (function () {
     const s = SESSIONS.w3_wed;
     const b = id => s.blocks.find(x => x.id === id);
-    b('sp').meta += ' · target 60–65 kg (132–143 lb)';
-    b('sp').cues = 'Target: start set 1 at 60 kg (132 lb); go to 62.5–65 kg (138–143 lb) if 3–4 reps in reserve (3RM 83.9 kg / 185 lb; Week 2 loads not reported). Same reps as last week, so progress loads. ' + b('sp').cues;
+    b('sp').meta += ' · start 55 kg (121 lb) → 57.5 kg (127 lb)';
+    b('sp').cues = 'Target (based on last week\'s 4×6 @ 52.2 kg / 115 lb): start at 55 kg (121 lb); if 3–4 reps in reserve, go to 57.5 kg (127 lb); 60 kg (132 lb) only on the last set if 57.5 felt easy. 3RM 83.9 kg / 185 lb. ' + b('sp').cues;
     b('dc').meta += ' · time tip: 60–75 s rest';
     b('arms').meta += ' · 0–1 RIR · time tip: 60–75 s rest';
     s.blocks.push(coreBlock('As on Monday.'));
+  })();
+
+  // Week 2 Wed actual (old app history, dated 19 Oct there). Added after the w3 clone so Week 3 doesn't inherit it.
+  (function () {
+    const sp = SESSIONS.w2_wed.blocks.find(x => x.id === 'sp');
+    sp.cues = 'Actual: 4 sets × 6 reps @ 52.2 kg (115 lb) (old app history). ' + sp.cues;
   })();
 
   ['w3_thu', 'w3_fri', 'w3_sat', 'w3_sun'].forEach(id => {
