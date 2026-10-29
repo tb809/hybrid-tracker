@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.4 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.5 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.4';
+  const APP_VERSION = '2.1.5';
 
   function start(BOOT) {
 
@@ -51,7 +51,7 @@
   const WEEK3 = [
     { id: 'w3_mon', date: '2026-10-26', dow: 'Mon', short: '10/26', title: 'Full Body 1', subtitle: 'Squat Focused · done 10/26 · squat 4×6 @ 100 kg', type: 'strength' },
     { id: 'w3_tue', date: '2026-10-27', dow: 'Tue', short: '10/27', title: 'Easy Conditioning', subtitle: 'Run 50 min progressive easy or Row 3×10 min @ 18/20/22 s/m', type: 'conditioning' },
-    { id: 'w3_wed', date: '2026-10-28', dow: 'Wed', short: '10/28', title: 'Full Body 2', subtitle: 'Press Focused · press 4×6 @ 55–57.5 kg · lunge 15.9 kg', type: 'strength' },
+    { id: 'w3_wed', date: '2026-10-28', dow: 'Wed', short: '10/28', title: 'Full Body 2', subtitle: 'Press Focused · done 10/28 (partial: A–C) · press/lunge loads pending', type: 'strength' },
     { id: 'w3_thu', date: '2026-10-29', dow: 'Thu', short: '10/29', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
     { id: 'w3_fri', date: '2026-10-30', dow: 'Fri', short: '10/30', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
     { id: 'w3_sat', date: '2026-10-31', dow: 'Sat', short: '10/31', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
@@ -827,9 +827,14 @@
     b('pu').meta += ' · ✓ DONE 10/28';
     b('pu').cues = 'Done 10/28 (all sets): chin-up 3 × 6 bodyweight, strict dip 3 × 10 bodyweight (same as last week). ' + (b('pu').cues || '');
     b('qg').cues = 'Target (based on last week\'s 3×8 @ 13.6 kg / 30 lb DBs): 15.9 kg (35 lb) DBs, 3×8 each leg; push sets 2–3 toward 10 reps if easy. If form breaks before 8, drop to 13.6 kg (30 lb) for 3×10. ' + (b('qg').cues || '');
-    b('dc').meta += ' · time tip: 60–75 s rest';
-    b('arms').meta += ' · 0–1 RIR · time tip: 60–75 s rest';
-    s.blocks.push(coreBlock('As on Monday.'));
+    b('dc').meta = 'Skipped 10/28 · ' + b('dc').meta + ' · time tip: 60–75 s rest';
+    b('arms').meta = 'Skipped 10/28 · ' + b('arms').meta + ' · 0–1 RIR · time tip: 60–75 s rest';
+    s.blocks.push(coreBlock('Skipped 10/28.'));
+    s.blocks[s.blocks.length - 1].meta = 'Skipped 10/28 · ' + s.blocks[s.blocks.length - 1].meta;
+    b('sm').meta = '✓ Done 10/28 · ' + b('sm').meta;
+    b('sp').meta += ' · ✓ DONE 10/28 (loads pending)';
+    b('sp').cues = 'Done 10/28: all 4 sets; loads not reported yet. ' + b('sp').cues;
+    b('qg').meta += ' · ✓ DONE 10/28 (loads pending)';
   })();
 
   // Week 2 Wed actual (old app history, dated 19 Oct there). Added after the w3 clone so Week 3 doesn't inherit it.
