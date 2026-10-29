@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.7 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.8 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.7';
+  const APP_VERSION = '2.1.8';
 
   function start(BOOT) {
 
@@ -2625,7 +2625,27 @@
 
   // —— Boot ——
   if (BOOT && BOOT.migrated) state.migratedAt = state.migratedAt || new Date().toISOString();
-  const stamped = stampMissingTimestamps();
+  // Known weigh-ins reported to the coach (fasted AM). Seeded once by stable id; skipped if
+  // that id exists (incl. deleted) or a weigh-in is already logged on the same LA date.
+  const SEED_WEIGHINS = [
+    { id: 'seed-wi-2026-10-16', measuredAt: '2026-10-16T06:30:00-07:00', weightLb: 240.1 },
+    { id: 'seed-wi-2026-10-17', measuredAt: '2026-10-17T06:30:00-07:00', weightLb: 240.9 },
+    { id: 'seed-wi-2026-10-18', measuredAt: '2026-10-18T06:30:00-07:00', weightLb: 243.0 },
+    { id: 'seed-wi-2026-10-29', measuredAt: '2026-10-29T06:30:00-07:00', weightLb: 241.8, notes: 'Fasted' },
+  ];
+  function seedWeighins() {
+    const laDate = iso => { try { return new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' }); } catch (e) { return String(iso).slice(0, 10); } };
+    const list = state.weighins || (state.weighins = []);
+    let added = 0;
+    SEED_WEIGHINS.forEach(sw => {
+      if (list.some(w => w.id === sw.id)) return;
+      if (list.some(w => !w.deleted && laDate(w.measuredAt) === laDate(sw.measuredAt))) return;
+      list.push({ id: sw.id, measuredAt: sw.measuredAt, weightLb: sw.weightLb, notes: sw.notes || 'Fasted', deleted: false, updatedAt: Date.parse(sw.measuredAt) });
+      added++;
+    });
+    return added;
+  }
+  const stamped = seedWeighins() + stampMissingTimestamps();
   collectRows().forEach(r => rowSigs.set(r.key, r.sig));
   if (stamped || (BOOT && BOOT.source !== 'idb')) {
     // persist migration stamps (no outbox: the sign-in backfill pushes everything)
