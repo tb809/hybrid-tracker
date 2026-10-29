@@ -1,18 +1,25 @@
-/* Hybrid Tracker v2.1 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.1 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.0';
+  const APP_VERSION = '2.1.1';
 
   function start(BOOT) {
 
   const STORAGE_KEY = 'hybrid-tracker-v1';
   const TODAY_ISO = '2026-10-15'; // box/user date context
   const REAL_TODAY = (() => {
+    // Device-local calendar date (Terry's phone is America/Los_Angeles). Built from local
+    // Date fields so it doesn't depend on locale formatting; LA via Intl as a fallback.
     try {
-      return new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+      const d = new Date();
+      if (isNaN(d.getTime())) throw new Error('bad date');
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    } catch (_) {}
+    try {
+      return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
     } catch (_) {
       return TODAY_ISO;
     }
