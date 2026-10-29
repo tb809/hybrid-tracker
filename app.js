@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.3 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.4 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.3';
+  const APP_VERSION = '2.1.4';
 
   function start(BOOT) {
 
@@ -824,6 +824,8 @@
     b('sp').meta += ' · start 55 kg (121 lb) → 57.5 kg (127 lb)';
     b('sp').cues = 'Target (based on last week\'s 4×6 @ 52.2 kg / 115 lb): start at 55 kg (121 lb); if 3–4 reps in reserve, go to 57.5 kg (127 lb); 60 kg (132 lb) only on the last set if 57.5 felt easy. 3RM 83.9 kg / 185 lb. ' + b('sp').cues;
     b('qg').meta += ' · 15.9 kg (35 lb) DBs 3×8/leg';
+    b('pu').meta += ' · ✓ DONE 10/28';
+    b('pu').cues = 'Done 10/28 (all sets): chin-up 3 × 6 bodyweight, strict dip 3 × 10 bodyweight (same as last week). ' + (b('pu').cues || '');
     b('qg').cues = 'Target (based on last week\'s 3×8 @ 13.6 kg / 30 lb DBs): 15.9 kg (35 lb) DBs, 3×8 each leg; push sets 2–3 toward 10 reps if easy. If form breaks before 8, drop to 13.6 kg (30 lb) for 3×10. ' + (b('qg').cues || '');
     b('dc').meta += ' · time tip: 60–75 s rest';
     b('arms').meta += ' · 0–1 RIR · time tip: 60–75 s rest';
@@ -836,6 +838,8 @@
     sp.cues = 'Actual: 4 sets × 6 reps @ 52.2 kg (115 lb) (old app history). ' + sp.cues;
     const qg = SESSIONS.w2_wed.blocks.find(x => x.id === 'qg');
     qg.cues = 'Actual: 3 sets × 8 reps each leg @ 13.6 kg (30 lb) DBs (old app history). ' + (qg.cues || '');
+    const pu = SESSIONS.w2_wed.blocks.find(x => x.id === 'pu');
+    pu.cues = 'Actual: chin-up 3 × 6 bodyweight, strict dip 3 × 10 bodyweight (Terry 10/28: same as Week 3). ' + (pu.cues || '');
     // Week 1 FB2 (app history dated 14 Oct)
     const qg1 = SESSIONS.tue.blocks.find(x => x.id === 'qg');
     qg1.cues = 'Actual: Deficit DB reverse lunge 3 × 8 each leg @ 9.1 / 11.3 / 13.6 kg (20 / 25 / 30 lb) DBs (old app history). ' + (qg1.cues || '');
