@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.5 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.6 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.5';
+  const APP_VERSION = '2.1.6';
 
   function start(BOOT) {
 
@@ -52,7 +52,7 @@
     { id: 'w3_mon', date: '2026-10-26', dow: 'Mon', short: '10/26', title: 'Full Body 1', subtitle: 'Squat Focused · done 10/26 · squat 4×6 @ 100 kg', type: 'strength' },
     { id: 'w3_tue', date: '2026-10-27', dow: 'Tue', short: '10/27', title: 'Easy Conditioning', subtitle: 'Run 50 min progressive easy or Row 3×10 min @ 18/20/22 s/m', type: 'conditioning' },
     { id: 'w3_wed', date: '2026-10-28', dow: 'Wed', short: '10/28', title: 'Full Body 2', subtitle: 'Press Focused · done 10/28 (partial: A–C) · press/lunge loads pending', type: 'strength' },
-    { id: 'w3_thu', date: '2026-10-29', dow: 'Thu', short: '10/29', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
+    { id: 'w3_thu', date: '2026-10-29', dow: 'Thu', short: '10/29', title: 'Pace Assessment', subtitle: 'Run 8×400m @ test pace (~1:56) or Row 8×500m @ 2k +3s', type: 'conditioning' },
     { id: 'w3_fri', date: '2026-10-30', dow: 'Fri', short: '10/30', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
     { id: 'w3_sat', date: '2026-10-31', dow: 'Sat', short: '10/31', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
     { id: 'w3_sun', date: '2026-11-01', dow: 'Sun', short: '11/01', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
@@ -817,6 +817,62 @@
     ],
   };
 
+  SESSIONS.w3_thu = {
+    name: 'Pace Assessment',
+    modality: true,
+    hrCard: 'pace3',
+    blocksRun: [
+      {
+        id: 'wu_p', title: 'A. Warm Up (Run Option)', meta: '15 min easy run incl. 3 × 20 s progressive strides · 40 s easy jog after each',
+        cues: 'Choose Option 1 or Option 2, not both. Z2, HR under ~137 bpm (~7:30–8:15/km · 12:04–13:17/mi). Strides build to about rep pace.',
+        sets: [
+          { id: 'wup15', label: '15 min easy · HR <137', fields: ['distance', 'avgHr', 'notes'] },
+          { id: 'strides', label: '3 × 20 s progressive strides', fields: ['notes'] },
+        ],
+      },
+      {
+        id: 'p400', title: 'Race Pace Intervals', meta: 'repeat 8x · 400m @ race / test pace · 1:30 easy jog rest',
+        cues: 'Test pace 4:49/km (7:45/mi) from the Oct 15 test → each 400m ≈ 1:56. Hold 1:54–1:58; back off if rep 1 is under 1:52. Jog the full 90 s, slowly.',
+        sets: [
+          { id: 'p400_1', label: '400m #1 · target ~1:56 (1:54–1:58)', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'p400_2', label: '400m #2 · target ~1:56 (1:54–1:58)', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'p400_3', label: '400m #3 · target ~1:56 (1:54–1:58)', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'p400_4', label: '400m #4 · target ~1:56 (1:54–1:58)', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'p400_5', label: '400m #5 · target ~1:56 (1:54–1:58)', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'p400_6', label: '400m #6 · target ~1:56 (1:54–1:58)', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'p400_7', label: '400m #7 · target ~1:56 (1:54–1:58)', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'p400_8', label: '400m #8 · target ~1:56 (1:54–1:58)', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+        ],
+      },
+      {
+        id: 'cd_p', title: 'Cool Down', meta: '15 min easy run',
+        cues: 'Z2, HR under ~137 bpm.',
+        sets: [{ id: 'cdp15', label: '15 min easy · HR <137', fields: ['distance', 'avgHr', 'notes'] }],
+      },
+    ],
+    blocksRow: [
+      {
+        id: 'easy_row_p', title: 'B. Easy Row (Row Option)', meta: '10 min Row Erg · easy · 18–22 s/m',
+        cues: 'Choose Option 1 or Option 2, not both.',
+        sets: [{ id: 'rowp10', label: '10 min easy row · 18–22 s/m', fields: ['distance', 'avgHr', 'rpe', 'notes'] }],
+      },
+      {
+        id: 'p500', title: '500m Intervals', meta: 'repeat 8x · 500m @ 2k pace +3s · 1:30 rest',
+        cues: 'Rest of the row option (after the intervals) was not visible in the screenshot.',
+        sets: [
+          { id: 'p500_1', label: '500m #1 · 2k pace +3s', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'p500_2', label: '500m #2 · 2k pace +3s', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'p500_3', label: '500m #3 · 2k pace +3s', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'p500_4', label: '500m #4 · 2k pace +3s', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'p500_5', label: '500m #5 · 2k pace +3s', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'p500_6', label: '500m #6 · 2k pace +3s', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'p500_7', label: '500m #7 · 2k pace +3s', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'p500_8', label: '500m #8 · 2k pace +3s', fields: ['time', 'avgHr', 'rpe', 'notes'] },
+        ],
+      },
+    ],
+  };
+
   SESSIONS.w3_wed = cloneSession('w2_wed');
   (function () {
     const s = SESSIONS.w3_wed;
@@ -850,7 +906,7 @@
     qg1.cues = 'Actual: Deficit DB reverse lunge 3 × 8 each leg @ 9.1 / 11.3 / 13.6 kg (20 / 25 / 30 lb) DBs (old app history). ' + (qg1.cues || '');
   })();
 
-  ['w3_thu', 'w3_fri', 'w3_sat', 'w3_sun'].forEach(id => {
+  ['w3_fri', 'w3_sat', 'w3_sun'].forEach(id => {
     SESSIONS[id] = {
       name: 'Awaiting screenshots',
       blocks: [{
@@ -1447,6 +1503,16 @@
           <li><strong>Easy (warm-up, cooldown): RPE 3–4, low Z2, HR under ~137 bpm</strong> (~<span class="pace">${z2}</span>)</li>
           <li><strong>Base intervals: RPE 4–5</strong>, high Z2 — may touch low Z3 (~140)</li>
           <li>If HR drifts well above that: slow down. Don't chase pace.</li>
+        </ul>
+      </div>`;
+    }
+    if (card === 'pace3') {
+      return `<div class="target-card hr-card hard">
+        <h4>PACE TARGET · 8 × 400m @ TEST PACE</h4>
+        <ul>
+          <li><strong>Each 400m ≈ 1:56</strong> (hold 1:54–1:58) — test pace ~<span class="pace">${dualPace('4:49')}</span> (Oct 15 test)</li>
+          <li>Back off if rep 1 is under 1:52. Jog the full 90 s, slowly.</li>
+          <li><strong>Warm-up + cooldown: Z2, HR under ~137</strong> (~<span class="pace">${z2}</span>). Strides build to about rep pace.</li>
         </ul>
       </div>`;
     }
