@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.10 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.11 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.10';
+  const APP_VERSION = '2.1.11';
 
   function start(BOOT) {
 
@@ -85,6 +85,7 @@
         },
         {
           id: 'bs', title: 'Back Squat', meta: 'KPI: build to 3RM, then back-off', kpi: '3rm_back_squat',
+          cues: "Done Mon 10/12: 142.9 kg (315 lb) × 3 @ RPE 9 (Remy's log, workout 867). Back-off sets not logged.",
           sets: [
             { id: 'bs_build', label: '3RM build / result', fields: ['weight', 'reps', 'rpe'], kpiField: true },
             { id: 'bs_bo1', label: 'Back-off set 1', fields: ['weight', 'reps', 'rpe'] },
@@ -94,6 +95,7 @@
         },
         {
           id: 'pp', title: 'Push + Pull', meta: 'Weighted push-ups · Cable seated row',
+          cues: "Done Mon 10/12: weighted push-up 3 × 10 @ 20.4 kg (45 lb); cable seated row 36.3 kg (80 lb) × 10, then 40.8 kg (90 lb) × 12 × 2 (Remy's log).",
           sets: [
             { id: 'pu1', label: 'Weighted push-ups 1', fields: ['weight', 'reps', 'rpe'] },
             { id: 'pu2', label: 'Weighted push-ups 2', fields: ['weight', 'reps', 'rpe'] },
@@ -130,11 +132,11 @@
           sets: [{ id: 'pogo1', label: 'Pogo jumps', fields: ['notes'] }],
         },
         {
-          id: 'easy_run', title: 'Easy Run', meta: 'Z2 · HR under ~137 bpm · ~7:30–8:15/km · 12:04–13:17/mi',
+          id: 'easy_run', title: 'Easy Run', meta: 'Z2 · HR under 139 bpm · ~7:30–8:15/km · 12:04–13:17/mi',
           sets: [
-            { id: 'er10', label: '10 min easy · Z2 HR <137', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
-            { id: 'er25', label: '25 min base · Z2 HR <137', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
-            { id: 'er5', label: '5 min easy · Z2 HR <137', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+            { id: 'er10', label: '10 min easy · Z2 HR <139', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+            { id: 'er25', label: '25 min base · Z2 HR <139', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+            { id: 'er5', label: '5 min easy · Z2 HR <139', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
           ],
         },
       ],
@@ -214,9 +216,9 @@
           sets: [{ id: 'pogo1', label: 'Pogo jumps', fields: ['notes'] }],
         },
         {
-          id: 'wu_run', title: 'Easy Warm-up + Strides', meta: '20 min easy · Z2 HR <137 · 3×20s strides',
+          id: 'wu_run', title: 'Easy Warm-up + Strides', meta: '20 min easy · Z2 HR <139 · 3×20s strides',
           sets: [
-            { id: 'wu20', label: '20 min easy · Z2 HR <137 (~7:30–8:15/km · 12:04–13:17/mi)', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+            { id: 'wu20', label: '20 min easy · Z2 HR <139 (~7:30–8:15/km · 12:04–13:17/mi)', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
             { id: 'str1', label: 'Stride 1 · 20s', fields: ['notes'] },
             { id: 'str2', label: 'Stride 2 · 20s', fields: ['notes'] },
             { id: 'str3', label: 'Stride 3 · 20s', fields: ['notes'] },
@@ -233,7 +235,7 @@
           ],
         },
         {
-          id: 'cd', title: 'Cooldown', meta: '10 min easy · Z2 HR <137',
+          id: 'cd', title: 'Cooldown', meta: '10 min easy · Z2 HR <139',
           sets: [{ id: 'cd10', label: '10 min easy jog', fields: ['distance', 'avgHr', 'notes'] }],
         },
       ],
@@ -300,23 +302,23 @@
           sets: [{ id: 'pogo1', label: 'Pogo jumps', fields: ['notes'] }],
         },
         {
-          id: 'wu', title: 'Easy Warm-up', meta: '15 min easy · Z2 HR <137',
-          sets: [{ id: 'wu15', label: '15 min easy · Z2 HR <137', fields: ['distance', 'avgHr', 'notes'] }],
+          id: 'wu', title: 'Easy Warm-up', meta: '15 min easy · Z2 HR <139',
+          sets: [{ id: 'wu15', label: '15 min easy · Z2 HR <139', fields: ['distance', 'avgHr', 'notes'] }],
         },
         {
-          id: 'tempo', title: 'Tempo Intervals', meta: 'MODERATE · 6 min @ Z3 HR ~140–155 (cap ~155–158) + 2 min easy × 3–4',
+          id: 'tempo', title: 'Tempo Intervals', meta: 'MODERATE · 6 min @ Z3 HR 139–158 (cap 158) + 2 min easy × 3–4',
           sets: [
-            { id: 't1', label: 'Tempo 1 · 6 min · HR 140–155', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+            { id: 't1', label: 'Tempo 1 · 6 min · HR 139–158', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
             { id: 'tr1', label: 'Easy jog 2 min', fields: ['notes'] },
-            { id: 't2', label: 'Tempo 2 · 6 min · HR 140–155', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+            { id: 't2', label: 'Tempo 2 · 6 min · HR 139–158', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
             { id: 'tr2', label: 'Easy jog 2 min', fields: ['notes'] },
-            { id: 't3', label: 'Tempo 3 · 6 min · HR 140–155', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+            { id: 't3', label: 'Tempo 3 · 6 min · HR 139–158', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
             { id: 'tr3', label: 'Easy jog 2 min', fields: ['notes'] },
-            { id: 't4', label: 'Tempo 4 · 6 min · HR 140–155 (optional)', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+            { id: 't4', label: 'Tempo 4 · 6 min · HR 139–158 (optional)', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
           ],
         },
         {
-          id: 'cd', title: 'Cooldown', meta: '5 min easy · Z2 HR <137',
+          id: 'cd', title: 'Cooldown', meta: '5 min easy · Z2 HR <139',
           sets: [{ id: 'cd5', label: '5 min cooldown', fields: ['distance', 'avgHr', 'notes'] }],
         },
       ],
@@ -330,15 +332,15 @@
           sets: [{ id: 'rwu10', label: '10 min easy', fields: ['distance', 'avgHr', 'notes'] }],
         },
         {
-          id: 'tempo_r', title: 'Tempo Row', meta: 'MODERATE · 6 min @ 20–24 s/m · HR ~140–155 (cap ~155–158) + 2 min rest × 4',
+          id: 'tempo_r', title: 'Tempo Row', meta: 'MODERATE · 6 min @ 20–24 s/m · HR 139–158 (cap 158) + 2 min rest × 4',
           sets: [
-            { id: 'rt1', label: 'Tempo 1 · 6 min · HR 140–155', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+            { id: 'rt1', label: 'Tempo 1 · 6 min · HR 139–158', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
             { id: 'rtr1', label: 'Rest 2 min', fields: ['notes'] },
-            { id: 'rt2', label: 'Tempo 2 · 6 min · HR 140–155', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+            { id: 'rt2', label: 'Tempo 2 · 6 min · HR 139–158', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
             { id: 'rtr2', label: 'Rest 2 min', fields: ['notes'] },
-            { id: 'rt3', label: 'Tempo 3 · 6 min · HR 140–155', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+            { id: 'rt3', label: 'Tempo 3 · 6 min · HR 139–158', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
             { id: 'rtr3', label: 'Rest 2 min', fields: ['notes'] },
-            { id: 'rt4', label: 'Tempo 4 · 6 min · HR 140–155', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+            { id: 'rt4', label: 'Tempo 4 · 6 min · HR 139–158', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
           ],
         },
         {
@@ -418,7 +420,7 @@
           sets: [{ id: 'pogo1', label: 'Pogo jumps', fields: ['notes'] }],
         },
         {
-          id: 'easy_run', title: 'Easy Run Warm-up', meta: '10 min easy · RPE 3–4 (low Z2) · HR <137',
+          id: 'easy_run', title: 'Easy Run Warm-up', meta: '10 min easy · RPE 3–4 (low Z2) · HR <139',
           cues: 'Option 1 (Run) or Option 2 (Row), not both.',
           sets: [{ id: 'er10', label: '10 min easy · RPE 3–4', fields: ['distance', 'avgHr', 'rpe', 'notes'] }],
         },
@@ -538,10 +540,10 @@
           sets: [{ id: 'pogo1', label: 'Pogo jumps', fields: ['notes'] }],
         },
         {
-          id: 'wu_run', title: 'Easy Run + Strides', meta: '15 min easy · Z2 HR <137 · 3×20s strides',
+          id: 'wu_run', title: 'Easy Run + Strides', meta: '15 min easy · Z2 HR <139 · 3×20s strides',
           cues: '15 min easy run with some progressive strides to warm up. A stride is a faster run but not an all-out sprint. Option 1 (Run) or Option 2 (Row), not both.',
           sets: [
-            { id: 'wu15', label: '15 min easy · Z2 HR <137', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+            { id: 'wu15', label: '15 min easy · Z2 HR <139', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
             { id: 'str1', label: 'Stride 1 · 20s', fields: ['notes'] },
             { id: 'str2', label: 'Stride 2 · 20s', fields: ['notes'] },
             { id: 'str3', label: 'Stride 3 · 20s', fields: ['notes'] },
@@ -562,7 +564,7 @@
           ],
         },
         {
-          id: 'cd', title: 'Cool Down', meta: '15 min easy · Z2 HR <137',
+          id: 'cd', title: 'Cool Down', meta: '15 min easy · Z2 HR <139',
           sets: [{ id: 'cd15', label: '15 min easy jog', fields: ['distance', 'avgHr', 'notes'] }],
         },
       ],
@@ -675,25 +677,25 @@
           sets: [{ id: 'pogo1', label: 'Pogo jumps', fields: ['notes'] }],
         },
         {
-          id: 'wu', title: 'Easy Run Warm-up', meta: '10 min easy · Z2 HR <137',
+          id: 'wu', title: 'Easy Run Warm-up', meta: '10 min easy · Z2 HR <139',
           cues: 'Option 1 (Run) or Option 2 (Row), not both.',
-          sets: [{ id: 'wu10', label: '10 min easy · Z2 HR <137', fields: ['distance', 'avgHr', 'notes'] }],
+          sets: [{ id: 'wu10', label: '10 min easy · Z2 HR <139', fields: ['distance', 'avgHr', 'notes'] }],
         },
         {
-          id: 'tempo', title: 'Tempo Run', meta: 'MODERATE · repeat 4x · 1 km @ tempo (Z3 HR ~140–155, cap ~155–158) · 2 min rest easy jog',
+          id: 'tempo', title: 'Tempo Run', meta: 'MODERATE · repeat 4x · 1 km @ tempo (Z3 HR 139–158, cap 158) · 2 min rest easy jog',
           cues: 'Aim for consistency across sets; choice of 3–4 sets.',
           sets: [
-            { id: 't1', label: 'Tempo 1 · 1 km / 0.62 mi · HR 140–155', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+            { id: 't1', label: 'Tempo 1 · 1 km / 0.62 mi · HR 139–158', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
             { id: 'tr1', label: 'Easy jog 2 min', fields: ['notes'] },
-            { id: 't2', label: 'Tempo 2 · 1 km / 0.62 mi · HR 140–155', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+            { id: 't2', label: 'Tempo 2 · 1 km / 0.62 mi · HR 139–158', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
             { id: 'tr2', label: 'Easy jog 2 min', fields: ['notes'] },
-            { id: 't3', label: 'Tempo 3 · 1 km / 0.62 mi · HR 140–155', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+            { id: 't3', label: 'Tempo 3 · 1 km / 0.62 mi · HR 139–158', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
             { id: 'tr3', label: 'Easy jog 2 min', fields: ['notes'] },
-            { id: 't4', label: 'Tempo 4 · 1 km / 0.62 mi · HR 140–155 (optional)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+            { id: 't4', label: 'Tempo 4 · 1 km / 0.62 mi · HR 139–158 (optional)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
           ],
         },
         {
-          id: 'cd', title: 'Cool Down', meta: '5 min easy · Z2 HR <137',
+          id: 'cd', title: 'Cool Down', meta: '5 min easy · Z2 HR <139',
           sets: [{ id: 'cd5', label: '5 min cool down', fields: ['distance', 'avgHr', 'notes'] }],
         },
       ],
@@ -708,7 +710,7 @@
           sets: [{ id: 'rwu10', label: '10 min easy · 18–20 s/m', fields: ['distance', 'avgHr', 'notes'] }],
         },
         {
-          id: 'tempo_r', title: 'Tempo Row', meta: 'MODERATE · repeat 4x · 1.5 km row @ tempo 20–24 s/m · HR ~140–155 (cap ~155–158) · 2 min rest',
+          id: 'tempo_r', title: 'Tempo Row', meta: 'MODERATE · repeat 4x · 1.5 km row @ tempo 20–24 s/m · HR 139–158 (cap 158) · 2 min rest',
           cues: 'Aim for consistency across sets; choice of 3–4 sets.',
           sets: [
             { id: 'rt1', label: 'Tempo 1 · 1.5 km · 20–24 s/m', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
@@ -783,10 +785,10 @@
       },
       {
         id: 'prog', title: 'A. Easy Conditioning (Run Option)', meta: 'Progressive Easy Run · 50 min @ Easy run · continuous, no rest between stages',
-        cues: 'Choose Option 1 or Option 2, not both. First 20 min easy; next 20 min comfortable aerobic effort; final 10 min slightly quicker, still conversational. Target: Z2, keep under ~137 bpm for the first 40 min; last 10 min may drift slightly but stay conversational and below Z3 (<139). Est. total 6.06 km–6.67 km at 7:30–8:15/km.',
+        cues: 'Choose Option 1 or Option 2, not both. First 20 min easy; next 20 min comfortable aerobic effort; final 10 min slightly quicker, still conversational. Target: Z2, keep under 139 bpm for the first 40 min; last 10 min may drift slightly but stay conversational and below Z3 (<139). Est. total 6.06 km–6.67 km at 7:30–8:15/km.',
         sets: [
-          { id: 'pr1', label: '0–20 min · 20 min easy · HR <137', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
-          { id: 'pr2', label: '20–40 min · 20 min comfortable aerobic · HR <137', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'pr1', label: '0–20 min · 20 min easy · HR <139', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'pr2', label: '20–40 min · 20 min comfortable aerobic · HR <139', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
           { id: 'pr3', label: '40–50 min · 10 min slightly quicker, conversational · HR <139', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
         ],
       },
@@ -824,9 +826,9 @@
     blocksRun: [
       {
         id: 'wu_p', title: 'A. Warm Up (Run Option)', meta: '15 min easy run incl. 3 × 20 s progressive strides · 40 s easy jog after each',
-        cues: 'Choose Option 1 or Option 2, not both. Z2, HR under ~137 bpm (~7:30–8:15/km · 12:04–13:17/mi). Strides build to about rep pace. Treadmill (1% incline): warm-up 4.5–5.0 mph (7.3–8.0 km/h); strides build 6.0 → ~7.7 mph (9.7 → 12.4 km/h; 10:00 → 7:45/mi, 6:13 → 4:49/km), 40 s jog at ~4.5 mph (7.2 km/h).',
+        cues: 'Choose Option 1 or Option 2, not both. Z2, HR under 139 bpm (~7:30–8:15/km · 12:04–13:17/mi). Strides build to about rep pace. Treadmill (1% incline): warm-up 4.5–5.0 mph (7.3–8.0 km/h); strides build 6.0 → ~7.7 mph (9.7 → 12.4 km/h; 10:00 → 7:45/mi, 6:13 → 4:49/km), 40 s jog at ~4.5 mph (7.2 km/h).',
         sets: [
-          { id: 'wup15', label: '15 min easy · HR <137', fields: ['distance', 'avgHr', 'notes'] },
+          { id: 'wup15', label: '15 min easy · HR <139', fields: ['distance', 'avgHr', 'notes'] },
           { id: 'strides', label: '3 × 20 s progressive strides', fields: ['notes'] },
         ],
       },
@@ -846,8 +848,8 @@
       },
       {
         id: 'cd_p', title: 'Cool Down', meta: '15 min easy run',
-        cues: 'Z2, HR under ~137 bpm. Treadmill (1% incline): 4.5–5.0 mph (7.3–8.0 km/h; 12:04–13:17/mi, 7:30–8:15/km).',
-        sets: [{ id: 'cdp15', label: '15 min easy · HR <137', fields: ['distance', 'avgHr', 'notes'] }],
+        cues: 'Z2, HR under 139 bpm. Treadmill (1% incline): 4.5–5.0 mph (7.3–8.0 km/h; 12:04–13:17/mi, 7:30–8:15/km).',
+        sets: [{ id: 'cdp15', label: '15 min easy · HR <139', fields: ['distance', 'avgHr', 'notes'] }],
       },
     ],
     blocksRow: [
@@ -1516,7 +1518,7 @@
       return `<div class="target-card hr-card easy">
         <h4>HR target · EASY / BASE (Z2)</h4>
         <ul>
-          <li><strong>Easy (warm-up, cooldown): RPE 3–4, low Z2, HR under ~137 bpm</strong> (~<span class="pace">${z2}</span>)</li>
+          <li><strong>Easy (warm-up, cooldown): RPE 3–4, low Z2, HR under 139 bpm</strong> (~<span class="pace">${z2}</span>)</li>
           <li><strong>Base intervals: RPE 4–5</strong>, high Z2 — may touch low Z3 (~140)</li>
           <li>If HR drifts well above that: slow down. Don't chase pace.</li>
         </ul>
@@ -1528,11 +1530,11 @@
         <ul>
           <li><strong>Each 400m ≈ 1:56</strong> (hold 1:54–1:58) — test pace ~<span class="pace">${dualPace('4:49')}</span> (Oct 15 test)</li>
           <li>Back off if rep 1 is under 1:52. Jog the full 90 s, slowly.</li>
-          <li><strong>Warm-up + cooldown: Z2, HR under ~137</strong> (~<span class="pace">${z2}</span>). Strides build to about rep pace.</li>
+          <li><strong>Warm-up + cooldown: Z2, HR under 139</strong> (~<span class="pace">${z2}</span>). Strides build to about rep pace.</li>
         </ul>
         <h4>TREADMILL · 1% INCLINE</h4>
         <ul>
-          <li><strong>Warm-up / cool-down: 4.5–5.0 mph</strong> (7.3–8.0 km/h) · 12:04–13:17/mi · 7:30–8:15/km · HR &lt;137</li>
+          <li><strong>Warm-up / cool-down: 4.5–5.0 mph</strong> (7.3–8.0 km/h) · 12:04–13:17/mi · 7:30–8:15/km · HR &lt;139</li>
           <li><strong>Strides: build 6.0 → ~7.7 mph</strong> (9.7 → 12.4 km/h) · 10:00 → 7:45/mi · 40 s jog ~4.5 mph (7.2 km/h)</li>
           <li><strong>400m reps: 7.7 mph (12.4 km/h)</strong> = 7:45/mi · 4:49/km · ~1:56/rep · band 7.6–7.9 mph (12.2–12.7 km/h) = 7:36–7:54/mi, ~1:53–1:58/rep</li>
           <li><strong>Recovery jog: 4.0–4.5 mph</strong> (6.4–7.2 km/h) · 13:20–15:00/mi · 8:17–9:19/km</li>
@@ -1551,7 +1553,7 @@
       return `<div class="target-card hr-card easy">
         <h4>HR target · PROGRESSIVE EASY RUN (Z2)</h4>
         <ul>
-          <li><strong>0–40 min: Z2, HR under ~137 bpm</strong> (~<span class="pace">${z2}</span>)</li>
+          <li><strong>0–40 min: Z2, HR under 139 bpm</strong> (~<span class="pace">${z2}</span>)</li>
           <li><strong>40–50 min: slightly quicker</strong>, HR may drift but stays conversational and below Z3 (<139)</li>
           <li>Est. 6.06–6.67 km · 3.77–4.14 mi for the 50 min. Don't chase pace.</li>
         </ul>
@@ -1561,7 +1563,7 @@
       return `<div class="target-card hr-card hard">
         <h4>HR target · RACE PACE INTERVALS (HARD)</h4>
         <ul>
-          <li><strong>Warm-up + cooldown: Z2, HR under ~137</strong> (~<span class="pace">${z2}</span>)</li>
+          <li><strong>Warm-up + cooldown: Z2, HR under 139</strong> (~<span class="pace">${z2}</span>)</li>
           <li><strong>8 × 2 min @ race pace: HARD</strong> — ~<span class="pace">${dualPace('4:49')}</span> (Oct 15 TT pace) · ~${dualKmLabel(0.415)} per rep</li>
           <li>2 min easy jog between efforts. Strides = faster run, not all-out sprint.</li>
         </ul>
@@ -1571,9 +1573,10 @@
       return `<div class="target-card hr-card easy">
         <h4>HR target · EASY / BASE (Z2)</h4>
         <ul>
-          <li><strong>HR under ~137 bpm</strong> the whole run (warm-up, base, cooldown)</li>
+          <li><strong>HR under 139 bpm</strong> the whole run (warm-up, base, cooldown)</li>
           <li>Pace is whatever Z2 gives — roughly <span class="pace">${z2}</span></li>
-          <li>If HR drifts above 137: slow down or walk briefly. Don't chase pace.</li>
+          <li>If HR drifts above 138: slow down or walk briefly. Don't chase pace.</li>
+          <li class="muted">Zones from max HR 199 (chest strap, Oct 1 &amp; 4): Z2 119–138 · Z3 139–158 · Z4 159–178</li>
         </ul>
       </div>`;
     }
@@ -1582,10 +1585,11 @@
       <div class="target-card hr-card tempo">
         <h4>HR target · TEMPO (Z3, moderate)</h4>
         <ul>
-          <li><strong>Tempo reps: HR ~140–155 bpm</strong> (Z3) · <strong>hard cap ~155–158</strong></li>
-          <li>Not hard. If HR hits 155–158, ease off — Z4 (157+) is too much for this session.</li>
+          <li><strong>Tempo reps: HR 139–158 bpm</strong> (Z3) · <strong>hard cap 158</strong></li>
+          <li>Not hard. If HR reaches 158, ease off — Z4 (159+) is too much for this session.</li>
           <li>Oct 10 tempo work laps averaged 159–162 bpm (Z4) — that was too hard.</li>
-          <li>Warm-up / jog recoveries / cooldown: Z2, HR under ~137 (~<span class="pace">${z2}</span>)</li>
+          <li>Warm-up / jog recoveries / cooldown: Z2, HR under 139 (~<span class="pace">${z2}</span>)</li>
+          <li class="muted">Zones from max HR 199 (chest strap, Oct 1 &amp; 4): Z2 119–138 · Z3 139–158 · Z4 159–178</li>
         </ul>
       </div>`;
     }
@@ -1593,7 +1597,7 @@
       return `<div class="target-card hr-card hard">
         <h4>HR target · INTERVALS / TT (HARD)</h4>
         <ul>
-          <li><strong>Warm-up + cooldown: Z2, HR under ~137</strong> (~<span class="pace">${z2}</span>)</li>
+          <li><strong>Warm-up + cooldown: Z2, HR under 139</strong> (~<span class="pace">${z2}</span>)</li>
           <li><strong>TT / strides: HARD</strong> — HR climbs into 180s, 190s by the finish</li>
         </ul>
       </div>`;
@@ -1612,12 +1616,12 @@
     return `<div class="target-card">
       <h4>Today’s TT targets</h4>
       <ul>
-        <li><strong>Warm-up:</strong> 20 min easy Z2, <strong>HR under ~137</strong> (~<span class="pace">${easy}</span>) · then 3×20s strides</li>
+        <li><strong>Warm-up:</strong> 20 min easy Z2, <strong>HR under 139</strong> (~<span class="pace">${easy}</span>) · then 3×20s strides</li>
         <li><strong>TT goal:</strong> <span class="pace">${goal}</span> · stretch <span class="pace">${stretch}</span> (avg ~${avgGoal})</li>
         <li><strong>Pacing:</strong> first 2 min ~<span class="pace">${first}</span> (no faster than 4:58/km · ${dualPace('4:58').split(' · ')[1]} first min) · middle <span class="pace">${mid}</span> · push last 2 min</li>
         <li><strong>Checkpoint:</strong> ${cp}</li>
         <li><strong>HR (HARD):</strong> climbs into 180s, 190s at finish · Oct 1 mile was 7:43/mi (4:48/km) but went out ~6:45/mi (4:12/km) and faded — stay patient</li>
-        <li><strong>Cooldown:</strong> 10 min easy · Z2 HR under ~137</li>
+        <li><strong>Cooldown:</strong> 10 min easy · Z2 HR under 139</li>
       </ul>
     </div>`;
   }
@@ -2239,6 +2243,10 @@
     root.innerHTML = html;
   }
 
+  // Pre-Phase 6 completed sets from Remy's Training Log (imported 2026-10-30; read-only, not synced).
+  // Source: fitness repo data/imports/remy_2026-10-30/sets.csv. Reps '?' = set marked done without reps.
+  const PRE_PHASE6_SETS = [{"date": "2026-09-23", "title": "Remy workout 1 · ⚠ bench loads conflict with plan notes (235–240 lb)", "items": [["Barbell Bench Press", "115.7 kg (255 lb) × 2 @8 (×2), 124.7 kg (275 lb) × 2 @8 (×3)"], ["Front Foot Elevated Barbell Split Squat", "56.7 kg (125 lb) × 7 (×3)"], ["Narrow Grip Cable Lat Pulldown", "40.8 kg (90 lb) × 10, 45.4 kg (100 lb) × 7, 47.6 kg (105 lb) × 7"], ["Cable Lean-Away Lateral Raise", "4.5 kg (10 lb) × 7 (×3)"], ["DB Skull Crusher", "20.4 kg (45 lb) × 7 (×3)"], ["Barbell Curl", "27.2 kg (60 lb) × 7, 29.5 kg (65 lb) × ?, 29.5 kg (65 lb) × 7"], ["Machine Calf Raise", "40.8 kg (90 lb) × 8, 20.4 kg (45 lb) × 8 (×2)"]]}, {"date": "2026-09-28", "title": "Remy workout 860 · front squat test", "items": [["Barbell Front Squat", "20 kg (44 lb) × 10, 60 kg (132 lb) × 8, 74.8 kg (165 lb) × 5, 100 kg (220 lb) × 3, 115.7 kg (255 lb) × 1, 120.2 kg (265 lb) × 3 @10"], ["Smith Machine Behind-the-Neck Press", "43.1 kg (95 lb) × 5, 52.2 kg (115 lb) × 5 (×2)"], ["DB Chest-Supported Upper Back Row", "27.2 kg (60 lb) × 7, 27.2 kg (60 lb) × ? (×2)"], ["Machine Lying Prone Hamstring Curl", "60 kg (132 lb) × 10 (×3)"], ["DB Preacher Curl", "13.6 kg (30 lb) × 7 (×2), 15.9 kg (35 lb) × 7"], ["Strict Dip", "BW × 7 (×3)"]]}, {"date": "2026-09-30", "title": "Remy workout 858 · bench test", "items": [["Barbell Bench Press", "20 kg (44 lb) × 10, 61.2 kg (135 lb) × 8, 79.4 kg (175 lb) × 5, 102.1 kg (225 lb) × 3, 111.1 kg (245 lb) × 1, 122.5 kg (270 lb) × 5 @10"], ["Front Foot Elevated Barbell Split Squat", "61.2 kg (135 lb) × ? (×3)"], ["Narrow Grip Cable Lat Pulldown", "45.4 kg (100 lb) × 7, 45.4 kg (100 lb) × ? (×2)"], ["Cable Lean-Away Lateral Raise", "4.5 kg (10 lb) × ? (×2)"], ["DB Skull Crusher", "20.4 kg (45 lb) × 7, 20.4 kg (45 lb) × 5 (×2)"], ["Barbell Curl", "11.3 kg (25 lb) × 7, 13.6 kg (30 lb) × 7 (×2)"], ["Machine Leg Press Calf Raise", "31.8 kg (70 lb) × 10, 49.9 kg (110 lb) × 10 (×2)"]]}, {"date": "2026-10-05", "title": "Remy workout 863 · deload", "items": [["Barbell Front Squat", "100 kg (220 lb) × 5 (×2)"], ["Smith Machine Behind the Neck Press", "43.1 kg (95 lb) × 5 (×2)"], ["DB Chest Supported Upper Back Row", "20.4 kg (45 lb) × 7 (×2)"], ["Machine Lying Prone Hamstring Curl", "40.8 kg (90 lb) × 7 (×2)"], ["DB Preacher Curl", "13.6 kg (30 lb) × 5 (×2)"], ["Strict Dip", "BW × 5 (×2)"]]}, {"date": "2026-10-08", "title": "Remy workout 864 · bench + split squat", "items": [["Barbell Bench Press", "102.1 kg (225 lb) × 5 (×2)"], ["Front Foot Elevated Barbell Split Squat", "52.2 kg (115 lb) × 7 (×2)"]]}, {"date": "2026-10-12", "title": "Remy workout 867 · FB1 back squat 3RM (done Mon 10/12)", "items": [["Barbell Back Squat", "142.9 kg (315 lb) × 3 @9"], ["Weighted Push Up", "20.4 kg (45 lb) × 10 (×3)"], ["Cable Seated Row", "36.3 kg (80 lb) × 10, 40.8 kg (90 lb) × 12 (×2)"]]}];
+
   function renderHistory() {
     const items = ALL_DAYS.map(d => {
       const log = state.logs[d.id];
@@ -2264,6 +2272,11 @@
       });
     }
     html += `</div>`;
+    html += `<div class="card"><h2>Pre-Phase 6 lifts</h2><p class="muted" style="margin:0">Completed sets from Remy's Training Log · read-only</p></div><div class="card pre6" style="padding:0">`
+      + PRE_PHASE6_SETS.map(sx => `<div class="history-item"><div>
+          <div style="font-weight:700">${escapeHtml(sx.date.slice(5).replace('-', '/'))} · ${escapeHtml(sx.title)}</div>
+          ${sx.items.map(it => `<div class="muted" style="font-size:12px;margin-top:2px"><strong>${escapeHtml(it[0])}:</strong> ${escapeHtml(it[1])}</div>`).join('')}
+        </div></div>`).join('') + `</div>`;
     const wis = activeWeighins();
     html += `<div class="card"><h2>Weigh-ins</h2>${wis.length ? '' : '<p class="muted" style="margin:0">None yet — log one on Today.</p>'}</div>`;
     if (wis.length) {
@@ -2651,6 +2664,14 @@
   // Known weigh-ins reported to the coach (fasted AM). Seeded once by stable id; skipped if
   // that id exists (incl. deleted) or a weigh-in is already logged on the same LA date.
   const SEED_WEIGHINS = [
+    // From Remy's Training Log export (imported 2026-10-30). Time of day not logged; only 9/27 stated fasted.
+    { id: 'seed-wi-2026-09-25', measuredAt: '2026-09-25T12:00:00-07:00', weightLb: 240.0, notes: "Remy's log" },
+    { id: 'seed-wi-2026-09-27', measuredAt: '2026-09-27T12:00:00-07:00', weightLb: 240.9, notes: "Fasted · Remy's log" },
+    { id: 'seed-wi-2026-10-02', measuredAt: '2026-10-02T12:00:00-07:00', weightLb: 240.9, notes: "Remy's log" },
+    { id: 'seed-wi-2026-10-05', measuredAt: '2026-10-05T12:00:00-07:00', weightLb: 240.5, notes: "Remy's log" },
+    { id: 'seed-wi-2026-10-07', measuredAt: '2026-10-07T12:00:00-07:00', weightLb: 243.4, notes: "Remy's log" },
+    { id: 'seed-wi-2026-10-10', measuredAt: '2026-10-10T12:00:00-07:00', weightLb: 245.0, notes: "Remy's log" },
+    { id: 'seed-wi-2026-10-12', measuredAt: '2026-10-12T12:00:00-07:00', weightLb: 242.8, notes: "Remy's log" },
     { id: 'seed-wi-2026-10-16', measuredAt: '2026-10-16T06:30:00-07:00', weightLb: 240.1 },
     { id: 'seed-wi-2026-10-17', measuredAt: '2026-10-17T06:30:00-07:00', weightLb: 240.9 },
     { id: 'seed-wi-2026-10-18', measuredAt: '2026-10-18T06:30:00-07:00', weightLb: 243.0 },
