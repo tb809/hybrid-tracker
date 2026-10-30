@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.8 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.9 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.8';
+  const APP_VERSION = '2.1.9';
 
   function start(BOOT) {
 
@@ -52,7 +52,7 @@
     { id: 'w3_mon', date: '2026-10-26', dow: 'Mon', short: '10/26', title: 'Full Body 1', subtitle: 'Squat Focused · done 10/26 · squat 4×6 @ 100 kg', type: 'strength' },
     { id: 'w3_tue', date: '2026-10-27', dow: 'Tue', short: '10/27', title: 'Easy Conditioning', subtitle: 'Run 50 min progressive easy or Row 3×10 min @ 18/20/22 s/m', type: 'conditioning' },
     { id: 'w3_wed', date: '2026-10-28', dow: 'Wed', short: '10/28', title: 'Full Body 2', subtitle: 'Press Focused · done 10/28 (partial: A–C) · press/lunge loads pending', type: 'strength' },
-    { id: 'w3_thu', date: '2026-10-29', dow: 'Thu', short: '10/29', title: 'Pace Assessment', subtitle: 'Run 8×400m @ test pace (~1:56) or Row 8×500m @ 2k +3s', type: 'conditioning' },
+    { id: 'w3_thu', date: '2026-10-29', dow: 'Thu', short: '10/29', title: 'Pace Assessment', subtitle: '✓ Done 10/29 · treadmill 6×400m (of 8) @ 7.6–7.7 mph · cool-down skipped', type: 'conditioning' },
     { id: 'w3_fri', date: '2026-10-30', dow: 'Fri', short: '10/30', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
     { id: 'w3_sat', date: '2026-10-31', dow: 'Sat', short: '10/31', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
     { id: 'w3_sun', date: '2026-11-01', dow: 'Sun', short: '11/01', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
@@ -832,7 +832,7 @@
       },
       {
         id: 'p400', title: 'Race Pace Intervals', meta: 'repeat 8x · 400m @ race / test pace · 1:30 easy jog rest',
-        cues: 'Test pace 4:49/km (7:45/mi) from the Oct 15 test → each 400m ≈ 1:56. Hold 1:54–1:58; back off if rep 1 is under 1:52. Jog the full 90 s, slowly. Treadmill (1% incline): reps 7.7 mph (12.4 km/h) = 7:45/mi, 4:49/km, ~1:56/rep; band 7.6–7.9 mph (12.2–12.7 km/h) = 7:36–7:54/mi, 4:43–4:55/km, ~1:53–1:58/rep. Recovery jog 4.0–4.5 mph (6.4–7.2 km/h; 13:20–15:00/mi, 8:17–9:19/km). Press the speed change ~5 s before each change.',
+        cues: 'Test pace 4:49/km (7:45/mi) from the Oct 15 test → each 400m ≈ 1:56. Hold 1:54–1:58; back off if rep 1 is under 1:52. Jog the full 90 s, slowly. Treadmill (1% incline): reps 7.7 mph (12.4 km/h) = 7:45/mi, 4:49/km, ~1:56/rep; band 7.6–7.9 mph (12.2–12.7 km/h) = 7:36–7:54/mi, 4:43–4:55/km, ~1:53–1:58/rep. Recovery jog 4.0–4.5 mph (6.4–7.2 km/h; 13:20–15:00/mi, 8:17–9:19/km). Press the speed change ~5 s before each change. Today (10/29): run the reps by pace, not HR — ignore HR caps on the reps but keep the watch recording. 0% incline is fine at the same speeds; if 7.7 mph feels comfortable by rep 3, nudge to 7.8. Too fast: fall back to 7.3–7.5 mph (11.7–12.1 km/h, ~8:00–8:13/mi, ~4:58–5:06/km, ~2:00–2:02 per 400m) and hold it even across all reps; on a bad day cut to 6 reps.',
         sets: [
           { id: 'p400_1', label: '400m #1 · target ~1:56 (1:54–1:58)', fields: ['time', 'avgHr', 'rpe', 'notes'] },
           { id: 'p400_2', label: '400m #2 · target ~1:56 (1:54–1:58)', fields: ['time', 'avgHr', 'rpe', 'notes'] },
@@ -872,6 +872,22 @@
       },
     ],
   };
+
+  // Thu 10/29 actuals (Terry): treadmill, 0% incline, run by pace not HR.
+  (function () {
+    const s = SESSIONS.w3_thu;
+    const b = id => s.blocksRun.find(x => x.id === id);
+    
+    b('wu_p').meta = '✓ Done 10/29 (per plan; details not reported) · ' + b('wu_p').meta;
+    b('p400').meta = '✓ Done 10/29 · 6 of 8 reps (stopped at 6 by choice) · ' + b('p400').meta;
+    b('p400').cues = 'Done 10/29 on the treadmill at 0% incline, run by pace (not HR): reps 1–4 @ 7.6 mph (12.2 km/h, ~4:54/km · ~7:54/mi, ~1:58 per 400m); reps 5–6 @ 7.7 mph (12.4 km/h, ~4:51/km · ~7:48/mi, ~1:56 per 400m). Reps 7–8 not run (stopped at 6 by choice). Cool-down skipped (left early for an evening event). HR not reported. ' + b('p400').cues;
+    b('p400').sets.forEach((set, i) => {
+      if (i < 4) set.label += ' · done @ 7.6 mph (~1:58)';
+      else if (i < 6) set.label += ' · done @ 7.7 mph (~1:56)';
+      else set.label += ' · not run (stopped at 6)';
+    });
+    b('cd_p').meta = 'Skipped 10/29 (left early for an evening event) · ' + b('cd_p').meta;
+  })();
 
   SESSIONS.w3_wed = cloneSession('w2_wed');
   (function () {
@@ -1522,6 +1538,13 @@
           <li><strong>Recovery jog: 4.0–4.5 mph</strong> (6.4–7.2 km/h) · 13:20–15:00/mi · 8:17–9:19/km</li>
           <li>Tip: press the speed change ~5 s before each change.</li>
         </ul>
+        <h4>TODAY'S NOTES · THU 10/29</h4>
+        <ul>
+          <li><strong>Run by pace today, not HR.</strong> Ignore HR caps on the reps, but keep the watch recording.</li>
+          <li><strong>0% incline is fine:</strong> keep the same speeds. If 7.7 mph feels comfortable by rep 3, nudge to 7.8.</li>
+          <li><strong>Too fast? Fall back to 7.3–7.5 mph</strong> (11.7–12.1 km/h) · ~8:00–8:13/mi · ~4:58–5:06/km · ~2:00–2:02 per 400m. Hold it even across all reps.</li>
+          <li>Bad day: cut to 6 reps.</li>
+        </ul>
       </div>`;
     }
     if (card === 'easy3') {
@@ -1824,7 +1847,7 @@
     const toSec = p => { const [m, x] = p.split(':').map(Number); return m * 60 + x; };
     s = s.replace(/(\d{1,2}:\d{2})(?:\s*[–-]\s*(\d{1,2}:\d{2}))?\s*\/km(?!\s*(?:·|\/|\(|,)\s*~?\d{1,2}:\d{2}(?:\s*[–-]\s*\d{1,2}:\d{2})?\s*\/mi)/g,
       (m, a, b) => m + ' (' + formatPace(toSec(a) * KM_PER_MI) + (b ? '–' + formatPace(toSec(b) * KM_PER_MI) : '') + '/mi)');
-    s = s.replace(/(\d+(?:\.\d+)?)\s?km\b(?!\s*(?:\/|·|\(|,)\s*~?\d+(?:\.\d+)?\s*mi\b)/g,
+    s = s.replace(/(\d+(?:\.\d+)?)\s?km\b(?!\/h)(?!\s*(?:\/|·|\(|,)\s*~?\d+(?:\.\d+)?\s*mi\b)/g,
       (m, n) => m + ' (' + fmtDistFixed(parseFloat(n) / KM_PER_MI, 2) + ' mi)');
     s = s.replace(/(^|[^\/\d.:])(\d{3,5})\s?m\b(?![\/\w])/g,
       (m, pre, n) => { const km = parseInt(n, 10) / 1000; return pre + n + 'm (' + fmtDistFixed(km, 2) + ' km · ' + fmtDistFixed(km / KM_PER_MI, 2) + ' mi)'; });
