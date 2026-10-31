@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.13 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.14 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.13';
+  const APP_VERSION = '2.1.14';
 
   function start(BOOT) {
 
@@ -47,14 +47,14 @@
     { id: 'w2_sat', date: '2026-10-24', dow: 'Sat', short: '10/24', title: 'Tempo Conditioning', subtitle: 'Run or Row', type: 'conditioning' },
     { id: 'w2_sun', date: '2026-10-25', dow: 'Sun', short: '10/25', title: 'Rest', subtitle: 'Recovery day', type: 'rest' },
   ];
-  // Phase 6 Week 3 (Mon Oct 26–Sun Nov 1, 2026). Ids prefixed w3_. Thu–Sun are placeholders until the app screenshots come in.
+  // Phase 6 Week 3 (Mon Oct 26–Sun Nov 1, 2026). Ids prefixed w3_. Fri/Sun are placeholders until the app screenshots come in.
   const WEEK3 = [
     { id: 'w3_mon', date: '2026-10-26', dow: 'Mon', short: '10/26', title: 'Full Body 1', subtitle: 'Squat Focused · done 10/26 · squat 4×6 @ 100 kg', type: 'strength' },
     { id: 'w3_tue', date: '2026-10-27', dow: 'Tue', short: '10/27', title: 'Easy Conditioning', subtitle: 'Run 50 min progressive easy or Row 3×10 min @ 18/20/22 s/m', type: 'conditioning' },
     { id: 'w3_wed', date: '2026-10-28', dow: 'Wed', short: '10/28', title: 'Full Body 2', subtitle: 'Press Focused · done 10/28 (partial: A–C) · press/lunge loads pending', type: 'strength' },
     { id: 'w3_thu', date: '2026-10-29', dow: 'Thu', short: '10/29', title: 'Pace Assessment', subtitle: '✓ Done 10/29 · treadmill 6×400m (of 8) @ 7.6–7.7 mph · cool-down skipped', type: 'conditioning' },
     { id: 'w3_fri', date: '2026-10-30', dow: 'Fri', short: '10/30', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
-    { id: 'w3_sat', date: '2026-10-31', dow: 'Sat', short: '10/31', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
+    { id: 'w3_sat', date: '2026-10-31', dow: 'Sat', short: '10/31', title: 'Tempo Conditioning', subtitle: 'Planned (not done yet) · outdoor run · 10 min easy + 3×8 min tempo + 10 min easy', type: 'conditioning' },
     { id: 'w3_sun', date: '2026-11-01', dow: 'Sun', short: '11/01', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
   ];
   WEEK.forEach(d => { d.week = 1; });
@@ -924,7 +924,7 @@
     qg1.cues = 'Actual: Deficit DB reverse lunge 3 × 8 each leg @ 9.1 / 11.3 / 13.6 kg (20 / 25 / 30 lb) DBs (old app history). ' + (qg1.cues || '');
   })();
 
-  ['w3_fri', 'w3_sat', 'w3_sun'].forEach(id => {
+  ['w3_fri', 'w3_sun'].forEach(id => {
     SESSIONS[id] = {
       name: 'Awaiting screenshots',
       blocks: [{
@@ -933,6 +933,48 @@
       }],
     };
   });
+
+  // Sat 10/31 · Week 3 Tempo Conditioning Day (Marchon app, Terry 10/31). Planned, not done yet; running it outside.
+  SESSIONS.w3_sat = {
+    name: 'Tempo Conditioning Day',
+    modality: true,
+    hrCard: 'tempo3',
+    tempoTimer: { work: 8, rest: 2, sets: 3 },
+    blocksRun: [
+      {
+        id: 'pogo', title: 'Warm up · Pogo Jump Series', meta: '1–2 rounds',
+        cues: 'Take yourself through 1–2 full rounds of the pogo jump series.',
+        sets: [{ id: 'pogo1', label: 'Pogo jumps', fields: ['notes'] }],
+      },
+      {
+        id: 'wu', title: 'A. Tempo Conditioning (Run Option) · Easy Run', meta: '10 min easy · Z2 HR 119–138',
+        cues: 'Option A (run) is today\'s choice, outside. Easy: 6:50–7:10/km · 11:00–11:30/mi · 5.2–5.5 mph · Zone 2, HR 119–138.',
+        sets: [{ id: 'wu10', label: '10 min easy · HR 119–138', fields: ['distance', 'avgHr', 'notes'] }],
+      },
+      {
+        id: 'tempo', title: 'Tempo Run', meta: 'MODERATE · repeat 3x · 8 min @ tempo (Z3 HR 139–158, aim 148–158, cap 158) · 2 min rest easy jog',
+        cues: 'Comfortable moderate effort, not a race. Tempo: 5:40–5:55/km · 9:08–9:30/mi · 6.3–6.6 mph · Zone 3, HR 139–158, aim for 148–158, hard cap 158. Jog the 2 min rests easy.',
+        sets: [
+          { id: 't1', label: 'Tempo 1 · 8 min · HR 148–158 (cap 158)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'tr1', label: 'Easy jog 2 min', fields: ['notes'] },
+          { id: 't2', label: 'Tempo 2 · 8 min · HR 148–158 (cap 158)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'tr2', label: 'Easy jog 2 min', fields: ['notes'] },
+          { id: 't3', label: 'Tempo 3 · 8 min · HR 148–158 (cap 158)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+        ],
+      },
+      {
+        id: 'cd', title: 'Cool Down', meta: '10 min easy · Z2 HR 119–138',
+        sets: [{ id: 'cd10', label: '10 min easy · HR 119–138', fields: ['distance', 'avgHr', 'notes'] }],
+      },
+    ],
+    blocksRow: [
+      {
+        id: 'alt_row', title: 'B. Interval Conditioning (Row Option) · alternative', meta: 'Not doing today · Terry is running Option A outside',
+        cues: 'Option B is interval conditioning on the rower. Listed as the alternative only; full row details were not captured.',
+        sets: [{ id: 'altr1', label: 'Notes', fields: ['notes'] }],
+      },
+    ],
+  };
 
   // —— v2: normalize set fields ——
   // RIR blocks log RIR (not RPE); every run/row segment gets a time field; fixed-distance
@@ -1502,7 +1544,7 @@
     if (sess.showTtTargets && log.modality !== 'row') {
       html += `<div class="card"><button type="button" class="btn lg" id="btn-open-tt-timer" style="width:100%">⏱ Start 10:00 TT Timer</button></div>`;
     }
-    if (selectedSessionId === 'fri' || sess.hrCard === 'tempo') {
+    if (selectedSessionId === 'fri' || sess.hrCard === 'tempo' || sess.tempoTimer) {
       html += `<div class="card"><button type="button" class="btn lg" id="btn-open-tempo-timer" style="width:100%">⏱ Start Tempo Timer</button></div>`;
     }
 
@@ -1546,6 +1588,19 @@
           <li><strong>0% incline is fine:</strong> keep the same speeds. If 7.7 mph feels comfortable by rep 3, nudge to 7.8.</li>
           <li><strong>Too fast? Fall back to 7.3–7.5 mph</strong> (11.7–12.1 km/h) · ~8:00–8:13/mi · ~4:58–5:06/km · ~2:00–2:02 per 400m. Hold it even across all reps.</li>
           <li>Bad day: cut to 6 reps.</li>
+        </ul>
+      </div>`;
+    }
+    if (card === 'tempo3') {
+      return `<div class="moderate-banner">⚠️ MODERATE — don't race it</div>
+      <div class="target-card hr-card tempo">
+        <h4>TARGETS · TEMPO CONDITIONING · SAT 10/31 (OUTSIDE)</h4>
+        <ul>
+          <li><strong>Easy (10 min warm-up, 2 min jogs, 10 min cool-down): 6:50–7:10/km</strong> · 11:00–11:30/mi · 5.2–5.5 mph · Zone 2, HR 119–138</li>
+          <li><strong>Tempo (3 × 8 min): 5:40–5:55/km</strong> · 9:08–9:30/mi · 6.3–6.6 mph · Zone 3, HR 139–158</li>
+          <li><strong>Aim for HR 148–158 on the tempo reps, hard cap 158.</strong> Comfortable moderate effort; ease off if HR hits 158.</li>
+          <li>Tempo timer is preset to 8 min work · 2 min rest · 3 sets.</li>
+          <li class="muted">Zones from max HR 199: Z2 119–138 · Z3 139–158 · Z4 159–178</li>
         </ul>
       </div>`;
     }
@@ -2161,7 +2216,15 @@
     const ttBtn = document.getElementById('btn-open-tt-timer');
     if (ttBtn) ttBtn.addEventListener('click', () => openTimer('tt'));
     const tempoBtn = document.getElementById('btn-open-tempo-timer');
-    if (tempoBtn) tempoBtn.addEventListener('click', () => openTimer('tempo'));
+    if (tempoBtn) tempoBtn.addEventListener('click', () => {
+      const tt = (SESSIONS[selectedSessionId] || {}).tempoTimer;
+      if (tt) {
+        document.getElementById('tempo-work').value = tt.work;
+        document.getElementById('tempo-rest').value = tt.rest;
+        document.getElementById('tempo-sets').value = tt.sets;
+      }
+      openTimer('tempo');
+    });
   }
 
   function persistField(inp) {
