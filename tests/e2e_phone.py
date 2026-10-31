@@ -94,7 +94,7 @@ with sync_playwright() as p:
     page.tap('#btn-weigh')
     wis = page.evaluate("__HT.state.weighins")
     seeds = sorted(w['weightLb'] for w in wis if str(w['id']).startswith('seed-wi-'))
-    check('seeded weigh-ins present once', seeds == [240.0, 240.1, 240.5, 240.9, 240.9, 240.9, 241.8, 242.8, 242.8, 243.0, 243.4, 245.0], seeds)
+    check('seeded weigh-ins present once', seeds == [240.0, 240.1, 240.5, 240.9, 240.9, 240.9, 241.8, 242.8, 242.8, 243.0, 243.4, 243.8, 245.0], seeds)
     rl = {w['id']: w.get('notes') for w in wis}
     check('Remy seeds: only 9/27 fasted', rl.get('seed-wi-2026-09-27', '').startswith('Fasted') and 'Fasted' not in (rl.get('seed-wi-2026-10-10') or ''), rl)
     mine = [w for w in wis if not str(w['id']).startswith('seed-wi-')]
@@ -109,7 +109,7 @@ with sync_playwright() as p:
     check('reload: loads from IndexedDB', boot2 == 'idb', boot2)
     check('reload: tapped set persisted', st2['logs']['w2_mon']['blocks']['bs']['sets']['bs2']['done'])
     check('reload: stepper edit persisted', st2['logs']['w2_mon']['blocks']['bs']['sets']['bs3']['fields'].get('weight') == '82.5')
-    check('reload: weigh-in persisted, seeds not duplicated', len(st2['weighins']) == 13, st2['weighins'])
+    check('reload: weigh-in persisted, seeds not duplicated', len(st2['weighins']) == 14, st2['weighins'])
 
     # --- units on run days ---
     page.evaluate("__HT.open('mon')")
@@ -142,7 +142,7 @@ with sync_playwright() as p:
     # --- offline: SW installed, reload with network off ---
     page.wait_for_function("navigator.serviceWorker && navigator.serviceWorker.controller", timeout=10000)
     caches = page.evaluate("caches.keys()")
-    check('SW cache v2-1-12 installed', 'hybrid-tracker-v2-1-12' in caches, caches)
+    check('SW cache v2-1-13 installed', 'hybrid-tracker-v2-1-13' in caches, caches)
     ctx.set_offline(True)
     page.reload()
     page.wait_for_function("window.__HT && window.__HT.boot", timeout=10000)
