@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.14 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.15 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.14';
+  const APP_VERSION = '2.1.15';
 
   function start(BOOT) {
 
@@ -2741,6 +2741,7 @@
     { id: 'seed-wi-2026-10-29', measuredAt: '2026-10-29T06:30:00-07:00', weightLb: 241.8, notes: 'Fasted' },
     { id: 'seed-wi-2026-10-30', measuredAt: '2026-10-30T06:30:00-07:00', weightLb: 242.8, notes: 'Fasted' },
     { id: 'seed-wi-2026-10-31', measuredAt: '2026-10-31T06:30:00-07:00', weightLb: 243.8, notes: 'Fasted · weekend (Fri–Sun readings run high)' },
+    { id: 'seed-wi-2026-11-01', measuredAt: '2026-11-01T06:30:00-08:00', weightLb: 243.1, notes: 'Approximate (~243.1, exact number not certain) · assumed AM · weekend (Fri–Sun readings run high)' },
   ];
   function seedWeighins() {
     const laDate = iso => { try { return new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' }); } catch (e) { return String(iso).slice(0, 10); } };
