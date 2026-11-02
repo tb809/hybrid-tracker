@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.21 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.22 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.21';
+  const APP_VERSION = '2.1.22';
 
   function start(BOOT) {
 
@@ -59,7 +59,7 @@
   ];
   // Phase 6 Week 4 (Mon Nov 2–Sun Nov 8, 2026). Ids prefixed w4_. Tue–Sun are placeholders until the app screenshots come in.
   const WEEK4 = [
-    { id: 'w4_mon', date: '2026-11-02', dow: 'Mon', short: '11/02', title: 'Full Body 1', subtitle: 'Squat Focused · in progress · squat 102.1 / 111.1 / 120.2 / 120.2 kg × 5 · hip thrust set 1 logged · Irving, TX gym', type: 'strength' },
+    { id: 'w4_mon', date: '2026-11-02', dow: 'Mon', short: '11/02', title: 'Full Body 1', subtitle: 'Squat Focused · ✓ Done 11/2 (all blocks) · squat 102.1 / 111.1 / 120.2 / 120.2 kg × 5 · hip thrust 3 × 12 @ 40.8 kg · Irving, TX gym', type: 'strength' },
     { id: 'w4_tue', date: '2026-11-03', dow: 'Tue', short: '11/03', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
     { id: 'w4_wed', date: '2026-11-04', dow: 'Wed', short: '11/04', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
     { id: 'w4_thu', date: '2026-11-05', dow: 'Thu', short: '11/05', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
@@ -995,15 +995,15 @@
   (function () {
     const s = SESSIONS.w4_mon;
     const b = id => s.blocks.find(x => x.id === id);
-    s.duration = 'In progress · Irving, TX gym · drive to Hico ~8:45 AM CT';
+    s.duration = 'Done 11/2 (all blocks) · Irving, TX gym · drive to Hico ~8:45 AM CT';
     b('wu').cues = '1 min Bike Erg · 10/10 Split Stance Leaps (can hold a med ball, or ~10 kg / 22 lb DBs) · 6 reps 90/90 Hip Rotations.';
     const bs = b('bs');
     bs.meta = '4 x 5 Barbell Back Squat · straight sets · 2 min rest · RPE 8 all sets (2 reps in reserve)';
     bs.cues = 'Done 11/2 (all 4 sets): set 1 = 102.1 kg (225 lb) × 5, set 2 = 111.1 kg (245 lb) × 5, set 3 = 120.2 kg (265 lb) × 5 (reps assumed per plan; only the weight was sent); set 4 = 120.2 kg (265 lb) × 5 (same as set 3, per Terry); barefoot (no shoes), free barbell. ' + 'Coach: progress load on one or more sets vs last week; keep effort consistent. Suggested: ~112–116 kg (245–255 lb). Last week (10/26): 4 × 6 @ 100 kg (220 lb) on the Nautilus Freedom Rack (not directly comparable to a free bar); 10/19: 4 × 6 @ 100 kg barefoot (hotel).';
     bs.sets.forEach((x, i) => { x.label = 'Set ' + (i + 1) + ' · 5 reps'; });
     b('pp').cues = 'Done 11/2 (app screenshot): weighted push-up 3 × 12 @ 20 kg (45 lb plate); cable seated row 12 @ 43 kg, 12 @ 54 kg, 12 @ 59.5 kg (95 / 119 / 131 lb) (units assumed kg). ' + 'Superset x3, 2 min rest. Suggested: push-up with a 20 kg / 45 lb plate on the back (10–15); cable seated row 36–41 kg (80–90 lb) (8–12). Row: lat focused, elbow finishes in line with body, neutral grip. Swap: 1-arm DB row.';
-    b('gl').meta = 'In progress 11/2 · ' + b('gl').meta;
-    b('gl').cues = 'In progress 11/2: set 1 = 40.8 kg (90 lb) × 12; more sets may come. ' + 'Barbell Hip Thrust 3 x 8–12. Ribs tucked, drive hips high. Smith machine OK. Swap: single-leg DB hip thrust.';
+    b('gl').meta = 'Done 11/2 · ' + b('gl').meta;
+    b('gl').cues = 'Done 11/2: 3 × 12 @ 40.8 kg (90 lb). ' + 'Barbell Hip Thrust 3 x 8–12. Ribs tucked, drive hips high. Smith machine OK. Swap: single-leg DB hip thrust.';
     const fi = s.blocks.findIndex(x => x.id === 'fin');
     s.blocks.splice(fi, 1, {
       id: 'rest_nc', title: 'Remaining blocks not captured', meta: 'Card cut off in the screenshot · notes only',
