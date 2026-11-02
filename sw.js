@@ -1,5 +1,5 @@
 /* Hybrid Tracker service worker — bump CACHE on every release so phones pick up updates. */
-const CACHE = 'hybrid-tracker-v2-1-16';
+const CACHE = 'hybrid-tracker-v2-1-17';
 const ASSETS = [
   './',
   './index.html',
