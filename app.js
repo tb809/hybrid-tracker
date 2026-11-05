@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.22 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.23 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.22';
+  const APP_VERSION = '2.1.23';
 
   function start(BOOT) {
 
@@ -60,8 +60,8 @@
   // Phase 6 Week 4 (Mon Nov 2–Sun Nov 8, 2026). Ids prefixed w4_. Tue–Sun are placeholders until the app screenshots come in.
   const WEEK4 = [
     { id: 'w4_mon', date: '2026-11-02', dow: 'Mon', short: '11/02', title: 'Full Body 1', subtitle: 'Squat Focused · ✓ Done 11/2 (all blocks) · squat 102.1 / 111.1 / 120.2 / 120.2 kg × 5 · hip thrust 3 × 12 @ 40.8 kg · Irving, TX gym', type: 'strength' },
-    { id: 'w4_tue', date: '2026-11-03', dow: 'Tue', short: '11/03', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
-    { id: 'w4_wed', date: '2026-11-04', dow: 'Wed', short: '11/04', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
+    { id: 'w4_tue', date: '2026-11-03', dow: 'Tue', short: '11/03', title: 'Easy Conditioning', subtitle: 'Planned · treadmill run, Houston hotel (evening) · awaiting Terry\'s confirmation + Garmin screenshot', type: 'conditioning' },
+    { id: 'w4_wed', date: '2026-11-04', dow: 'Wed', short: '11/04', title: 'Full Body 2', subtitle: 'Press Focused · done 11/4 (partial: warm-up, A, B) · cut short by a work call · Houston downtown gym', type: 'strength' },
     { id: 'w4_thu', date: '2026-11-05', dow: 'Thu', short: '11/05', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
     { id: 'w4_fri', date: '2026-11-06', dow: 'Fri', short: '11/06', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
     { id: 'w4_sat', date: '2026-11-07', dow: 'Sat', short: '11/07', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
@@ -1011,7 +1011,29 @@
       sets: [{ id: 'rnc1', label: 'Notes', fields: ['notes'] }],
     });
   })();
-  ['w4_tue', 'w4_wed', 'w4_thu', 'w4_fri', 'w4_sat', 'w4_sun'].forEach(id => {
+  // Tue 11/3 · Week 4 Easy Conditioning. Plan structure assumed same as Week 3 Tue. Treadmill run, Houston hotel, evening.
+  // Not confirmed done yet; stats pending a Garmin screenshot.
+  SESSIONS.w4_tue = cloneSession('w3_tue');
+  SESSIONS.w4_tue.duration = 'Planned · treadmill run, Houston hotel (evening) · awaiting confirmation; stats pending Garmin screenshot';
+  // Wed 11/4 · Week 4 Full Body 2 (Press Focused). PARTIAL: Houston downtown gym (travel), cut short by a ~20-min work call.
+  SESSIONS.w4_wed = cloneSession('w2_wed');
+  (function () {
+    const s = SESSIONS.w4_wed;
+    const b = id => s.blocks.find(x => x.id === id);
+    s.duration = 'Done 11/4 (partial: warm-up, A, B) · Houston downtown gym · cut short by a ~20-min work call';
+    b('sm').meta = '✓ Done 11/4 · ' + b('sm').meta;
+    b('sp').meta += ' · ✓ DONE 11/4 (substitute; sets/reps not reported)';
+    b('sp').cues = 'Done 11/4 (substitute, not a barbell strict press): standing press on a Precor functional trainer (cable/pulley rack) with a straight bar, 100 lb (~45.4 kg) per side (~200 lb / 90.7 kg of cable stack). Needs a lot of stabilization; not comparable to a barbell strict press, so not a strict press progression. Sets/reps not reported (planned 4 × 6). Last barbell: 4 × 6 @ 52.2 kg (115 lb) (Week 2). ' + 'Make sure the bar touches the collarbone with each rep. Aim to hit similar loads across all sets or aim to increase from set to set.';
+    b('qg').meta += ' · ✓ DONE 11/4 (substitute: flat DB reverse lunge, 13.6 kg / 30 lb DBs × 8/leg; sets not reported)';
+    b('qg').cues = 'Done 11/4 (substitute): DB reverse lunge on flat ground (no deficit; no plates in the gym), sets of 8 each leg with 13.6 kg (30 lb) DBs. Number of sets not reported (planned 3). ' + 'Allow both the knee and the hip to bend equally. Use straps if you have access.';
+    b('pu').meta = 'Skipped 11/4 · ' + b('pu').meta;
+    b('pu').cues = 'Skipped 11/4 (session cut short by a work call). Last week: chin-up 3 × 6 bodyweight, strict dip 3 × 10 bodyweight.';
+    b('dc').meta = 'Skipped 11/4 · ' + b('dc').meta;
+    b('arms').meta = 'Skipped 11/4 · ' + b('arms').meta;
+    s.blocks.push(coreBlock('Skipped 11/4.'));
+    s.blocks[s.blocks.length - 1].meta = 'Skipped 11/4 · ' + s.blocks[s.blocks.length - 1].meta;
+  })();
+  ['w4_thu', 'w4_fri', 'w4_sat', 'w4_sun'].forEach(id => {
     SESSIONS[id] = {
       name: 'Awaiting screenshots',
       blocks: [{
@@ -1856,7 +1878,7 @@
 
   // —— Targets / prefill ——
   // Week 2 sessions → the Week 1 session they repeat (for "last week's load" prefill)
-  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon' };
+  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed' };
 
   function setStem(setId) { return String(setId).replace(/\d+$/, ''); }
 
