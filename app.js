@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.23 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.24 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.23';
+  const APP_VERSION = '2.1.24';
 
   function start(BOOT) {
 
@@ -63,7 +63,7 @@
     { id: 'w4_tue', date: '2026-11-03', dow: 'Tue', short: '11/03', title: 'Easy Conditioning', subtitle: 'Planned · treadmill run, Houston hotel (evening) · awaiting Terry\'s confirmation + Garmin screenshot', type: 'conditioning' },
     { id: 'w4_wed', date: '2026-11-04', dow: 'Wed', short: '11/04', title: 'Full Body 2', subtitle: 'Press Focused · done 11/4 (partial: warm-up, A, B) · cut short by a work call · Houston downtown gym', type: 'strength' },
     { id: 'w4_thu', date: '2026-11-05', dow: 'Thu', short: '11/05', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
-    { id: 'w4_fri', date: '2026-11-06', dow: 'Fri', short: '11/06', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
+    { id: 'w4_fri', date: '2026-11-06', dow: 'Fri', short: '11/06', title: 'Interval Conditioning', subtitle: '✓ Done 11/6 (partial: WU + 2/4 rounds) · 2.95 mi · 7.6/7.7/7.8 mph · Mexico · moved onto Fri', type: 'conditioning' },
     { id: 'w4_sat', date: '2026-11-07', dow: 'Sat', short: '11/07', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
     { id: 'w4_sun', date: '2026-11-08', dow: 'Sun', short: '11/08', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
   ];
@@ -1033,7 +1033,62 @@
     s.blocks.push(coreBlock('Skipped 11/4.'));
     s.blocks[s.blocks.length - 1].meta = 'Skipped 11/4 · ' + s.blocks[s.blocks.length - 1].meta;
   })();
-  ['w4_thu', 'w4_fri', 'w4_sat', 'w4_sun'].forEach(id => {
+
+  // Fri 11/6 · Week 4 Interval Conditioning (Run Option). Moved onto Friday (normally rest) because of travel.
+  // Mexico (Punta de Mita / wedding trip); likely treadmill (mph reported). PARTIAL: warm-up + 2 of 4 rounds.
+  SESSIONS.w4_fri = {
+    name: 'Interval Conditioning',
+    modality: true,
+    hrCard: 'hard2',
+    duration: 'Done 11/6 (partial: WU + 2 of 4 rounds) · Mexico (Punta de Mita) · likely treadmill · 2.95 mi / 4.75 km · no Garmin yet',
+    blocksRun: [
+      {
+        id: 'wu_i', title: 'A. Warm Up (Run Option)', meta: '✓ Done 11/6 · 15 min easy run with 3 × 20 s progressive strides',
+        cues: 'Included in the 2.95 mi / 4.75 km total with rounds 1–2. Details of the warm-up itself not broken out. Test pace baseline (Oct 15 TT): 4:49/km (7:45/mi).',
+        sets: [
+          { id: 'wui15', label: '15 min easy + 3 × 20 s strides · done (details not broken out)', fields: ['distance', 'avgHr', 'notes'] },
+        ],
+      },
+      {
+        id: 'prog', title: 'Progressive Interval Rounds', meta: '✓ Done 11/6 · 2 of 4 rounds · planned: 4 rounds of [3 min @ test+5 s/km / 1:30 / 2 min @ test / 1:30 / 1 min @ test to −5 s/km / 1:30]',
+        cues: 'Targets from Oct 15 test pace 4:49/km: 4:54 / 4:49 / 4:44–4:49/km. Done 11/6 (chat): each progressive triad at 7.6 / 7.7 / 7.8 mph (~4:54 / ~4:50 / ~4:47/km · ~7:54 / ~7:48 / ~7:42/mi) — on target. Raw speeds reported as "7.6 .7,.7 .8"; interpreted as 7.6, 7.7, 7.8 with a stray extra ".7" flagged as ambiguous. 1:30 recoveries walked (not jogged). Rounds 3–4 not done. Total with warm-up: 2.95 mi / 4.75 km. No Garmin yet.',
+        sets: [
+          { id: 'r1a', label: 'R1 · 3 min @ test+5 s/km · done @ 7.6 mph (~4:54/km · ~7:54/mi)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'r1j1', label: 'R1 · 1:30 recovery · walked', fields: ['notes'] },
+          { id: 'r1b', label: 'R1 · 2 min @ test pace · done @ 7.7 mph (~4:50/km · ~7:48/mi)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'r1j2', label: 'R1 · 1:30 recovery · walked', fields: ['notes'] },
+          { id: 'r1c', label: 'R1 · 1 min @ test to −5 s/km · done @ 7.8 mph (~4:47/km · ~7:42/mi)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'r1j3', label: 'R1 · 1:30 recovery · walked', fields: ['notes'] },
+          { id: 'r2a', label: 'R2 · 3 min @ test+5 s/km · done @ 7.6 mph (~4:54/km · ~7:54/mi)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'r2j1', label: 'R2 · 1:30 recovery · walked', fields: ['notes'] },
+          { id: 'r2b', label: 'R2 · 2 min @ test pace · done @ 7.7 mph (~4:50/km · ~7:48/mi)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'r2j2', label: 'R2 · 1:30 recovery · walked', fields: ['notes'] },
+          { id: 'r2c', label: 'R2 · 1 min @ test to −5 s/km · done @ 7.8 mph (~4:47/km · ~7:42/mi)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'r2j3', label: 'R2 · 1:30 recovery · walked', fields: ['notes'] },
+          { id: 'r3a', label: 'R3 · 3 min · not done', fields: ['notes'] },
+          { id: 'r3b', label: 'R3 · 2 min · not done', fields: ['notes'] },
+          { id: 'r3c', label: 'R3 · 1 min · not done', fields: ['notes'] },
+          { id: 'r4a', label: 'R4 · 3 min · not done', fields: ['notes'] },
+          { id: 'r4b', label: 'R4 · 2 min · not done', fields: ['notes'] },
+          { id: 'r4c', label: 'R4 · 1 min · not done', fields: ['notes'] },
+        ],
+      },
+      {
+        id: 'cd_i', title: 'Cool Down', meta: 'Not done 11/6 · 10 min easy run (planned)',
+        cues: 'Not reported; treated as not done. Session stopped after round 2.',
+        sets: [{ id: 'cdi10', label: '10 min easy · not done', fields: ['distance', 'avgHr', 'notes'] }],
+      },
+    ],
+    blocksRow: [
+      {
+        id: 'alt_row_i', title: 'B. Interval Conditioning (Row Option) · alternative', meta: 'Not doing today · Terry ran Option A',
+        cues: 'Row option not used.',
+        sets: [{ id: 'altri1', label: 'Notes', fields: ['notes'] }],
+      },
+    ],
+  };
+
+  ['w4_thu', 'w4_sat', 'w4_sun'].forEach(id => {
     SESSIONS[id] = {
       name: 'Awaiting screenshots',
       blocks: [{
@@ -1878,7 +1933,7 @@
 
   // —— Targets / prefill ——
   // Week 2 sessions → the Week 1 session they repeat (for "last week's load" prefill)
-  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed' };
+  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed', w4_fri: 'w3_thu' };
 
   function setStem(setId) { return String(setId).replace(/\d+$/, ''); }
 
