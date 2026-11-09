@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.24 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.25 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.24';
+  const APP_VERSION = '2.1.25';
 
   function start(BOOT) {
 
@@ -64,8 +64,8 @@
     { id: 'w4_wed', date: '2026-11-04', dow: 'Wed', short: '11/04', title: 'Full Body 2', subtitle: 'Press Focused · done 11/4 (partial: warm-up, A, B) · cut short by a work call · Houston downtown gym', type: 'strength' },
     { id: 'w4_thu', date: '2026-11-05', dow: 'Thu', short: '11/05', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
     { id: 'w4_fri', date: '2026-11-06', dow: 'Fri', short: '11/06', title: 'Interval Conditioning', subtitle: '✓ Done 11/6 (partial: WU + 2/4 rounds) · 2.95 mi · 7.6/7.7/7.8 mph · Mexico · moved onto Fri', type: 'conditioning' },
-    { id: 'w4_sat', date: '2026-11-07', dow: 'Sat', short: '11/07', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
-    { id: 'w4_sun', date: '2026-11-08', dow: 'Sun', short: '11/08', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
+    { id: 'w4_sat', date: '2026-11-07', dow: 'Sat', short: '11/07', title: 'No session (wedding)', subtitle: 'Wedding day · Mexico (Punta de Mita) · nothing logged', type: 'rest' },
+    { id: 'w4_sun', date: '2026-11-08', dow: 'Sun', short: '11/08', title: 'Tempo Conditioning', subtitle: 'Planned / in progress · tonight at home (CA) · 10\' easy + 1/1.5/1.5/1 km tempo + 10\' easy', type: 'conditioning' },
   ];
   WEEK.forEach(d => { d.week = 1; });
   WEEK2.forEach(d => { d.week = 2; });
@@ -1088,7 +1088,61 @@
     ],
   };
 
-  ['w4_thu', 'w4_sat', 'w4_sun'].forEach(id => {
+
+  // Sat 11/7 · Week 4. Wedding day in Mexico — no session logged.
+  SESSIONS.w4_sat = {
+    name: 'No session (wedding)',
+    blocks: [{
+      id: 'rest', title: 'Rest / wedding day', meta: 'No session logged · wedding in Mexico (Punta de Mita)',
+      cues: 'Sat 11/7: wedding day. Nothing logged.',
+      sets: [{ id: 'rest1', label: 'Notes', fields: ['notes'] }],
+    }],
+  };
+  // Sun 11/8 · Week 4 Tempo Conditioning Day. Planned / in progress tonight at home (California, back from Mexico).
+  SESSIONS.w4_sun = {
+    name: 'Tempo Conditioning Day',
+    modality: true,
+    hrCard: 'tempo3',
+    duration: 'Planned / in progress · tonight at home (CA, back from Mexico)',
+    blocksRun: [
+      {
+        id: 'pogo', title: 'Warm up · Pogo Jump Series', meta: '1–2 rounds',
+        cues: 'Take yourself through 1–2 full rounds of the pogo jump series.',
+        sets: [{ id: 'pogo1', label: 'Pogo jumps', fields: ['notes'] }],
+      },
+      {
+        id: 'wu', title: 'A. Tempo Conditioning (Run Option) · Easy Run', meta: '10 min easy · Z2 HR 119–138',
+        cues: 'Easy opener before the tempo reps. Z2, conversational.',
+        sets: [{ id: 'wu10', label: '10 min easy · HR 119–138', fields: ['distance', 'avgHr', 'notes'] }],
+      },
+      {
+        id: 'tempo', title: 'Tempo Reps', meta: 'MODERATE · 1 km · 1.5 km · 1.5 km · 1 km (5 km tempo total) · 90 s easy jog between · suggested 5:25–5:40/km · HR ~140–155 (Z3)',
+        cues: 'Coach: comfortable moderate effort — aerobic and controlled, not threshold. Settle into a sustainable pace for the longer middle reps and keep the same effort on the final km. Leaderboard records average pace over the 5 km of tempo only (not WU/CD). Suggested: 5:25–5:40/km at HR around 140–155 (Z3).',
+        sets: [
+          { id: 't1', label: 'Tempo 1 · 1 km · 5:25–5:40/km · HR 140–155', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'tr1', label: 'Easy jog 90 s', fields: ['notes'] },
+          { id: 't2', label: 'Tempo 2 · 1.5 km · 5:25–5:40/km · HR 140–155', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'tr2', label: 'Easy jog 90 s', fields: ['notes'] },
+          { id: 't3', label: 'Tempo 3 · 1.5 km · 5:25–5:40/km · HR 140–155', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'tr3', label: 'Easy jog 90 s', fields: ['notes'] },
+          { id: 't4', label: 'Tempo 4 · 1 km · 5:25–5:40/km · HR 140–155', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+        ],
+      },
+      {
+        id: 'cd', title: 'Cool Down', meta: '10 min easy · Z2 HR 119–138',
+        sets: [{ id: 'cd10', label: '10 min easy · HR 119–138', fields: ['distance', 'avgHr', 'notes'] }],
+      },
+    ],
+    blocksRow: [
+      {
+        id: 'alt_row', title: 'B. Tempo / Interval Conditioning (Row Option) · alternative', meta: 'Choose one, not both · row details not expanded (run is tonight\'s choice)',
+        cues: 'A row option exists on the card. Terry is running Option A at home tonight.',
+        sets: [{ id: 'altr1', label: 'Notes', fields: ['notes'] }],
+      },
+    ],
+  };
+
+  ['w4_thu'].forEach(id => {
     SESSIONS[id] = {
       name: 'Awaiting screenshots',
       blocks: [{
@@ -1933,7 +1987,7 @@
 
   // —— Targets / prefill ——
   // Week 2 sessions → the Week 1 session they repeat (for "last week's load" prefill)
-  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed', w4_fri: 'w3_thu' };
+  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed', w4_fri: 'w3_thu', w4_sun: 'w3_sat' };
 
   function setStem(setId) { return String(setId).replace(/\d+$/, ''); }
 
@@ -2864,6 +2918,7 @@
     { id: 'seed-wi-2026-10-30', measuredAt: '2026-10-30T06:30:00-07:00', weightLb: 242.8, notes: 'Fasted' },
     { id: 'seed-wi-2026-10-31', measuredAt: '2026-10-31T06:30:00-07:00', weightLb: 243.8, notes: 'Fasted · weekend (Fri–Sun readings run high)' },
     { id: 'seed-wi-2026-11-01', measuredAt: '2026-11-01T06:30:00-08:00', weightLb: 243.1, notes: 'Approximate (~243.1, exact number not certain) · assumed AM · weekend (Fri–Sun readings run high)' },
+    { id: 'seed-wi-2026-11-08', measuredAt: '2026-11-08T18:30:00-08:00', weightLb: 243.3, notes: 'EVENING (~6:30 PM PT) · day he flew home from Mexico · NOT fasted morning · off-protocol (keep out of AM trend)' },
   ];
   function seedWeighins() {
     const laDate = iso => { try { return new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' }); } catch (e) { return String(iso).slice(0, 10); } };
