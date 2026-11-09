@@ -4,7 +4,7 @@
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.28';
+  const APP_VERSION = '2.1.29';
 
   function start(BOOT) {
 
@@ -32,7 +32,7 @@
     { id: 'tue', date: '2026-10-13', dow: 'Tue', short: '10/13', title: 'Full Body 2', subtitle: 'Press Focused', type: 'strength', kpi: '3RM Strict Press' },
     { id: 'wed', date: '2026-10-14', dow: 'Wed', short: '10/14', title: 'Interval Conditioning', subtitle: '10-min TT / 2k Row', type: 'conditioning', kpi: '10min Max Distance' },
     { id: 'thu', date: '2026-10-15', dow: 'Thu', short: '10/15', title: 'Full Body 3', subtitle: 'Deadlift Focused', type: 'strength', kpi: '3RM Deadlift' },
-    { id: 'fri', date: '2026-10-16', dow: 'Fri', short: '10/16', title: 'Tempo Conditioning', subtitle: 'Run or Row', type: 'conditioning' },
+    { id: 'fri', date: '2026-10-16', dow: 'Fri', short: '10/16', title: 'Tempo Conditioning', subtitle: '✓ Done 11/8 · Garmin 8.14 km · 55:42 · HR 145/160 · tempo 5 km @ 6:18/km avg, HR 148–155 (Z3) · G 25015230551', type: 'conditioning' },
     { id: 'sat', date: '2026-10-17', dow: 'Sat', short: '10/17', title: 'Rest', subtitle: 'Recovery day', type: 'rest' },
   ];
 
@@ -44,7 +44,7 @@
     // 10/22 schedule change (tentative): Thu = rest (NYC conference) / FB3 optional; Interval moved to Fri. Ids unchanged so logs stay keyed.
     { id: 'w2_fri', date: '2026-10-22', dow: 'Thu', short: '10/22', title: 'Rest / Full Body 3', subtitle: 'Likely rest (conference) · FB3 Deadlift optional / usually skipped', type: 'strength' },
     { id: 'w2_thu', date: '2026-10-23', dow: 'Fri', short: '10/23', title: 'Interval Conditioning', subtitle: 'Race pace 8×2 min / 8×500m row · moved from Thu (tentative)', type: 'conditioning' },
-    { id: 'w2_sat', date: '2026-10-24', dow: 'Sat', short: '10/24', title: 'Tempo Conditioning', subtitle: 'Run or Row', type: 'conditioning' },
+    { id: 'w2_sat', date: '2026-10-24', dow: 'Sat', short: '10/24', title: 'Tempo Conditioning', subtitle: '✓ Done 11/8 · Garmin 8.14 km · 55:42 · HR 145/160 · tempo 5 km @ 6:18/km avg, HR 148–155 (Z3) · G 25015230551', type: 'conditioning' },
     { id: 'w2_sun', date: '2026-10-25', dow: 'Sun', short: '10/25', title: 'Rest', subtitle: 'Recovery day', type: 'rest' },
   ];
   // Phase 6 Week 3 (Mon Oct 26–Sun Nov 1, 2026). Ids prefixed w3_. Fri/Sun are placeholders until the app screenshots come in.
@@ -1112,7 +1112,7 @@
     name: 'Tempo Conditioning Day',
     modality: true,
     hrCard: 'tempo3',
-    duration: 'Planned / in progress · tonight at home (CA, back from Mexico)',
+    duration: 'Done 11/8 · home (CA) · Garmin 8.14 km · 55:42 · HR 145/160 · G 25015230551',
     blocksRun: [
       {
         id: 'pogo', title: 'Warm up · Pogo Jump Series', meta: '1–2 rounds',
