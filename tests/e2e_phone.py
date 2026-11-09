@@ -123,7 +123,7 @@ with sync_playwright() as p:
     meta = page.text_content('[data-block="easy_run"] .block-meta')
     check('plan text paces have /mi', '/mi' in meta, meta)
     hr = page.get_attribute('[data-field="mon|easy_run|er25|avgHr"]', 'placeholder')
-    check('HR target shown as Avg HR hint', '140' in (hr or ''), hr)
+    check('HR target shown as Avg HR hint', '139' in (hr or ''), hr)
     page.evaluate("__HT.open('w2_thu')")
     page.wait_for_selector('.block')
     body = page.text_content('#view-root')
@@ -142,7 +142,7 @@ with sync_playwright() as p:
     # --- offline: SW installed, reload with network off ---
     page.wait_for_function("navigator.serviceWorker && navigator.serviceWorker.controller", timeout=10000)
     caches = page.evaluate("caches.keys()")
-    check('SW cache v2-1-27 installed', 'hybrid-tracker-v2-1-27' in caches, caches)
+    check('SW cache v2-1-28 installed', 'hybrid-tracker-v2-1-28' in caches, caches)
     ctx.set_offline(True)
     page.reload()
     page.wait_for_function("window.__HT && window.__HT.boot", timeout=10000)
