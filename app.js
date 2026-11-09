@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.25 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.26 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.25';
+  const APP_VERSION = '2.1.26';
 
   function start(BOOT) {
 
@@ -60,10 +60,10 @@
   // Phase 6 Week 4 (Mon Nov 2–Sun Nov 8, 2026). Ids prefixed w4_. Tue–Sun are placeholders until the app screenshots come in.
   const WEEK4 = [
     { id: 'w4_mon', date: '2026-11-02', dow: 'Mon', short: '11/02', title: 'Full Body 1', subtitle: 'Squat Focused · ✓ Done 11/2 (all blocks) · squat 102.1 / 111.1 / 120.2 / 120.2 kg × 5 · hip thrust 3 × 12 @ 40.8 kg · Irving, TX gym', type: 'strength' },
-    { id: 'w4_tue', date: '2026-11-03', dow: 'Tue', short: '11/03', title: 'Easy Conditioning', subtitle: 'Planned · treadmill run, Houston hotel (evening) · awaiting Terry\'s confirmation + Garmin screenshot', type: 'conditioning' },
-    { id: 'w4_wed', date: '2026-11-04', dow: 'Wed', short: '11/04', title: 'Full Body 2', subtitle: 'Press Focused · done 11/4 (partial: warm-up, A, B) · cut short by a work call · Houston downtown gym', type: 'strength' },
+    { id: 'w4_tue', date: '2026-11-03', dow: 'Tue', short: '11/03', title: 'Easy Conditioning', subtitle: '✓ Done 11/3 · treadmill Houston hotel · 6.64 km / 4.12 mi · 51:13 · HR 139/154 · G 24958648508', type: 'conditioning' },
+    { id: 'w4_wed', date: '2026-11-04', dow: 'Wed', short: '11/04', title: 'Full Body 2', subtitle: 'Press Focused · done 11/4 (partial) · 41:40 · HR 88/132 · Houston downtown · G 24970365391', type: 'strength' },
     { id: 'w4_thu', date: '2026-11-05', dow: 'Thu', short: '11/05', title: 'Awaiting screenshots', subtitle: 'Session added once the app screenshot comes in', type: 'rest' },
-    { id: 'w4_fri', date: '2026-11-06', dow: 'Fri', short: '11/06', title: 'Interval Conditioning', subtitle: '✓ Done 11/6 (partial: WU + 2/4 rounds) · 2.95 mi · 7.6/7.7/7.8 mph · Mexico · moved onto Fri', type: 'conditioning' },
+    { id: 'w4_fri', date: '2026-11-06', dow: 'Fri', short: '11/06', title: 'Interval Conditioning', subtitle: '✓ Done 11/6 (partial: WU+2/4) · Garmin 4.17 km / 32:29 · HR 159/200 · Terry 2.95 mi @ 7.6/7.7/7.8 · G 24988351388', type: 'conditioning' },
     { id: 'w4_sat', date: '2026-11-07', dow: 'Sat', short: '11/07', title: 'No session (wedding)', subtitle: 'Wedding day · Mexico (Punta de Mita) · nothing logged', type: 'rest' },
     { id: 'w4_sun', date: '2026-11-08', dow: 'Sun', short: '11/08', title: 'Tempo Conditioning', subtitle: 'Planned / in progress · tonight at home (CA) · 10\' easy + 1/1.5/1.5/1 km tempo + 10\' easy', type: 'conditioning' },
   ];
@@ -1011,16 +1011,25 @@
       sets: [{ id: 'rnc1', label: 'Notes', fields: ['notes'] }],
     });
   })();
-  // Tue 11/3 · Week 4 Easy Conditioning. Plan structure assumed same as Week 3 Tue. Treadmill run, Houston hotel, evening.
-  // Not confirmed done yet; stats pending a Garmin screenshot.
+  // Tue 11/3 · Week 4 Easy Conditioning. DONE — Garmin treadmill run, Houston hotel evening.
   SESSIONS.w4_tue = cloneSession('w3_tue');
-  SESSIONS.w4_tue.duration = 'Planned · treadmill run, Houston hotel (evening) · awaiting confirmation; stats pending Garmin screenshot';
+  (function () {
+    const s = SESSIONS.w4_tue;
+    s.duration = 'Done 11/3 · treadmill · Houston hotel (evening) · 6.64 km / 4.12 mi · 51:13 · HR 139/154 · G 24958648508';
+    const br = id => (s.blocksRun || []).find(x => x.id === id);
+    const prog = br('prog');
+    if (prog) {
+      prog.meta = '✓ Done 11/3 (Garmin) · Progressive Easy Run · 51:13 · 6.64 km';
+      prog.cues = 'Done 11/3 treadmill (Houston hotel, start 18:37 local): 6.64 km / 4.12 mi in 51:13 (moving ~49:56). Avg pace 7:43/km · 12:25/mi · 4.83 mph. HR 139 avg / 154 max. Zones: Z1 0:43 · Z2 18:04 · Z3 32:24 · Z4/Z5 0. Slightly hot vs easy Z2 (<139) — most time in Z3. Lap km paces ~7:40 / 7:32 / 7:39 / 7:39 / 7:38 / 7:22 + 0.63 km. Garmin 24958648508.';
+      prog.sets.forEach((set, i) => { set.label += ' · done (session totals on block)'; });
+    }
+  })();
   // Wed 11/4 · Week 4 Full Body 2 (Press Focused). PARTIAL: Houston downtown gym (travel), cut short by a ~20-min work call.
   SESSIONS.w4_wed = cloneSession('w2_wed');
   (function () {
     const s = SESSIONS.w4_wed;
     const b = id => s.blocks.find(x => x.id === id);
-    s.duration = 'Done 11/4 (partial: warm-up, A, B) · Houston downtown gym · cut short by a ~20-min work call';
+    s.duration = 'Done 11/4 (partial: warm-up, A, B) · Houston downtown gym · 41:40 · HR 88/132 · cut short by a ~20-min work call · G 24970365391';
     b('sm').meta = '✓ Done 11/4 · ' + b('sm').meta;
     b('sp').meta += ' · ✓ DONE 11/4 (substitute; sets/reps not reported)';
     b('sp').cues = 'Done 11/4 (substitute, not a barbell strict press): standing press on a Precor functional trainer (cable/pulley rack) with a straight bar, 100 lb (~45.4 kg) per side (~200 lb / 90.7 kg of cable stack). Needs a lot of stabilization; not comparable to a barbell strict press, so not a strict press progression. Sets/reps not reported (planned 4 × 6). Last barbell: 4 × 6 @ 52.2 kg (115 lb) (Week 2). ' + 'Make sure the bar touches the collarbone with each rep. Aim to hit similar loads across all sets or aim to increase from set to set.';
@@ -1040,18 +1049,18 @@
     name: 'Interval Conditioning',
     modality: true,
     hrCard: 'hard2',
-    duration: 'Done 11/6 (partial: WU + 2 of 4 rounds) · Mexico (Punta de Mita) · likely treadmill · 2.95 mi / 4.75 km · no Garmin yet',
+    duration: 'Done 11/6 (partial: WU + 2 of 4 rounds) · Mexico · Terry 2.95 mi @ 7.6/7.7/7.8 · Garmin 4.17 km / 2.59 mi · 32:29 · HR 159/200 · G 24988351388',
     blocksRun: [
       {
         id: 'wu_i', title: 'A. Warm Up (Run Option)', meta: '✓ Done 11/6 · 15 min easy run with 3 × 20 s progressive strides',
-        cues: 'Included in the 2.95 mi / 4.75 km total with rounds 1–2. Details of the warm-up itself not broken out. Test pace baseline (Oct 15 TT): 4:49/km (7:45/mi).',
+        cues: 'Garmin laps 1–2 (~11:28, 1.65 km, HR ~133–135) look like the warm-up; Terry included WU in his 2.95 mi total. Test pace baseline (Oct 15 TT): 4:49/km (7:45/mi).',
         sets: [
           { id: 'wui15', label: '15 min easy + 3 × 20 s strides · done (details not broken out)', fields: ['distance', 'avgHr', 'notes'] },
         ],
       },
       {
         id: 'prog', title: 'Progressive Interval Rounds', meta: '✓ Done 11/6 · 2 of 4 rounds · planned: 4 rounds of [3 min @ test+5 s/km / 1:30 / 2 min @ test / 1:30 / 1 min @ test to −5 s/km / 1:30]',
-        cues: 'Targets from Oct 15 test pace 4:49/km: 4:54 / 4:49 / 4:44–4:49/km. Done 11/6 (chat): each progressive triad at 7.6 / 7.7 / 7.8 mph (~4:54 / ~4:50 / ~4:47/km · ~7:54 / ~7:48 / ~7:42/mi) — on target. Raw speeds reported as "7.6 .7,.7 .8"; interpreted as 7.6, 7.7, 7.8 with a stray extra ".7" flagged as ambiguous. 1:30 recoveries walked (not jogged). Rounds 3–4 not done. Total with warm-up: 2.95 mi / 4.75 km. No Garmin yet.',
+        cues: 'Targets from Oct 15 test pace 4:49/km: 4:54 / 4:49 / 4:44–4:49/km. Done 11/6 (chat): each progressive triad at 7.6 / 7.7 / 7.8 mph (~4:54 / ~4:50 / ~4:47/km · ~7:54 / ~7:48 / ~7:42/mi) — on target. Raw "7.6 .7,.7 .8"; stray extra ".7" flagged ambiguous. 1:30 recoveries walked. Rounds 3–4 + CD not done. Terry total 2.95 mi / 4.75 km; Garmin 24988351388: 4.17 km / 2.59 mi in 32:29 (moving 27:05), HR 159/200, zones Z2 11:46 · Z3 4:30 · Z4 7:05 · Z5 9:05. Watch distance below Terry\'s treadmill figure (common GPS-vs-belt gap). Garmin lap map: WU laps 1–2; R1 = 3:00/1:30/2:00/1:30/1:00/1:30; R2 = same pattern; then stop.',
         sets: [
           { id: 'r1a', label: 'R1 · 3 min @ test+5 s/km · done @ 7.6 mph (~4:54/km · ~7:54/mi)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
           { id: 'r1j1', label: 'R1 · 1:30 recovery · walked', fields: ['notes'] },
