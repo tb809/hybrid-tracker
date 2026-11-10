@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.32 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.33 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.32';
+  const APP_VERSION = '2.1.33';
 
   function start(BOOT) {
 
@@ -69,7 +69,7 @@
   ];
   // Phase 6 Week 5 (Mon Nov 9–Sun Nov 15, 2026). Ids prefixed w5_. Only Mon is filled (screenshot transcription; coach notes not transcribed). Tue–Sun await screenshots.
   const WEEK5 = [
-    { id: 'w5_mon', date: '2026-11-09', dow: 'Mon', short: '11/09', title: 'Full Body 1', subtitle: 'Squat Focused · in progress · set 1 124.7 kg (275 lb) × 4 Freedom Rack · sets 2–4 pending · G 25026807221', type: 'strength' },
+    { id: 'w5_mon', date: '2026-11-09', dow: 'Mon', short: '11/09', title: 'Full Body 1', subtitle: 'Squat Focused · in progress · squat 4 × 4 @ 124.7 kg (275 lb) Freedom Rack · G 25026807221', type: 'strength' },
     { id: 'w5_tue', date: '2026-11-10', dow: 'Tue', short: '11/10', title: 'Easy Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
     { id: 'w5_wed', date: '2026-11-11', dow: 'Wed', short: '11/11', title: 'Full Body 2', subtitle: 'Session added once the app screenshot comes in', type: 'strength' },
     { id: 'w5_thu', date: '2026-11-12', dow: 'Thu', short: '11/12', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
@@ -1180,15 +1180,15 @@
   (function () {
     const s = SESSIONS.w5_mon;
     const b = id => s.blocks.find(x => x.id === id);
-    s.duration = 'In progress 11/9 evening · squat set 1 done 124.7 kg (275 lb) × 4 · sets 2–4 pending · Garmin 55:23 · HR 93/140 · G 25026807221';
+    s.duration = 'In progress 11/9 evening · squat 4 × 4 @ 124.7 kg (275 lb) Freedom Rack · Garmin 55:23 · HR 93/140 · G 25026807221';
     const wu = b('wu');
     wu.meta = 'Circuit · repeat 2x · 1:00 Bike Erg · 10/10 Split Stance Lunges · 6/6 90/90 Hip Rotations';
     wu.cues = 'Repeat 2x: 1:00 Bike Erg · 10/10 Split Stance Lunges · 6/6 90/90 Hip Rotations. Coach notes: not transcribed (low-res screenshot).';
     wu.sets.forEach((x, i) => { x.label = 'Round ' + (i + 1) + ' · Bike Erg 1:00 · Lunges 10/10 · 90/90 6/6'; });
     const bs = b('bs');
-    bs.meta = 'In progress 11/9 · 4 sets × 4 reps Barbell Back Squat · 3 min rest · RPE 8';
-    bs.cues = 'Done 11/9 set 1: 124.7 kg (275 lb) × 4 on the Nautilus Freedom Rack (built-in 44 lb / 20 kg bar counted). Sets 2–4 loads not yet reported. Last free-bar squat (Mon 11/2, Irving, barefoot): 102.1 / 111.1 / 120.2 / 120.2 kg (225 / 245 / 265 / 265 lb) × 5 — not comparable. Last Freedom Rack squat (Mon 10/26): 4 × 6 @ 100 kg (220 lb). Coach notes: not transcribed.';
-    bs.sets.forEach((x, i) => { x.label = i === 0 ? 'Set 1 · 4 reps · done 124.7 kg (275 lb) · Freedom Rack (44 lb bar counted)' : 'Set ' + (i + 1) + ' · 4 reps · RPE 8 · load not yet reported'; });
+    bs.meta = 'Done 11/9 · 4 × 4 @ 124.7 kg (275 lb) · RPE 8 · 3 min rest · Freedom Rack';
+    bs.cues = 'Done 11/9 (Terry: all 4 sets): 4 × 4 @ 124.7 kg (275 lb) on the Nautilus Freedom Rack (built-in 44 lb / 20 kg bar counted), RPE 8. Last free-bar squat (Mon 11/2, Irving, barefoot): 102.1 / 111.1 / 120.2 / 120.2 kg (225 / 245 / 265 / 265 lb) × 5 — not comparable. Last Freedom Rack squat (Mon 10/26): 4 × 6 @ 100 kg (220 lb). Coach notes: not transcribed.';
+    bs.sets.forEach((x, i) => { x.label = 'Set ' + (i + 1) + ' · 4 reps · done 124.7 kg (275 lb) · Freedom Rack (44 lb bar counted) · RPE 8'; });
     const pp = b('pp');
     pp.meta = 'Push + Pull superset · 5 sets · 10–15 Weighted Push Up + 8–12 Cable Seated Row · rest between rounds';
     pp.cues = 'Planned 11/9: 5 supersets. Last week (11/2): weighted push-up 3 × 12 @ 20 kg (45 lb plate); cable seated row 12 @ 43 / 54 / 59.5 kg (units assumed kg). Coach notes: not transcribed.';
