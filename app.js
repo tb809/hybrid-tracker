@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.28 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.30 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.29';
+  const APP_VERSION = '2.1.30';
 
   function start(BOOT) {
 
@@ -67,17 +67,29 @@
     { id: 'w4_sat', date: '2026-11-07', dow: 'Sat', short: '11/07', title: 'No session (wedding)', subtitle: 'Wedding day · Mexico (Punta de Mita) · nothing logged', type: 'rest' },
     { id: 'w4_sun', date: '2026-11-08', dow: 'Sun', short: '11/08', title: 'Tempo Conditioning', subtitle: 'Planned / in progress · tonight at home (CA) · 10\' easy + 1/1.5/1.5/1 km tempo + 10\' easy', type: 'conditioning' },
   ];
+  // Phase 6 Week 5 (Mon Nov 9–Sun Nov 15, 2026). Ids prefixed w5_. Only Mon is filled (screenshot transcription; coach notes not transcribed). Tue–Sun await screenshots.
+  const WEEK5 = [
+    { id: 'w5_mon', date: '2026-11-09', dow: 'Mon', short: '11/09', title: 'Full Body 1', subtitle: 'Squat Focused · planned · 4 × 4 @ RPE 8 · apartment gym / Freedom Rack likely', type: 'strength' },
+    { id: 'w5_tue', date: '2026-11-10', dow: 'Tue', short: '11/10', title: 'Easy Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
+    { id: 'w5_wed', date: '2026-11-11', dow: 'Wed', short: '11/11', title: 'Full Body 2', subtitle: 'Session added once the app screenshot comes in', type: 'strength' },
+    { id: 'w5_thu', date: '2026-11-12', dow: 'Thu', short: '11/12', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
+    { id: 'w5_fri', date: '2026-11-13', dow: 'Fri', short: '11/13', title: 'Rest', subtitle: 'Typical rest day · awaiting screenshot confirmation', type: 'rest' },
+    { id: 'w5_sat', date: '2026-11-14', dow: 'Sat', short: '11/14', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
+    { id: 'w5_sun', date: '2026-11-15', dow: 'Sun', short: '11/15', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
+  ];
   WEEK.forEach(d => { d.week = 1; });
   WEEK2.forEach(d => { d.week = 2; });
   WEEK3.forEach(d => { d.week = 3; });
   WEEK4.forEach(d => { d.week = 4; });
+  WEEK5.forEach(d => { d.week = 5; });
   const WEEKS = {
     1: { label: 'Week 1', range: 'Oct 11–17, 2026', days: WEEK },
     2: { label: 'Week 2', range: 'Oct 19–25, 2026', days: WEEK2 },
     3: { label: 'Week 3', range: 'Oct 26–Nov 1, 2026', days: WEEK3 },
     4: { label: 'Week 4', range: 'Nov 2–8, 2026', days: WEEK4 },
+    5: { label: 'Week 5', range: 'Nov 9–15, 2026', days: WEEK5 },
   };
-  const ALL_DAYS = WEEK.concat(WEEK2, WEEK3, WEEK4);
+  const ALL_DAYS = WEEK.concat(WEEK2, WEEK3, WEEK4, WEEK5);
 
   // Terry shifted: Thu Oct 15 → Interval / TT session (not calendar Deadlift day)
   const DEFAULT_SESSION_FOR_TODAY = 'wed';
@@ -1161,6 +1173,51 @@
     };
   });
 
+  // —— Week 5 sessions ——
+  // Mon 11/9 · Week 5 Full Body 1 (Squat Focused). Planned, from a low-res Marchon screenshot transcription.
+  // Coach notes not transcribed. Likely apartment gym / Nautilus Freedom Rack. Garmin: no 11/9 strength activity yet.
+  SESSIONS.w5_mon = cloneSession('w2_mon');
+  (function () {
+    const s = SESSIONS.w5_mon;
+    const b = id => s.blocks.find(x => x.id === id);
+    s.duration = 'Planned 11/9 · likely apartment gym · Nautilus Freedom Rack for squat';
+    const wu = b('wu');
+    wu.meta = 'Circuit · repeat 2x · 1:00 Bike Erg · 10/10 Split Stance Lunges · 6/6 90/90 Hip Rotations';
+    wu.cues = 'Repeat 2x: 1:00 Bike Erg · 10/10 Split Stance Lunges · 6/6 90/90 Hip Rotations. Coach notes: not transcribed (low-res screenshot).';
+    wu.sets.forEach((x, i) => { x.label = 'Round ' + (i + 1) + ' · Bike Erg 1:00 · Lunges 10/10 · 90/90 6/6'; });
+    const bs = b('bs');
+    bs.meta = '4 sets × 4 reps Barbell Back Squat · 3 min rest · RPE 8';
+    bs.cues = 'Planned 11/9: 4 × 4 @ RPE 8, 3 min rest. Likely apartment gym on the Nautilus Freedom Rack (its own 44 lb / 20 kg bar; count bar + plates; bar moves vertically and forward/back, so loads are not directly comparable to a free barbell). Last back squat: Mon 11/2 (Irving, barefoot, free barbell, not Freedom Rack) 102.1 / 111.1 / 120.2 / 120.2 kg (225 / 245 / 265 / 265 lb) × 5. Last Freedom Rack squat: Mon 10/26, 4 × 6 @ 100 kg (220 lb), apartment gym. Coach notes: not transcribed.';
+    bs.sets.forEach((x, i) => { x.label = 'Set ' + (i + 1) + ' · 4 reps · RPE 8'; });
+    const pp = b('pp');
+    pp.meta = 'Push + Pull superset · 5 sets · 10–15 Weighted Push Up + 8–12 Cable Seated Row · rest between rounds';
+    pp.cues = 'Planned 11/9: 5 supersets. Last week (11/2): weighted push-up 3 × 12 @ 20 kg (45 lb plate); cable seated row 12 @ 43 / 54 / 59.5 kg (units assumed kg). Coach notes: not transcribed.';
+    pp.sets.push(
+      { id: 'pu4', label: 'Weighted Push Up 4 · 10–15', fields: ['weight', 'reps', 'rpe'] },
+      { id: 'csr4', label: 'Cable Seated Row 4 · 8–12', fields: ['weight', 'reps', 'rpe'] },
+      { id: 'pu5', label: 'Weighted Push Up 5 · 10–15', fields: ['weight', 'reps', 'rpe'] },
+      { id: 'csr5', label: 'Cable Seated Row 5 · 8–12', fields: ['weight', 'reps', 'rpe'] }
+    );
+    const gl = b('gl');
+    gl.meta = 'Barbell Hip Thrust · 3 × 8–12 · 2 min rest';
+    gl.cues = 'Planned 11/9: 3 × 8–12, 2 min rest. Last hip thrust (Mon 11/2): 3 × 12 @ 40.8 kg (90 lb). Coach notes: not transcribed.';
+    const fin = b('fin');
+    fin.meta = 'Arms + Abs · repeat 3x · 10–15 EZ bar preacher curl · 10–15 cable straight-bar pushdown · 10–15 rope cable crunch';
+    fin.cues = 'Planned 11/9, circuit × 3. Coach notes: not transcribed (low-res screenshot).';
+    fin.sets.forEach(x => {
+      x.label = x.label.replace('Ez Bar Preacher Curl', 'EZ Bar Preacher Curl').replace('Cable Rope Push Down', 'Cable Straight-Bar Pushdown');
+    });
+  })();
+  ['w5_tue', 'w5_wed', 'w5_thu', 'w5_fri', 'w5_sat', 'w5_sun'].forEach(id => {
+    SESSIONS[id] = {
+      name: 'Awaiting screenshots',
+      blocks: [{
+        id: 'tbd', title: 'Session not added yet', meta: 'Added once the coach app screenshot comes in · notes only for now',
+        sets: [{ id: 'tbd1', label: 'Notes', fields: ['notes'] }],
+      }],
+    };
+  });
+
   // —— v2: normalize set fields ——
   // RIR blocks log RIR (not RPE); every run/row segment gets a time field; fixed-distance
   // row pieces (500m, 2000m) get a distance field so pace shows in /km and /mi.
@@ -1199,10 +1256,10 @@
   let selectedSessionId = (TODAY_DAY && state.todayOverrideDate !== REAL_TODAY) ? TODAY_DAY.id : (
     (state.todayOverrideSession && SESSIONS[state.todayOverrideSession]) ? state.todayOverrideSession : (
     REAL_TODAY === '2026-10-15' ? DEFAULT_SESSION_FOR_TODAY :
-    (TODAY_DAY || {}).id || (REAL_TODAY >= WEEK4[0].date ? WEEK4[0].id : REAL_TODAY >= WEEK3[0].date ? WEEK3[0].id : REAL_TODAY >= WEEK2[0].date ? WEEK2[0].id : DEFAULT_SESSION_FOR_TODAY)
+    (TODAY_DAY || {}).id || (REAL_TODAY >= WEEK5[0].date ? WEEK5[0].id : REAL_TODAY >= WEEK4[0].date ? WEEK4[0].id : REAL_TODAY >= WEEK3[0].date ? WEEK3[0].id : REAL_TODAY >= WEEK2[0].date ? WEEK2[0].id : DEFAULT_SESSION_FOR_TODAY)
   ));
   function dayFor(id) { return ALL_DAYS.find(d => d.id === id); }
-  let selectedWeek = (dayFor(selectedSessionId) || {}).week || 4;
+  let selectedWeek = (dayFor(selectedSessionId) || {}).week || 5;
   function weightUnitFor(sessionId) { return (SESSIONS[sessionId] && SESSIONS[sessionId].weightUnit) || 'lb'; }
   function kgToLbLabel(v) {
     const n = parseNum(v);
@@ -1996,7 +2053,7 @@
 
   // —— Targets / prefill ——
   // Week 2 sessions → the Week 1 session they repeat (for "last week's load" prefill)
-  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed', w4_fri: 'w3_thu', w4_sun: 'w3_sat' };
+  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed', w4_fri: 'w3_thu', w4_sun: 'w3_sat', w5_mon: 'w4_mon' };
 
   function setStem(setId) { return String(setId).replace(/\d+$/, ''); }
 
