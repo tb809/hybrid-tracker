@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.33 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.34 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.33';
+  const APP_VERSION = '2.1.34';
 
   function start(BOOT) {
 
@@ -69,8 +69,8 @@
   ];
   // Phase 6 Week 5 (Mon Nov 9–Sun Nov 15, 2026). Ids prefixed w5_. Only Mon is filled (screenshot transcription; coach notes not transcribed). Tue–Sun await screenshots.
   const WEEK5 = [
-    { id: 'w5_mon', date: '2026-11-09', dow: 'Mon', short: '11/09', title: 'Full Body 1', subtitle: 'Squat Focused · in progress · squat 4 × 4 @ 124.7 kg (275 lb) Freedom Rack · G 25026807221', type: 'strength' },
-    { id: 'w5_tue', date: '2026-11-10', dow: 'Tue', short: '11/10', title: 'Easy Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
+    { id: 'w5_mon', date: '2026-11-09', dow: 'Mon', short: '11/09', title: 'Full Body 1', subtitle: 'Squat Focused · ✓ Done 11/9 · squat 4 × 4 @ 124.7 kg · push-up 3 × 10 @ +20 kg · row 3 × 10 @ 38.6 kg · C/D skipped · G 25026807221', type: 'strength' },
+    { id: 'w5_tue', date: '2026-11-10', dow: 'Tue', short: '11/10', title: 'Easy Conditioning', subtitle: 'Planned · ~60 min · pogo + 10\' easy + 4 × (8\' base + 2\' quicker) + 10\' easy · by HR', type: 'conditioning' },
     { id: 'w5_wed', date: '2026-11-11', dow: 'Wed', short: '11/11', title: 'Full Body 2', subtitle: 'Session added once the app screenshot comes in', type: 'strength' },
     { id: 'w5_thu', date: '2026-11-12', dow: 'Thu', short: '11/12', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
     { id: 'w5_fri', date: '2026-11-13', dow: 'Fri', short: '11/13', title: 'Rest', subtitle: 'Typical rest day · awaiting screenshot confirmation', type: 'rest' },
@@ -1180,7 +1180,7 @@
   (function () {
     const s = SESSIONS.w5_mon;
     const b = id => s.blocks.find(x => x.id === id);
-    s.duration = 'In progress 11/9 evening · squat 4 × 4 @ 124.7 kg (275 lb) Freedom Rack · Garmin 55:23 · HR 93/140 · G 25026807221';
+    s.duration = 'Done 11/9 evening · squat 4 × 4 @ 124.7 kg · B 3/5 supersets · C/D skipped · Garmin 55:23 · HR 93/140 · G 25026807221';
     const wu = b('wu');
     wu.meta = 'Circuit · repeat 2x · 1:00 Bike Erg · 10/10 Split Stance Lunges · 6/6 90/90 Hip Rotations';
     wu.cues = 'Repeat 2x: 1:00 Bike Erg · 10/10 Split Stance Lunges · 6/6 90/90 Hip Rotations. Coach notes: not transcribed (low-res screenshot).';
@@ -1190,8 +1190,8 @@
     bs.cues = 'Done 11/9 (Terry: all 4 sets): 4 × 4 @ 124.7 kg (275 lb) on the Nautilus Freedom Rack (built-in 44 lb / 20 kg bar counted), RPE 8. Last free-bar squat (Mon 11/2, Irving, barefoot): 102.1 / 111.1 / 120.2 / 120.2 kg (225 / 245 / 265 / 265 lb) × 5 — not comparable. Last Freedom Rack squat (Mon 10/26): 4 × 6 @ 100 kg (220 lb). Coach notes: not transcribed.';
     bs.sets.forEach((x, i) => { x.label = 'Set ' + (i + 1) + ' · 4 reps · done 124.7 kg (275 lb) · Freedom Rack (44 lb bar counted) · RPE 8'; });
     const pp = b('pp');
-    pp.meta = 'Push + Pull superset · 5 sets · 10–15 Weighted Push Up + 8–12 Cable Seated Row · rest between rounds';
-    pp.cues = 'Planned 11/9: 5 supersets. Last week (11/2): weighted push-up 3 × 12 @ 20 kg (45 lb plate); cable seated row 12 @ 43 / 54 / 59.5 kg (units assumed kg). Coach notes: not transcribed.';
+    pp.meta = 'Done 11/9 · 3 of 5 planned supersets · Weighted Push Up 3 × 10 @ +20 kg (44 lb) · Cable Seated Row 3 × 10 @ 38.6 kg (85 lb)';
+    pp.cues = 'Done 11/9 (screenshot): weighted push-up 3 × 10 @ +20 kg (44 lb) added load; cable seated row 3 × 10 @ 38.6 kg (85 lb) — this confirms the 85 lb Terry asked about mid-session. Planned 5 rounds; stopped after 3. Sets 4–5 not done.';
     pp.sets.push(
       { id: 'pu4', label: 'Weighted Push Up 4 · 10–15', fields: ['weight', 'reps', 'rpe'] },
       { id: 'csr4', label: 'Cable Seated Row 4 · 8–12', fields: ['weight', 'reps', 'rpe'] },
@@ -1199,16 +1199,65 @@
       { id: 'csr5', label: 'Cable Seated Row 5 · 8–12', fields: ['weight', 'reps', 'rpe'] }
     );
     const gl = b('gl');
-    gl.meta = 'Barbell Hip Thrust · 3 × 8–12 · 2 min rest';
-    gl.cues = 'Planned 11/9: 3 × 8–12, 2 min rest. Last hip thrust (Mon 11/2): 3 × 12 @ 40.8 kg (90 lb). Coach notes: not transcribed.';
+    gl.meta = 'Skipped 11/9 · Barbell Hip Thrust · 3 × 8–12 · 2 min rest';
+    gl.cues = 'Skipped 11/9: session stopped after the push-up/row superset. Last hip thrust (Mon 11/2): 3 × 12 @ 40.8 kg (90 lb).';
     const fin = b('fin');
-    fin.meta = 'Arms + Abs · repeat 3x · 10–15 EZ bar preacher curl · 10–15 cable straight-bar pushdown · 10–15 rope cable crunch';
-    fin.cues = 'Planned 11/9, circuit × 3. Coach notes: not transcribed (low-res screenshot).';
+    fin.meta = 'Skipped 11/9 · Arms + Abs · repeat 3x';
+    fin.cues = 'Skipped 11/9: EZ bar preacher curl, cable straight-bar pushdown and rope cable crunch not done — session stopped after the push-up/row superset.';
     fin.sets.forEach(x => {
       x.label = x.label.replace('Ez Bar Preacher Curl', 'EZ Bar Preacher Curl').replace('Cable Rope Push Down', 'Cable Straight-Bar Pushdown');
     });
+    pp.sets.forEach((x) => {
+      if (/[123]/.test(x.id.slice(-1)) && x.id.startsWith('pu')) x.label = x.id.replace('pu', 'Weighted Push Up ') + ' · done 10 @ +20 kg (44 lb)';
+      if (/[123]/.test(x.id.slice(-1)) && x.id.startsWith('csr')) x.label = x.id.replace('csr', 'Cable Seated Row ') + ' · done 10 @ 38.6 kg (85 lb)';
+      if (/[45]/.test(x.id.slice(-1))) x.label += ' · not done (stopped after 3)';
+    });
   })();
-  ['w5_tue', 'w5_wed', 'w5_thu', 'w5_fri', 'w5_sat', 'w5_sun'].forEach(id => {
+
+  // Tue 11/10 · Week 5 Easy Conditioning Day. Planned. Choose run or row, not both. Guidance by HR, not pace.
+  SESSIONS.w5_tue = {
+    name: 'Easy Conditioning',
+    modality: true,
+    hrCard: 'easy3',
+    duration: 'Planned · ~60 min · guidance by HR (RPE 4–5), not pace',
+    blocksRun: [
+      {
+        id: 'pogo', title: 'Warm up · Pogo Jump Series', meta: '1 set · 1–2 full rounds',
+        cues: 'Take yourself through 1–2 full rounds of the pogo jump series.',
+        sets: [{ id: 'pogo1', label: 'Pogo jumps · 1–2 full rounds', fields: ['notes'] }],
+      },
+      {
+        id: 'easy', title: 'A. Easy Conditioning (Run Option)', meta: '~60 min · 10 min easy · 4 × (8 min comfortable base + 2 min slightly quicker, still conversational) · 10 min easy',
+        cues: 'Choose the run or the row option, not both. Guidance is by HR, not pace: RPE 4–5, low to mid 140s; the quicker 2 min in the high 140s and under about 150.',
+        sets: [
+          { id: 'wu10', label: '10 min easy · RPE 4–5 · low–mid 140s', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'b1', label: 'Base 1 · 8 min comfortable · RPE 4–5 · low–mid 140s', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'q1', label: 'Quicker 1 · 2 min · still conversational · high 140s, under ~150', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'b2', label: 'Base 2 · 8 min comfortable · RPE 4–5 · low–mid 140s', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'q2', label: 'Quicker 2 · 2 min · still conversational · high 140s, under ~150', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'b3', label: 'Base 3 · 8 min comfortable · RPE 4–5 · low–mid 140s', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'q3', label: 'Quicker 3 · 2 min · still conversational · high 140s, under ~150', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'b4', label: 'Base 4 · 8 min comfortable · RPE 4–5 · low–mid 140s', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'q4', label: 'Quicker 4 · 2 min · still conversational · high 140s, under ~150', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'cd10', label: '10 min easy · RPE 4–5 · low–mid 140s', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+        ],
+      },
+    ],
+    blocksRow: [
+      {
+        id: 'pogo_r', title: 'Warm up · Pogo Jump Series', meta: '1 set · 1–2 full rounds',
+        cues: 'Take yourself through 1–2 full rounds of the pogo jump series.',
+        sets: [{ id: 'pogo_r1', label: 'Pogo jumps · 1–2 full rounds', fields: ['notes'] }],
+      },
+      {
+        id: 'alt_row', title: 'B. Easy Conditioning (Row Option) · alternative', meta: 'Choose one, not both · row details not on this card update',
+        cues: 'A row option exists. Choose the run or the row, not both. Row structure was not in this update.',
+        sets: [{ id: 'altr1', label: 'Notes', fields: ['notes'] }],
+      },
+    ],
+  };
+
+  ['w5_wed', 'w5_thu', 'w5_fri', 'w5_sat', 'w5_sun'].forEach(id => {
     SESSIONS[id] = {
       name: 'Awaiting screenshots',
       blocks: [{
@@ -2053,7 +2102,7 @@
 
   // —— Targets / prefill ——
   // Week 2 sessions → the Week 1 session they repeat (for "last week's load" prefill)
-  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed', w4_fri: 'w3_thu', w4_sun: 'w3_sat', w5_mon: 'w4_mon' };
+  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed', w4_fri: 'w3_thu', w4_sun: 'w3_sat', w5_mon: 'w4_mon', w5_tue: 'w4_tue' };
 
   function setStem(setId) { return String(setId).replace(/\d+$/, ''); }
 
