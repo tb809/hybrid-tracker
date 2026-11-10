@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.30 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.31 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.30';
+  const APP_VERSION = '2.1.31';
 
   function start(BOOT) {
 
@@ -69,7 +69,7 @@
   ];
   // Phase 6 Week 5 (Mon Nov 9–Sun Nov 15, 2026). Ids prefixed w5_. Only Mon is filled (screenshot transcription; coach notes not transcribed). Tue–Sun await screenshots.
   const WEEK5 = [
-    { id: 'w5_mon', date: '2026-11-09', dow: 'Mon', short: '11/09', title: 'Full Body 1', subtitle: 'Squat Focused · planned · 4 × 4 @ RPE 8 · apartment gym / Freedom Rack likely', type: 'strength' },
+    { id: 'w5_mon', date: '2026-11-09', dow: 'Mon', short: '11/09', title: 'Full Body 1', subtitle: 'Squat Focused · ✓ Garmin strength 55:23 · HR 93/140 · 281 kcal · G 25026807221 · loads not auto-logged', type: 'strength' },
     { id: 'w5_tue', date: '2026-11-10', dow: 'Tue', short: '11/10', title: 'Easy Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
     { id: 'w5_wed', date: '2026-11-11', dow: 'Wed', short: '11/11', title: 'Full Body 2', subtitle: 'Session added once the app screenshot comes in', type: 'strength' },
     { id: 'w5_thu', date: '2026-11-12', dow: 'Thu', short: '11/12', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
@@ -1180,7 +1180,7 @@
   (function () {
     const s = SESSIONS.w5_mon;
     const b = id => s.blocks.find(x => x.id === id);
-    s.duration = 'Planned 11/9 · likely apartment gym · Nautilus Freedom Rack for squat';
+    s.duration = 'Done 11/9 evening · Garmin strength 55:23 (moving 38:15) · HR 93 avg / 140 max · Z1 15:04 · Z2 4:04 · Z3 0:27 · 281 kcal · G 25026807221 · loads not recorded by Garmin';
     const wu = b('wu');
     wu.meta = 'Circuit · repeat 2x · 1:00 Bike Erg · 10/10 Split Stance Lunges · 6/6 90/90 Hip Rotations';
     wu.cues = 'Repeat 2x: 1:00 Bike Erg · 10/10 Split Stance Lunges · 6/6 90/90 Hip Rotations. Coach notes: not transcribed (low-res screenshot).';
