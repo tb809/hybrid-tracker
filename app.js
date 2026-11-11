@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.34 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.35 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.34';
+  const APP_VERSION = '2.1.35';
 
   function start(BOOT) {
 
@@ -67,10 +67,10 @@
     { id: 'w4_sat', date: '2026-11-07', dow: 'Sat', short: '11/07', title: 'No session (wedding)', subtitle: 'Wedding day · Mexico (Punta de Mita) · nothing logged', type: 'rest' },
     { id: 'w4_sun', date: '2026-11-08', dow: 'Sun', short: '11/08', title: 'Tempo Conditioning', subtitle: 'Planned / in progress · tonight at home (CA) · 10\' easy + 1/1.5/1.5/1 km tempo + 10\' easy', type: 'conditioning' },
   ];
-  // Phase 6 Week 5 (Mon Nov 9–Sun Nov 15, 2026). Ids prefixed w5_. Only Mon is filled (screenshot transcription; coach notes not transcribed). Tue–Sun await screenshots.
+  // Phase 6 Week 5 (Mon Nov 9–Sun Nov 15, 2026). Ids prefixed w5_. Mon FB1 done (C/D skipped). Tue Easy Conditioning done (shortened vs ~60 min). Wed–Sun await screenshots.
   const WEEK5 = [
     { id: 'w5_mon', date: '2026-11-09', dow: 'Mon', short: '11/09', title: 'Full Body 1', subtitle: 'Squat Focused · ✓ Done 11/9 · squat 4 × 4 @ 124.7 kg · push-up 3 × 10 @ +20 kg · row 3 × 10 @ 38.6 kg · C/D skipped · G 25026807221', type: 'strength' },
-    { id: 'w5_tue', date: '2026-11-10', dow: 'Tue', short: '11/10', title: 'Easy Conditioning', subtitle: 'Planned · ~60 min · pogo + 10\' easy + 4 × (8\' base + 2\' quicker) + 10\' easy · by HR', type: 'conditioning' },
+    { id: 'w5_tue', date: '2026-11-10', dow: 'Tue', short: '11/10', title: 'Easy Conditioning', subtitle: 'Done 11/10 (shortened) · treadmill · 30:02 · HR 136/154 · no distance on Garmin · G 25038455131', type: 'conditioning' },
     { id: 'w5_wed', date: '2026-11-11', dow: 'Wed', short: '11/11', title: 'Full Body 2', subtitle: 'Session added once the app screenshot comes in', type: 'strength' },
     { id: 'w5_thu', date: '2026-11-12', dow: 'Thu', short: '11/12', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
     { id: 'w5_fri', date: '2026-11-13', dow: 'Fri', short: '11/13', title: 'Rest', subtitle: 'Typical rest day · awaiting screenshot confirmation', type: 'rest' },
@@ -1214,32 +1214,32 @@
     });
   })();
 
-  // Tue 11/10 · Week 5 Easy Conditioning Day. Planned. Choose run or row, not both. Guidance by HR, not pace.
+  // Tue 11/10 · Week 5 Easy Conditioning Day. Done, shortened (~30 min vs ~60 min plan).
   SESSIONS.w5_tue = {
     name: 'Easy Conditioning',
     modality: true,
     hrCard: 'easy3',
-    duration: 'Planned · ~60 min · guidance by HR (RPE 4–5), not pace',
+    duration: 'Done 11/10 (shortened vs ~60 min plan) · treadmill · 30:02 · HR 136/154 · no distance on Garmin · G 25038455131',
     blocksRun: [
       {
-        id: 'pogo', title: 'Warm up · Pogo Jump Series', meta: '1 set · 1–2 full rounds',
-        cues: 'Take yourself through 1–2 full rounds of the pogo jump series.',
-        sets: [{ id: 'pogo1', label: 'Pogo jumps · 1–2 full rounds', fields: ['notes'] }],
+        id: 'pogo', title: 'Warm up · Pogo Jump Series', meta: 'Not on Garmin · 1 set · 1–2 full rounds',
+        cues: 'Pogo not recorded on Garmin (common — the watch activity starts with the run). Planned: 1–2 full rounds of the pogo jump series.',
+        sets: [{ id: 'pogo1', label: 'Pogo jumps · 1–2 full rounds · not on Garmin', fields: ['notes'] }],
       },
       {
-        id: 'easy', title: 'A. Easy Conditioning (Run Option)', meta: '~60 min · 10 min easy · 4 × (8 min comfortable base + 2 min slightly quicker, still conversational) · 10 min easy',
-        cues: 'Choose the run or the row option, not both. Guidance is by HR, not pace: RPE 4–5, low to mid 140s; the quicker 2 min in the high 140s and under about 150.',
+        id: 'easy', title: 'A. Easy Conditioning (Run Option)', meta: '✓ Done 11/10 (shortened) · 30:02 · 2 of 4 rounds · no distance on Garmin',
+        cues: 'Done 11/10 evening treadmill (reported; start 19:09 PT). Shortened vs the ~60 min plan: 10 min easy + 2 of 4 (8 min base + 2 min quicker) rounds; rounds 3–4 and the 10 min easy cool-down not done. Garmin 25038455131 saved as indoor_cardio titled “Hybrid: Tempo Conditioning Day -” (watch workout name), but the structured steps match this Easy session (10′ + 8′ + 2′ + 8′ + 2′), then he stopped at the start of base 3. Timer 30:02, elapsed 34:25 (includes a ~4:23 pause in the second 8 min base). Distance 0.00 km — no treadmill-estimated distance, so no pace (min/km, min/mi, mph, or km/h). HR 136 avg / 154 max (ANT+ chest strap). 372 kcal. Zones from samples on Garmin-set ranges (Z1 100–118, Z2 119–138, Z3 139–158, Z4 159–178, Z5 179+): below 100 0:24 · Z1 2:05 · Z2 11:26 · Z3 16:09 · Z4/Z5 0. Meal Prep called it ~30 min of Z2; avg 136 is at the top of Z2, but most time was Z3. Splits: 10′ easy HR 123/135; base 1 HR 140/145; quicker 1 HR 146/151 (on target; Garmin tagged the 2′ steps as REST); base 2 HR 144/154 with a mid-block dip and ~4:23 pause; quicker 2 HR 150/154 (at/slightly over the ~150 cap).',
         sets: [
-          { id: 'wu10', label: '10 min easy · RPE 4–5 · low–mid 140s', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
-          { id: 'b1', label: 'Base 1 · 8 min comfortable · RPE 4–5 · low–mid 140s', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
-          { id: 'q1', label: 'Quicker 1 · 2 min · still conversational · high 140s, under ~150', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
-          { id: 'b2', label: 'Base 2 · 8 min comfortable · RPE 4–5 · low–mid 140s', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
-          { id: 'q2', label: 'Quicker 2 · 2 min · still conversational · high 140s, under ~150', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
-          { id: 'b3', label: 'Base 3 · 8 min comfortable · RPE 4–5 · low–mid 140s', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
-          { id: 'q3', label: 'Quicker 3 · 2 min · still conversational · high 140s, under ~150', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
-          { id: 'b4', label: 'Base 4 · 8 min comfortable · RPE 4–5 · low–mid 140s', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
-          { id: 'q4', label: 'Quicker 4 · 2 min · still conversational · high 140s, under ~150', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
-          { id: 'cd10', label: '10 min easy · RPE 4–5 · low–mid 140s', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'wu10', label: '10 min easy · done · 10:00 · HR 123 avg / 135 max', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'b1', label: 'Base 1 · done · 8:00 · HR 140 avg / 145 max', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'q1', label: 'Quicker 1 · done · 2:00 · HR 146 avg / 151 max (high 140s, max just over ~150)', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'b2', label: 'Base 2 · done · 8:00 recorded + ~4:23 pause · HR 144 avg / 154 max (mid-block dip)', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'q2', label: 'Quicker 2 · done · 2:00 · HR 150 avg / 154 max (at/slightly over the ~150 cap)', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'b3', label: 'Base 3 · not done (stopped after 2 of 4 rounds)', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'q3', label: 'Quicker 3 · not done (stopped after 2 of 4 rounds)', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'b4', label: 'Base 4 · not done (stopped after 2 of 4 rounds)', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'q4', label: 'Quicker 4 · not done (stopped after 2 of 4 rounds)', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'cd10', label: '10 min easy cool-down · not done', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
         ],
       },
     ],
