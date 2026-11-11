@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.35 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.36 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.35';
+  const APP_VERSION = '2.1.36';
 
   function start(BOOT) {
 
@@ -67,11 +67,11 @@
     { id: 'w4_sat', date: '2026-11-07', dow: 'Sat', short: '11/07', title: 'No session (wedding)', subtitle: 'Wedding day · Mexico (Punta de Mita) · nothing logged', type: 'rest' },
     { id: 'w4_sun', date: '2026-11-08', dow: 'Sun', short: '11/08', title: 'Tempo Conditioning', subtitle: 'Planned / in progress · tonight at home (CA) · 10\' easy + 1/1.5/1.5/1 km tempo + 10\' easy', type: 'conditioning' },
   ];
-  // Phase 6 Week 5 (Mon Nov 9–Sun Nov 15, 2026). Ids prefixed w5_. Mon FB1 done (C/D skipped). Tue Easy Conditioning done (shortened vs ~60 min). Wed–Sun await screenshots.
+  // Phase 6 Week 5 (Mon Nov 9–Sun Nov 15, 2026). Ids prefixed w5_. Mon FB1 done (C/D skipped). Tue Easy Conditioning done (shortened vs ~60 min). Wed FB2 planned. Thu–Sun await screenshots.
   const WEEK5 = [
     { id: 'w5_mon', date: '2026-11-09', dow: 'Mon', short: '11/09', title: 'Full Body 1', subtitle: 'Squat Focused · ✓ Done 11/9 · squat 4 × 4 @ 124.7 kg · push-up 3 × 10 @ +20 kg · row 3 × 10 @ 38.6 kg · C/D skipped · G 25026807221', type: 'strength' },
     { id: 'w5_tue', date: '2026-11-10', dow: 'Tue', short: '11/10', title: 'Easy Conditioning', subtitle: 'Done 11/10 (shortened) · treadmill · 30:02 · HR 136/154 · no distance on Garmin · G 25038455131', type: 'conditioning' },
-    { id: 'w5_wed', date: '2026-11-11', dow: 'Wed', short: '11/11', title: 'Full Body 2', subtitle: 'Session added once the app screenshot comes in', type: 'strength' },
+    { id: 'w5_wed', date: '2026-11-11', dow: 'Wed', short: '11/11', title: 'Full Body 2', subtitle: 'Press Focused · Planned · 4 × 4 strict press @ RPE 8 · Bakar Fitness UCSF (likely)', type: 'strength' },
     { id: 'w5_thu', date: '2026-11-12', dow: 'Thu', short: '11/12', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
     { id: 'w5_fri', date: '2026-11-13', dow: 'Fri', short: '11/13', title: 'Rest', subtitle: 'Typical rest day · awaiting screenshot confirmation', type: 'rest' },
     { id: 'w5_sat', date: '2026-11-14', dow: 'Sat', short: '11/14', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
@@ -1257,7 +1257,40 @@
     ],
   };
 
-  ['w5_wed', 'w5_thu', 'w5_fri', 'w5_sat', 'w5_sun'].forEach(id => {
+
+  // Wed 11/11 · Week 5 Full Body 2 (Press Focused). Planned, from the Marchon app screenshot (Terry 11/10). ~45 min. Likely Bakar Fitness UCSF (open regular hours 6 AM–9 PM on Veterans Day).
+  SESSIONS.w5_wed = cloneSession('w2_wed');
+  (function () {
+    const s = SESSIONS.w5_wed;
+    const b = id => s.blocks.find(x => x.id === id);
+    s.duration = 'Planned · ~45 min · Bakar Fitness UCSF (likely; open 6 AM–9 PM on Veterans Day)';
+    const sm = b('sm');
+    sm.meta = 'Circuit · repeat 2x · 1 min Ski Erg · 5/5 KB Arm Bar · 10–15 Cable Face Pull · 2 min rest between rounds';
+    sm.cues = 'KB Arm Bar: 5 reps on each arm; focus on reaching to the ceiling on each arm. Cable Face Pull: can use a band if this is easier. Rest as much as you need between rounds.';
+    const sp = b('sp');
+    sp.meta = '4 sets × 4 reps Barbell Strict Press · RPE 8 all sets (around 2 RIR) · at least 2 min rest · suggested start 65.8 kg (145 lb)';
+    sp.cues = 'Coach (Marchon card): 4 × 4 @ RPE 8 (around 2 reps in reserve). Reps are lower this week, so try to progress the load on one set or across multiple sets compared with last week. Keep loads close together across the four working sets; small increases are fine if technique stays consistent and you stay at RPE 8. Touch the bar to the collarbone on each rep, keep a strong brace and press without leg drive. Rest at least 2 minutes between sets and take longer if needed to maintain quality. Suggested loads (not on the Marchon card): warm-ups 43.1 kg (95 lb) × 5, 52.2 kg (115 lb) × 3, 61.2 kg (135 lb) × 2; work sets start at 65.8 kg (145 lb); go to 68–70.3 kg (150–155 lb) if set 1 leaves 3+ RIR. 3RM 83.9 kg (185 lb). Last barbell: 4 × 6 @ 52.2 kg (115 lb) on 10/21 (Week 2). Week 3 (10/28) was done but loads were not reported. Week 4 (11/4) was a Precor cable standing-press substitute — not comparable, not a strict-press progression.';
+    sp.sets.forEach((x, i) => { x.label = 'Set ' + (i + 1) + ' · 4 reps · RPE 8 · suggested start 65.8 kg (145 lb)'; });
+    const qg = b('qg');
+    qg.meta = '3 sets × 8–10 reps each leg Deficit DB Reverse Lunge · 2 min rest · 0–1 RIR · suggested 15.9 kg (35 lb) DBs · final week at this rep range';
+    qg.cues = 'Coach (Marchon card): 0–1 RIR. Use a 20 kg plate or something to raise the front leg. Final week at this rep range before reps lower, so push reps as much as possible. Allow both the knee and the hip to bend equally. Use straps if you have access to them. 8–10 on each leg. 2 min rest programmed but rest as much as you need between sets. Options: can use a Smith machine or a barbell instead if you feel more comfortable with them. Suggested load (not on the Marchon card): 15.9 kg (35 lb) DBs. Last deficit lunge logged: Week 2 (10/21) 3 × 8/leg @ 13.6 kg (30 lb) DBs. Week 3 (10/28) was done but loads were not reported (target then was 15.9 kg). Week 4 (11/4) was a flat-ground substitute (no deficit) @ 13.6 kg DBs — not the deficit variation.';
+    qg.sets.forEach((x, i) => { x.label = 'Set ' + (i + 1) + ' · 8–10 each leg · 0–1 RIR · suggested 15.9 kg (35 lb) DBs'; });
+    const pu = b('pu');
+    pu.meta = 'Superset × 3 · 6–10 Chin Up + 6–10 Strict Dip · 0–1 RIR · 2 min rest · add weight if possible · final week at this rep range';
+    pu.cues = 'Coach (Marchon card): 0–1 RIR. Add weight if you can to either exercise. Final week at this rep range before reps lower, so push reps as much as possible. Chin-up: palms facing you; use straps if you have access; arms fully straight at the bottom and chin over the bar at the top; use a band if you need assistance. Dip: focus on the elbow coming below the line of the shoulder at the bottom; use a band if you need assistance. 2 min programmed but rest as much as you need between sets. Suggested (not on the Marchon card): chin-up bodyweight, aim 7–8; dip bodyweight + 10 kg (22 lb) if 10 bodyweight reps are easy. Last logged (10/28): chin-up 3 × 6 bodyweight, strict dip 3 × 10 bodyweight. Week 4 (11/4) skipped.';
+    pu.sets.forEach(x => {
+      if (x.id.startsWith('chin')) x.label = x.id.replace('chin', 'R') + ' · Chin Up · 6–10 · 0–1 RIR · suggested BW, aim 7–8';
+      if (x.id.startsWith('dip')) x.label = x.id.replace('dip', 'R') + ' · Strict Dip · 6–10 · 0–1 RIR · suggested BW+10 kg if 10 BW are easy';
+    });
+    const dc = b('dc');
+    dc.meta = 'Superset × 3 · 10–15 Single Arm Rear Delt Fly + 10–15 Single Leg Seated Calf Raise · 0–1 RIR · 2 min rest · final week at this rep range';
+    dc.cues = 'Coach (Marchon card): 0–1 RIR. Final week at this rep range before reps lower, so push reps as much as possible. Cable rear delt fly: slight bend in the elbow; focus on driving the arm behind the body; use cuffs if you have access to them. Seated calf raise: use a calf machine if you have access to one; if not, a DB or a sandbag on the knee works well. 2 min rest programmed but rest as much as you need between sets.';
+    const arms = b('arms');
+    arms.meta = 'Superset × 3 · 10–15 Cable Standing Curl + 10–15 Cable Tricep Pushdown · 0–1 RIR · 2 min rest · straight bar · final week at this rep range';
+    arms.cues = 'Coach (Marchon card): 0–1 RIR. Final week at this rep range before reps lower, so push reps as much as possible. Cable biceps curl: palms facing the ceiling; use a straight bar attachment if you have one. Cable tricep pushdown: keep elbows tucked in by your sides; use a straight bar attachment. 2 min programmed but rest as much as you need between sets.';
+  })();
+
+  ['w5_thu', 'w5_fri', 'w5_sat', 'w5_sun'].forEach(id => {
     SESSIONS[id] = {
       name: 'Awaiting screenshots',
       blocks: [{
@@ -2102,7 +2135,7 @@
 
   // —— Targets / prefill ——
   // Week 2 sessions → the Week 1 session they repeat (for "last week's load" prefill)
-  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed', w4_fri: 'w3_thu', w4_sun: 'w3_sat', w5_mon: 'w4_mon', w5_tue: 'w4_tue' };
+  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed', w4_fri: 'w3_thu', w4_sun: 'w3_sat', w5_mon: 'w4_mon', w5_tue: 'w4_tue', w5_wed: 'w4_wed' };
 
   function setStem(setId) { return String(setId).replace(/\d+$/, ''); }
 
