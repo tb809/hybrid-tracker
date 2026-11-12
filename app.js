@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.39 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.40 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.39';
+  const APP_VERSION = '2.1.40';
 
   function start(BOOT) {
 
@@ -67,12 +67,12 @@
     { id: 'w4_sat', date: '2026-11-07', dow: 'Sat', short: '11/07', title: 'No session (wedding)', subtitle: 'Wedding day · Mexico (Punta de Mita) · nothing logged', type: 'rest' },
     { id: 'w4_sun', date: '2026-11-08', dow: 'Sun', short: '11/08', title: 'Tempo Conditioning', subtitle: 'Planned / in progress · tonight at home (CA) · 10\' easy + 1/1.5/1.5/1 km tempo + 10\' easy', type: 'conditioning' },
   ];
-  // Phase 6 Week 5 (Mon Nov 9–Sun Nov 15, 2026). Ids prefixed w5_. Mon FB1 done (C/D skipped). Tue Easy Conditioning done (shortened vs ~60 min). Wed FB2 planned. Thu–Sun await screenshots.
+  // Phase 6 Week 5 (Mon Nov 9–Sun Nov 15, 2026). Ids prefixed w5_. Mon FB1 done (C/D skipped). Tue Easy Conditioning done (shortened vs ~60 min). Wed FB2 done (Garmin; loads not auto-logged). Thu Interval Conditioning planned. Fri–Sun await screenshots.
   const WEEK5 = [
     { id: 'w5_mon', date: '2026-11-09', dow: 'Mon', short: '11/09', title: 'Full Body 1', subtitle: 'Squat Focused · ✓ Done 11/9 · squat 4 × 4 @ 124.7 kg · push-up 3 × 10 @ +20 kg · row 3 × 10 @ 38.6 kg · C/D skipped · G 25026807221', type: 'strength' },
     { id: 'w5_tue', date: '2026-11-10', dow: 'Tue', short: '11/10', title: 'Easy Conditioning', subtitle: 'Done 11/10 (shortened) · treadmill · 30:02 · HR 136/154 · no distance on Garmin · G 25038455131', type: 'conditioning' },
     { id: 'w5_wed', date: '2026-11-11', dow: 'Wed', short: '11/11', title: 'Full Body 2', subtitle: 'Press Focused · ✓ Garmin strength 42:44 · HR 103/162 · 306 kcal · G 25044757421 · loads not auto-logged', type: 'strength' },
-    { id: 'w5_thu', date: '2026-11-12', dow: 'Thu', short: '11/12', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
+    { id: 'w5_thu', date: '2026-11-12', dow: 'Thu', short: '11/12', title: 'Interval Conditioning', subtitle: 'Planned · ~75 min · pogo + 15\' easy w/ 3×20 s strides + 10 × 600 m @ 4:49/km + 10\' easy', type: 'conditioning' },
     { id: 'w5_fri', date: '2026-11-13', dow: 'Fri', short: '11/13', title: 'Rest', subtitle: 'Typical rest day · awaiting screenshot confirmation', type: 'rest' },
     { id: 'w5_sat', date: '2026-11-14', dow: 'Sat', short: '11/14', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
     { id: 'w5_sun', date: '2026-11-15', dow: 'Sun', short: '11/15', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
@@ -1290,7 +1290,88 @@
     arms.cues = 'Coach (Marchon card): 0–1 RIR. Final week at this rep range before reps lower, so push reps as much as possible. Cable biceps curl: palms facing the ceiling; use a straight bar attachment if you have one. Cable tricep pushdown: keep elbows tucked in by your sides; use a straight bar attachment. 2 min programmed but rest as much as you need between sets.';
   })();
 
-  ['w5_thu', 'w5_fri', 'w5_sat', 'w5_sun'].forEach(id => {
+
+  // Thu 11/12 · Week 5 Interval Conditioning. Planned. Choose run or row, not both. ~75 min. Test pace from the Oct 15 10-min test (2.08 km): 4:49/km.
+  SESSIONS.w5_thu = {
+    name: 'Interval Conditioning',
+    modality: true,
+    hrCard: 'hard2',
+    duration: 'Planned · ~75 min · 10 × 600 m @ test pace 4:49/km (about 2:53 / 600 m) · leaderboard = avg pace of the 10 work reps',
+    blocksRun: [
+      {
+        id: 'pogo', title: 'Warm up · Pogo Jump Series', meta: '1–2 full rounds',
+        cues: 'Take yourself through 1–2 full rounds of the pogo jump series.',
+        sets: [{ id: 'pogo1', label: 'Pogo jumps · 1–2 full rounds', fields: ['notes'] }],
+      },
+      {
+        id: 'wu', title: 'A. Warm Up (Run Option)', meta: '15 min easy run including 3 × 20 s progressive strides with 40 s easy jog after each',
+        cues: 'Choose the run or the row, not both. 15 min easy, with 3 × 20 s progressive strides (40 s easy jog after each) built into that 15 min. Outside: easy and conversational. Treadmill (1% incline): warm-up at 9–10 km/h (6:40–6:00/km · 10:44–9:39/mi · 5.6–6.2 mph).',
+        sets: [
+          { id: 'wu15', label: '15 min easy · includes 3 × 20 s strides', fields: ['distance', 'avgHr', 'notes'] },
+          { id: 'str1', label: 'Stride 1 · 20 s progressive · 40 s easy jog', fields: ['notes'] },
+          { id: 'str2', label: 'Stride 2 · 20 s progressive · 40 s easy jog', fields: ['notes'] },
+          { id: 'str3', label: 'Stride 3 · 20 s progressive · 40 s easy jog', fields: ['notes'] },
+        ],
+      },
+      {
+        id: 'reps', title: 'Race Pace Intervals', meta: '10 × 600 m @ test pace + 2 min easy jog · test pace 4:49/km (7:45/mi · 12.5 km/h · 7.7 mph) · about 2:53 per 600 m',
+        cues: 'Test pace from the Oct 15 10-min test (2.08 km): 4:49/km (7:45/mi · 12.5 km/h · 7.7 mph), so each 600 m (0.37 mi) is about 2:53. The leaderboard value is the average pace of the 10 work reps only (6,000 m / 3.73 mi total), not including warm-up, jogs, or cool-down. Outside: run the reps by pace and jog easy for the full 2 min. Treadmill (1% incline): reps at 12.5 km/h (the 4:49/km setting; 7.7 mph · 7:45/mi); recovery at about 8 km/h (7:30/km · 12:04/mi · 5.0 mph). Press the speed change about 5 s early, because the belt takes a moment to settle.',
+        sets: [
+          { id: 'r1', label: 'Rep 1 · 600 m @ test pace · target ~2:53 (4:49/km · 7:45/mi · 12.5 km/h · 7.7 mph)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'j1', label: 'Jog 1 · 2 min easy', fields: ['notes'] },
+          { id: 'r2', label: 'Rep 2 · 600 m @ test pace · target ~2:53 (4:49/km · 7:45/mi · 12.5 km/h · 7.7 mph)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'j2', label: 'Jog 2 · 2 min easy', fields: ['notes'] },
+          { id: 'r3', label: 'Rep 3 · 600 m @ test pace · target ~2:53 (4:49/km · 7:45/mi · 12.5 km/h · 7.7 mph)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'j3', label: 'Jog 3 · 2 min easy', fields: ['notes'] },
+          { id: 'r4', label: 'Rep 4 · 600 m @ test pace · target ~2:53 (4:49/km · 7:45/mi · 12.5 km/h · 7.7 mph)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'j4', label: 'Jog 4 · 2 min easy', fields: ['notes'] },
+          { id: 'r5', label: 'Rep 5 · 600 m @ test pace · target ~2:53 (4:49/km · 7:45/mi · 12.5 km/h · 7.7 mph)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'j5', label: 'Jog 5 · 2 min easy', fields: ['notes'] },
+          { id: 'r6', label: 'Rep 6 · 600 m @ test pace · target ~2:53 (4:49/km · 7:45/mi · 12.5 km/h · 7.7 mph)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'j6', label: 'Jog 6 · 2 min easy', fields: ['notes'] },
+          { id: 'r7', label: 'Rep 7 · 600 m @ test pace · target ~2:53 (4:49/km · 7:45/mi · 12.5 km/h · 7.7 mph)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'j7', label: 'Jog 7 · 2 min easy', fields: ['notes'] },
+          { id: 'r8', label: 'Rep 8 · 600 m @ test pace · target ~2:53 (4:49/km · 7:45/mi · 12.5 km/h · 7.7 mph)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'j8', label: 'Jog 8 · 2 min easy', fields: ['notes'] },
+          { id: 'r9', label: 'Rep 9 · 600 m @ test pace · target ~2:53 (4:49/km · 7:45/mi · 12.5 km/h · 7.7 mph)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'j9', label: 'Jog 9 · 2 min easy', fields: ['notes'] },
+          { id: 'r10', label: 'Rep 10 · 600 m @ test pace · target ~2:53 (4:49/km · 7:45/mi · 12.5 km/h · 7.7 mph)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'j10', label: 'Jog 10 · 2 min easy', fields: ['notes'] },
+          { id: 'lb', label: 'Leaderboard · avg pace of the 10 work reps only (6,000 m)', fields: ['time', 'notes'] },
+        ],
+      },
+      {
+        id: 'cd', title: 'Cool Down', meta: '10 min easy run',
+        cues: '10 min easy. Treadmill (1% incline): back to about 9–10 km/h.',
+        sets: [{ id: 'cd10', label: '10 min easy', fields: ['distance', 'avgHr', 'notes'] }],
+      },
+    ],
+    blocksRow: [
+      {
+        id: 'pogo_r', title: 'Warm up · Pogo Jump Series', meta: '1–2 full rounds',
+        cues: 'Take yourself through 1–2 full rounds of the pogo jump series.',
+        sets: [{ id: 'pogo_r1', label: 'Pogo jumps · 1–2 full rounds', fields: ['notes'] }],
+      },
+      {
+        id: 'wu_r', title: 'B. Interval Conditioning (Row Option) · alternative', meta: '10 min Row Erg @ 18–22 s/m with 3 × 20 s at interval pace and 40 s easy',
+        cues: 'Choose the run or the row, not both. 10 min Row Erg at 18–22 s/m, including 3 × 20 s at interval pace with 40 s easy after each.',
+        sets: [{ id: 'rwu10', label: '10 min easy @ 18–22 s/m + 3 × 20 s interval-pace bursts', fields: ['distance', 'avgHr', 'notes'] }],
+      },
+      {
+        id: 'rreps', title: 'Row Intervals', meta: '5 × 750 m @ 2k pace + 3–4 s/500 m · 26–30 s/m · 2:30 rest',
+        cues: '5 × 750 m at 2k pace plus 3–4 s per 500 m, 26–30 s/m, with 2:30 rest after each rep.',
+        sets: [
+          { id: 'rr1', label: 'Rep 1 · 750 m @ 2k + 3–4 s/500 m · 26–30 s/m', fields: ['time', 'avgHr', 'notes'] },
+          { id: 'rr2', label: 'Rep 2 · 750 m @ 2k + 3–4 s/500 m · 26–30 s/m', fields: ['time', 'avgHr', 'notes'] },
+          { id: 'rr3', label: 'Rep 3 · 750 m @ 2k + 3–4 s/500 m · 26–30 s/m', fields: ['time', 'avgHr', 'notes'] },
+          { id: 'rr4', label: 'Rep 4 · 750 m @ 2k + 3–4 s/500 m · 26–30 s/m', fields: ['time', 'avgHr', 'notes'] },
+          { id: 'rr5', label: 'Rep 5 · 750 m @ 2k + 3–4 s/500 m · 26–30 s/m', fields: ['time', 'avgHr', 'notes'] },
+        ],
+      },
+    ],
+  };
+
+  ['w5_fri', 'w5_sat', 'w5_sun'].forEach(id => {
     SESSIONS[id] = {
       name: 'Awaiting screenshots',
       blocks: [{
@@ -2135,7 +2216,7 @@
 
   // —— Targets / prefill ——
   // Week 2 sessions → the Week 1 session they repeat (for "last week's load" prefill)
-  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed', w4_fri: 'w3_thu', w4_sun: 'w3_sat', w5_mon: 'w4_mon', w5_tue: 'w4_tue', w5_wed: 'w4_wed' };
+  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed', w4_fri: 'w3_thu', w4_sun: 'w3_sat', w5_mon: 'w4_mon', w5_tue: 'w4_tue', w5_wed: 'w4_wed', w5_thu: 'w4_fri' };
 
   function setStem(setId) { return String(setId).replace(/\d+$/, ''); }
 
