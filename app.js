@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.37 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.38 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.37';
+  const APP_VERSION = '2.1.38';
 
   function start(BOOT) {
 
@@ -1263,7 +1263,7 @@
   (function () {
     const s = SESSIONS.w5_wed;
     const b = id => s.blocks.find(x => x.id === id);
-    s.duration = 'Done 11/11 morning · Garmin strength 42:44 (moving 21:35) · HR 103 avg / 162 max · Z1 13:05 · Z2 6:39 · Z3 2:53 · Z4 0:31 · 306 kcal · G 25044757421 · loads not recorded by Garmin';
+    s.duration = 'Done 11/11 morning · Garmin strength 42:44 (moving 21:35) · HR 103 avg / 162 max · <100 23:18 · Z1 10:48 · Z2 5:42 · Z3 2:48 · Z4 0:06 (Terry's zones) · 306 kcal · G 25044757421 · loads not recorded by Garmin';
     const sm = b('sm');
     sm.meta = 'Circuit · repeat 2x · 1 min Ski Erg · 5/5 KB Arm Bar · 10–15 Cable Face Pull · 2 min rest between rounds';
     sm.cues = 'KB Arm Bar: 5 reps on each arm; focus on reaching to the ceiling on each arm. Cable Face Pull: can use a band if this is easier. Rest as much as you need between rounds.';
