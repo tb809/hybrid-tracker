@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.36 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.37 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.36';
+  const APP_VERSION = '2.1.37';
 
   function start(BOOT) {
 
@@ -71,7 +71,7 @@
   const WEEK5 = [
     { id: 'w5_mon', date: '2026-11-09', dow: 'Mon', short: '11/09', title: 'Full Body 1', subtitle: 'Squat Focused · ✓ Done 11/9 · squat 4 × 4 @ 124.7 kg · push-up 3 × 10 @ +20 kg · row 3 × 10 @ 38.6 kg · C/D skipped · G 25026807221', type: 'strength' },
     { id: 'w5_tue', date: '2026-11-10', dow: 'Tue', short: '11/10', title: 'Easy Conditioning', subtitle: 'Done 11/10 (shortened) · treadmill · 30:02 · HR 136/154 · no distance on Garmin · G 25038455131', type: 'conditioning' },
-    { id: 'w5_wed', date: '2026-11-11', dow: 'Wed', short: '11/11', title: 'Full Body 2', subtitle: 'Press Focused · Planned · 4 × 4 strict press @ RPE 8 · Bakar Fitness UCSF (likely)', type: 'strength' },
+    { id: 'w5_wed', date: '2026-11-11', dow: 'Wed', short: '11/11', title: 'Full Body 2', subtitle: 'Press Focused · ✓ Garmin strength 42:44 · HR 103/162 · 306 kcal · G 25044757421 · loads not auto-logged', type: 'strength' },
     { id: 'w5_thu', date: '2026-11-12', dow: 'Thu', short: '11/12', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
     { id: 'w5_fri', date: '2026-11-13', dow: 'Fri', short: '11/13', title: 'Rest', subtitle: 'Typical rest day · awaiting screenshot confirmation', type: 'rest' },
     { id: 'w5_sat', date: '2026-11-14', dow: 'Sat', short: '11/14', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
@@ -1263,7 +1263,7 @@
   (function () {
     const s = SESSIONS.w5_wed;
     const b = id => s.blocks.find(x => x.id === id);
-    s.duration = 'Planned · ~45 min · Bakar Fitness UCSF (likely; open 6 AM–9 PM on Veterans Day)';
+    s.duration = 'Done 11/11 morning · Garmin strength 42:44 (moving 21:35) · HR 103 avg / 162 max · Z1 13:05 · Z2 6:39 · Z3 2:53 · Z4 0:31 · 306 kcal · G 25044757421 · loads not recorded by Garmin';
     const sm = b('sm');
     sm.meta = 'Circuit · repeat 2x · 1 min Ski Erg · 5/5 KB Arm Bar · 10–15 Cable Face Pull · 2 min rest between rounds';
     sm.cues = 'KB Arm Bar: 5 reps on each arm; focus on reaching to the ceiling on each arm. Cable Face Pull: can use a band if this is easier. Rest as much as you need between rounds.';
