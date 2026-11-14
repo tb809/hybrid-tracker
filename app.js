@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.42 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.43 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.42';
+  const APP_VERSION = '2.1.43';
 
   function start(BOOT) {
 
@@ -67,14 +67,14 @@
     { id: 'w4_sat', date: '2026-11-07', dow: 'Sat', short: '11/07', title: 'No session (wedding)', subtitle: 'Wedding day · Mexico (Punta de Mita) · nothing logged', type: 'rest' },
     { id: 'w4_sun', date: '2026-11-08', dow: 'Sun', short: '11/08', title: 'Tempo Conditioning', subtitle: 'Planned / in progress · tonight at home (CA) · 10\' easy + 1/1.5/1.5/1 km tempo + 10\' easy', type: 'conditioning' },
   ];
-  // Phase 6 Week 5 (Mon Nov 9–Sun Nov 15, 2026). Ids prefixed w5_. Mon FB1 done (C/D skipped). Tue Easy Conditioning done (shortened). Wed FB2 done (Garmin; loads not auto-logged). Thu Interval Conditioning done Fri 11/13 (modified: 5 of 10). Fri is rest/moved. Sat–Sun await screenshots.
+  // Phase 6 Week 5 (Mon Nov 9–Sun Nov 15, 2026). Ids prefixed w5_. Mon FB1 done (C/D skipped). Tue Easy Conditioning done (shortened). Wed FB2 done (Garmin; loads not auto-logged). Thu Interval Conditioning done Fri 11/13 (modified: 5 of 10). Fri is rest/moved. Sat Tempo Conditioning planned (run option, 54 min; may run outdoors Sat or Sun). Sun awaits screenshot.
   const WEEK5 = [
     { id: 'w5_mon', date: '2026-11-09', dow: 'Mon', short: '11/09', title: 'Full Body 1', subtitle: 'Squat Focused · ✓ Done 11/9 · squat 4 × 4 @ 124.7 kg · push-up 3 × 10 @ +20 kg · row 3 × 10 @ 38.6 kg · C/D skipped · G 25026807221', type: 'strength' },
     { id: 'w5_tue', date: '2026-11-10', dow: 'Tue', short: '11/10', title: 'Easy Conditioning', subtitle: 'Done 11/10 (shortened) · treadmill · 30:02 · HR 136/154 · no distance on Garmin · G 25038455131', type: 'conditioning' },
     { id: 'w5_wed', date: '2026-11-11', dow: 'Wed', short: '11/11', title: 'Full Body 2', subtitle: 'Press Focused · ✓ Garmin strength 42:44 · HR 103/162 · 306 kcal · G 25044757421 · loads not auto-logged', type: 'strength' },
     { id: 'w5_thu', date: '2026-11-12', dow: 'Thu', short: '11/12', title: 'Interval Conditioning', subtitle: 'Done Fri 11/13 (modified: 5 of 10, walk recoveries) · treadmill · 49:36 · HR 144/196 · LB 4:51/km · G 25071164087', type: 'conditioning' },
     { id: 'w5_fri', date: '2026-11-13', dow: 'Fri', short: '11/13', title: 'Rest', subtitle: 'Typical rest day · Thursday interval was moved and done today (see Thu / w5_thu)', type: 'rest' },
-    { id: 'w5_sat', date: '2026-11-14', dow: 'Sat', short: '11/14', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
+    { id: 'w5_sat', date: '2026-11-14', dow: 'Sat', short: '11/14', title: 'Tempo Conditioning', subtitle: 'Planned · run option · 54 min · 10 min easy + 3×10 min tempo (2 min jog) + 10 min easy · may run outdoors Sat or Sun', type: 'conditioning' },
     { id: 'w5_sun', date: '2026-11-15', dow: 'Sun', short: '11/15', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
   ];
   WEEK.forEach(d => { d.week = 1; });
@@ -1431,12 +1431,56 @@
     duration: 'Typical rest day · Thursday Interval Conditioning was moved and done today (see Thu 11/12 / w5_thu)',
     blocks: [{
       id: 'rest', title: 'Rest', meta: 'Thursday interval moved to Friday and completed (modified) — the log is on w5_thu',
-      cues: 'No separate Friday session. The Week 5 Thursday Interval Conditioning workout was moved to Friday 11/13 and logged on the Thursday card (5 of 10 × 600 m, walk recoveries, treadmill).',
+      cues: 'No separate Friday session. The Week 5 Thursday Interval Conditioning workout was moved to Friday 11/13 and logged on the Thursday card (5 of 10 × 600 m, walk recoveries, treadmill). Day burn 11/13: Garmin 3,686 kcal (BMR 2,544 + active 1,142, 12,839 steps); Oura 3,354 (active 629, 8,091 steps); best estimate ~3,400 kcal.',
       sets: [{ id: 'rest1', label: 'No separate Friday session · interval logged on Thu (w5_thu)', fields: ['notes'] }],
     }],
   };
 
-  ['w5_sat', 'w5_sun'].forEach(id => {
+  // Sat 11/14 · Week 5 Tempo Conditioning Day (Marchon app). Planned. Run option chosen; may be run outdoors Sat or Sun.
+  SESSIONS.w5_sat = {
+    name: 'Tempo Conditioning Day',
+    modality: true,
+    hrCard: 'tempo3',
+    tempoTimer: { work: 10, rest: 2, sets: 3 },
+    duration: 'Planned · run option · 54 min · 10 min easy + 3 × 10 min tempo (2 min easy jog) + 10 min easy · may run outdoors Sat or Sun',
+    blocksRun: [
+      {
+        id: 'pogo', title: 'Warm up · Pogo Jump Series', meta: '1–2 rounds',
+        cues: 'Take yourself through 1–2 full rounds of the pogo jump series.',
+        sets: [{ id: 'pogo1', label: 'Pogo jumps', fields: ['notes'] }],
+      },
+      {
+        id: 'wu', title: 'A. Tempo Conditioning (Run Option) · Easy Run', meta: '10 min easy · Z2 HR 119–138',
+        cues: 'Option A (run) is today\'s choice. May be run outdoors Sat 11/14 or Sun 11/15 if it is sunny. Easy: treadmill 5.8 mph (9.3 km/h, 6:26/km, 10:21/mi) · Z2, HR 119–138.',
+        sets: [{ id: 'wu10', label: '10 min easy · HR 119–138', fields: ['distance', 'avgHr', 'notes'] }],
+      },
+      {
+        id: 'tempo', title: 'Tempo Run', meta: 'MODERATE · repeat 3x · 10 min comfortable moderate effort · 2 min easy jog · 30 min work total · HR Z3 140–155',
+        cues: 'Coach (Marchon card): reps are longer than week 3; settle into a sustainable pace and keep the three efforts consistent. Aerobic and controlled; comfortable moderate work, not a test or threshold session; avoid chasing Thursday\'s test-pace intervals. Keep the recovery jog very easy. Finish feeling you could do more controlled work. Leaderboard is average pace across the 30 min of work only (exclude warm-up, recovery jogs, and cooldown). Guidance (not on the card): tempo by HR Z3 140–155 bpm. Treadmill: start 6.5 mph (10.5 km/h, 5:44/km, 9:14/mi); easy 5.8 mph (9.3 km/h, 6:26/km, 10:21/mi); jog 5.0 mph (8.0 km/h, 7:30/km, 12:04/mi). Outdoor expected tempo roughly 5:40–6:00/km (9:07–9:39/mi).',
+        sets: [
+          { id: 't1', label: 'Tempo 1 · 10 min · HR 140–155 (Z3)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'tr1', label: 'Easy jog 2 min', fields: ['notes'] },
+          { id: 't2', label: 'Tempo 2 · 10 min · HR 140–155 (Z3)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'tr2', label: 'Easy jog 2 min', fields: ['notes'] },
+          { id: 't3', label: 'Tempo 3 · 10 min · HR 140–155 (Z3)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+        ],
+      },
+      {
+        id: 'cd', title: 'Cool Down', meta: '10 min easy · Z2 HR 119–138',
+        cues: 'Easy: treadmill 5.8 mph (9.3 km/h, 6:26/km, 10:21/mi) · Z2, HR 119–138.',
+        sets: [{ id: 'cd10', label: '10 min easy · HR 119–138', fields: ['distance', 'avgHr', 'notes'] }],
+      },
+    ],
+    blocksRow: [
+      {
+        id: 'alt_row', title: 'B. Tempo Conditioning (Row Option) · alternative', meta: 'Not the plan today · run option chosen · 10 min easy row 18–20 s/m',
+        cues: 'Choose run or row, not both. A row option exists (starts with 10 min easy row at 18–20 s/m); remaining row details were not fully captured. Listed as the alternative only.',
+        sets: [{ id: 'altr1', label: 'Notes', fields: ['notes'] }],
+      },
+    ],
+  };
+
+  ['w5_sun'].forEach(id => {
     SESSIONS[id] = {
       name: 'Awaiting screenshots',
       blocks: [{
@@ -2281,7 +2325,7 @@
 
   // —— Targets / prefill ——
   // Week 2 sessions → the Week 1 session they repeat (for "last week's load" prefill)
-  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed', w4_fri: 'w3_thu', w4_sun: 'w3_sat', w5_mon: 'w4_mon', w5_tue: 'w4_tue', w5_wed: 'w4_wed', w5_thu: 'w4_fri' };
+  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed', w4_fri: 'w3_thu', w4_sun: 'w3_sat', w5_mon: 'w4_mon', w5_tue: 'w4_tue', w5_wed: 'w4_wed', w5_thu: 'w4_fri', w5_sat: 'w4_sun' };
 
   function setStem(setId) { return String(setId).replace(/\d+$/, ''); }
 
