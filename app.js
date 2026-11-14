@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.40 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.41 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.40';
+  const APP_VERSION = '2.1.41';
 
   function start(BOOT) {
 
@@ -67,13 +67,13 @@
     { id: 'w4_sat', date: '2026-11-07', dow: 'Sat', short: '11/07', title: 'No session (wedding)', subtitle: 'Wedding day · Mexico (Punta de Mita) · nothing logged', type: 'rest' },
     { id: 'w4_sun', date: '2026-11-08', dow: 'Sun', short: '11/08', title: 'Tempo Conditioning', subtitle: 'Planned / in progress · tonight at home (CA) · 10\' easy + 1/1.5/1.5/1 km tempo + 10\' easy', type: 'conditioning' },
   ];
-  // Phase 6 Week 5 (Mon Nov 9–Sun Nov 15, 2026). Ids prefixed w5_. Mon FB1 done (C/D skipped). Tue Easy Conditioning done (shortened vs ~60 min). Wed FB2 done (Garmin; loads not auto-logged). Thu Interval Conditioning planned. Fri–Sun await screenshots.
+  // Phase 6 Week 5 (Mon Nov 9–Sun Nov 15, 2026). Ids prefixed w5_. Mon FB1 done (C/D skipped). Tue Easy Conditioning done (shortened). Wed FB2 done (Garmin; loads not auto-logged). Thu Interval Conditioning done Fri 11/13 (modified: 5 of 10). Fri is rest/moved. Sat–Sun await screenshots.
   const WEEK5 = [
     { id: 'w5_mon', date: '2026-11-09', dow: 'Mon', short: '11/09', title: 'Full Body 1', subtitle: 'Squat Focused · ✓ Done 11/9 · squat 4 × 4 @ 124.7 kg · push-up 3 × 10 @ +20 kg · row 3 × 10 @ 38.6 kg · C/D skipped · G 25026807221', type: 'strength' },
     { id: 'w5_tue', date: '2026-11-10', dow: 'Tue', short: '11/10', title: 'Easy Conditioning', subtitle: 'Done 11/10 (shortened) · treadmill · 30:02 · HR 136/154 · no distance on Garmin · G 25038455131', type: 'conditioning' },
     { id: 'w5_wed', date: '2026-11-11', dow: 'Wed', short: '11/11', title: 'Full Body 2', subtitle: 'Press Focused · ✓ Garmin strength 42:44 · HR 103/162 · 306 kcal · G 25044757421 · loads not auto-logged', type: 'strength' },
-    { id: 'w5_thu', date: '2026-11-12', dow: 'Thu', short: '11/12', title: 'Interval Conditioning', subtitle: 'Planned · ~75 min · pogo + 15\' easy w/ 3×20 s strides + 10 × 600 m @ 4:49/km + 10\' easy', type: 'conditioning' },
-    { id: 'w5_fri', date: '2026-11-13', dow: 'Fri', short: '11/13', title: 'Rest', subtitle: 'Typical rest day · awaiting screenshot confirmation', type: 'rest' },
+    { id: 'w5_thu', date: '2026-11-12', dow: 'Thu', short: '11/12', title: 'Interval Conditioning', subtitle: 'Done Fri 11/13 (modified: 5 of 10, walk recoveries) · treadmill · 49:36 · HR 144/196 · LB 4:53/km · G 25071164087', type: 'conditioning' },
+    { id: 'w5_fri', date: '2026-11-13', dow: 'Fri', short: '11/13', title: 'Rest', subtitle: 'Typical rest day · Thursday interval was moved and done today (see Thu / w5_thu)', type: 'rest' },
     { id: 'w5_sat', date: '2026-11-14', dow: 'Sat', short: '11/14', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
     { id: 'w5_sun', date: '2026-11-15', dow: 'Sun', short: '11/15', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
   ];
@@ -1371,7 +1371,72 @@
     ],
   };
 
-  ['w5_fri', 'w5_sat', 'w5_sun'].forEach(id => {
+
+  (function () {
+    const s = SESSIONS.w5_thu;
+    const br = id => (s.blocksRun || []).find(x => x.id === id);
+    s.duration = 'Done Fri 11/13 (moved from Thu; modified: 5 of 10 reps, walk recoveries) · treadmill · 49:36 · 4.25 km Garmin (distance may be off) · HR 144/196 · LB 4:53/km · G 25071164087';
+    const pogo = br('pogo');
+    pogo.meta = 'Not on Garmin · 1–2 full rounds';
+    pogo.cues = 'Pogo not recorded on Garmin (the watch activity starts with the treadmill run).';
+    pogo.sets[0].label = 'Pogo jumps · 1–2 full rounds · not on Garmin';
+    const wu = br('wu');
+    wu.meta = 'Done 11/13 · 14:59 · 2.03 km Garmin · HR ~121–133 (Z2)';
+    wu.cues = 'Done 11/13 (Garmin 25071164087, start 18:04 PT): auto-km laps 7:21 / 7:26 + 25 m in 0:12 = 14:59, 2.03 km, pace about 7:24/km (HR 121–133). Strides are not broken out as separate laps. Then a 1:14 near-stationary pause before rep 1.';
+    wu.sets[0].label = '15 min easy · done 14:59 · 2.03 km Garmin · HR 121–133';
+    wu.sets[1].label = 'Stride 1 · 20 s · not broken out on Garmin';
+    wu.sets[2].label = 'Stride 2 · 20 s · not broken out on Garmin';
+    wu.sets[3].label = 'Stride 3 · 20 s · not broken out on Garmin';
+    const reps = br('reps');
+    reps.meta = 'Done 11/13 · modified: 5 of 10 × 600 m · all set at 7.7 mph (4:51/km) · walk recoveries · LB 4:53/km';
+    reps.cues = 'Done Fri 11/13 on a treadmill (Week 5 Thursday interval moved to Friday). Terry: 5 × 600 m (not 10), all at 7.7 mph (12.4 km/h, 4:51/km, 7:48/mi, about 2:54 per rep); recoveries were walks, not jogs (2:30 after rep 1, then 3 min); stopped at 5 on purpose. Garmin laps 5/7/9/11/13 are the work reps by duration (2:54 / 2:54 / 2:55 / 3:01 / 2:55) alternating with near-zero-distance walks; watch distances are short (0.41–0.48 km vs 600 m), so Garmin lap paces are not the running pace. Leaderboard uses Garmin work-rep times over 5 × 600 m belt: 4:53/km (7:51/mi). Per-rep (time · belt pace · HR avg/max): R1 2:54 · 4:49/km (7:46/mi) · 161/177; R2 2:54 · 4:50/km (7:47/mi) · 166/186; R3 2:55 · 4:52/km (7:51/mi) · 172/190; R4 3:01 · 5:02/km (8:06/mi) · 177/195; R5 2:55 · 4:52/km (7:49/mi) · 177/196. Garmin recoveries: 2:13 / 2:35 / 3:13 / 3:36 (Terry: 2:30, then 3 min). Coach: the 10-min test pace (4:49/km) was too aggressive for 10 × 600 m today — even 5 reps with walk recoveries reached Z5 (max 196, near HRmax 200), and rep 4 drifted to 3:01. Re-evaluate rep pace, or keep 4:51/km with jog recoveries as the build target. Session totals: 49:36, 4.25 km / 2.64 mi Garmin (distance may be off vs the belt), HR 144 avg / 196 max (chest strap), 619 kcal. Zones (Garmin-set, from samples): below 100 0:26 · Z1 2:57 · Z2 25:54 · Z3 4:44 · Z4 7:06 · Z5 8:26.';
+    const work = {
+      r1: 'Rep 1 · done 2:54 · 4:49/km (7:46/mi) · HR 161/177 · set 7.7 mph',
+      j1: 'Recovery 1 · walk 2:13 Garmin (Terry: 2:30)',
+      r2: 'Rep 2 · done 2:54 · 4:50/km (7:47/mi) · HR 166/186 · set 7.7 mph',
+      j2: 'Recovery 2 · walk 2:35 Garmin (Terry: 3 min)',
+      r3: 'Rep 3 · done 2:55 · 4:52/km (7:51/mi) · HR 172/190 · set 7.7 mph',
+      j3: 'Recovery 3 · walk 3:13 Garmin (Terry: 3 min)',
+      r4: 'Rep 4 · done 3:01 · 5:02/km (8:06/mi) · HR 177/195 · drifted vs 2:54',
+      j4: 'Recovery 4 · walk 3:36 Garmin (Terry: 3 min)',
+      r5: 'Rep 5 · done 2:55 · 4:52/km (7:49/mi) · HR 177/196 · set 7.7 mph',
+      j5: 'Recovery 5 · no separate jog · went to cool-down walk',
+      lb: 'Leaderboard · 4:53/km (7:51/mi) · avg of 5 work reps (Garmin times / 5 × 600 m belt)',
+    };
+    reps.sets.forEach(set => {
+      if (work[set.id]) set.label = work[set.id];
+      else if (/^r(6|7|8|9|10)$/.test(set.id) || /^j(6|7|8|9|10)$/.test(set.id)) {
+        set.label = set.id.startsWith('r') ? (set.id.replace('r', 'Rep ') + ' · not done (stopped at 5 on purpose)') : (set.id.replace('j', 'Jog ') + ' · not done (stopped at 5)');
+      }
+    });
+    const cd = br('cd');
+    cd.meta = 'Done 11/13 · walk 7:07 (not a 10 min easy run)';
+    cd.cues = 'Cool-down was a walk (Terry), 7:07 Garmin, 3 m, HR 138 avg / 193 max (193 is residual from the end of rep 5). Not the planned 10 min easy run.';
+    cd.sets[0].label = 'Cool-down · walk 7:07 · not a 10 min easy run';
+    const row = (s.blocksRow || []).find(x => x.id === 'wu_r');
+    if (row) {
+      row.meta = 'Not used · he ran';
+      row.cues = 'Row option not used. Thursday interval was moved to Friday and completed as a treadmill run.';
+    }
+    const rreps = (s.blocksRow || []).find(x => x.id === 'rreps');
+    if (rreps) {
+      rreps.meta = 'Not used · he ran';
+      rreps.cues = 'Row option not used.';
+    }
+  })();
+
+  // Fri 11/13 · typical rest day. The Thursday interval session was moved and done today (logged on w5_thu).
+  SESSIONS.w5_fri = {
+    name: 'Rest',
+    duration: 'Typical rest day · Thursday Interval Conditioning was moved and done today (see Thu 11/12 / w5_thu)',
+    blocks: [{
+      id: 'rest', title: 'Rest', meta: 'Thursday interval moved to Friday and completed (modified) — the log is on w5_thu',
+      cues: 'No separate Friday session. The Week 5 Thursday Interval Conditioning workout was moved to Friday 11/13 and logged on the Thursday card (5 of 10 × 600 m, walk recoveries, treadmill).',
+      sets: [{ id: 'rest1', label: 'No separate Friday session · interval logged on Thu (w5_thu)', fields: ['notes'] }],
+    }],
+  };
+
+  ['w5_sat', 'w5_sun'].forEach(id => {
     SESSIONS[id] = {
       name: 'Awaiting screenshots',
       blocks: [{
