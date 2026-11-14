@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.41 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.42 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.41';
+  const APP_VERSION = '2.1.42';
 
   function start(BOOT) {
 
@@ -72,7 +72,7 @@
     { id: 'w5_mon', date: '2026-11-09', dow: 'Mon', short: '11/09', title: 'Full Body 1', subtitle: 'Squat Focused · ✓ Done 11/9 · squat 4 × 4 @ 124.7 kg · push-up 3 × 10 @ +20 kg · row 3 × 10 @ 38.6 kg · C/D skipped · G 25026807221', type: 'strength' },
     { id: 'w5_tue', date: '2026-11-10', dow: 'Tue', short: '11/10', title: 'Easy Conditioning', subtitle: 'Done 11/10 (shortened) · treadmill · 30:02 · HR 136/154 · no distance on Garmin · G 25038455131', type: 'conditioning' },
     { id: 'w5_wed', date: '2026-11-11', dow: 'Wed', short: '11/11', title: 'Full Body 2', subtitle: 'Press Focused · ✓ Garmin strength 42:44 · HR 103/162 · 306 kcal · G 25044757421 · loads not auto-logged', type: 'strength' },
-    { id: 'w5_thu', date: '2026-11-12', dow: 'Thu', short: '11/12', title: 'Interval Conditioning', subtitle: 'Done Fri 11/13 (modified: 5 of 10, walk recoveries) · treadmill · 49:36 · HR 144/196 · LB 4:53/km · G 25071164087', type: 'conditioning' },
+    { id: 'w5_thu', date: '2026-11-12', dow: 'Thu', short: '11/12', title: 'Interval Conditioning', subtitle: 'Done Fri 11/13 (modified: 5 of 10, walk recoveries) · treadmill · 49:36 · HR 144/196 · LB 4:51/km · G 25071164087', type: 'conditioning' },
     { id: 'w5_fri', date: '2026-11-13', dow: 'Fri', short: '11/13', title: 'Rest', subtitle: 'Typical rest day · Thursday interval was moved and done today (see Thu / w5_thu)', type: 'rest' },
     { id: 'w5_sat', date: '2026-11-14', dow: 'Sat', short: '11/14', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
     { id: 'w5_sun', date: '2026-11-15', dow: 'Sun', short: '11/15', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
@@ -1375,7 +1375,7 @@
   (function () {
     const s = SESSIONS.w5_thu;
     const br = id => (s.blocksRun || []).find(x => x.id === id);
-    s.duration = 'Done Fri 11/13 (moved from Thu; modified: 5 of 10 reps, walk recoveries) · treadmill · 49:36 · 4.25 km Garmin (distance may be off) · HR 144/196 · LB 4:53/km · G 25071164087';
+    s.duration = 'Done Fri 11/13 (moved from Thu; modified: 5 of 10 reps, walk recoveries) · treadmill · 49:36 · 4.25 km Garmin (distance may be off) · HR 144/196 · LB 4:51/km · G 25071164087';
     const pogo = br('pogo');
     pogo.meta = 'Not on Garmin · 1–2 full rounds';
     pogo.cues = 'Pogo not recorded on Garmin (the watch activity starts with the treadmill run).';
@@ -1388,8 +1388,8 @@
     wu.sets[2].label = 'Stride 2 · 20 s · not broken out on Garmin';
     wu.sets[3].label = 'Stride 3 · 20 s · not broken out on Garmin';
     const reps = br('reps');
-    reps.meta = 'Done 11/13 · modified: 5 of 10 × 600 m · all set at 7.7 mph (4:51/km) · walk recoveries · LB 4:53/km';
-    reps.cues = 'Done Fri 11/13 on a treadmill (Week 5 Thursday interval moved to Friday). Terry: 5 × 600 m (not 10), all at 7.7 mph (12.4 km/h, 4:51/km, 7:48/mi, about 2:54 per rep); recoveries were walks, not jogs (2:30 after rep 1, then 3 min); stopped at 5 on purpose. Garmin laps 5/7/9/11/13 are the work reps by duration (2:54 / 2:54 / 2:55 / 3:01 / 2:55) alternating with near-zero-distance walks; watch distances are short (0.41–0.48 km vs 600 m), so Garmin lap paces are not the running pace. Leaderboard uses Garmin work-rep times over 5 × 600 m belt: 4:53/km (7:51/mi). Per-rep (time · belt pace · HR avg/max): R1 2:54 · 4:49/km (7:46/mi) · 161/177; R2 2:54 · 4:50/km (7:47/mi) · 166/186; R3 2:55 · 4:52/km (7:51/mi) · 172/190; R4 3:01 · 5:02/km (8:06/mi) · 177/195; R5 2:55 · 4:52/km (7:49/mi) · 177/196. Garmin recoveries: 2:13 / 2:35 / 3:13 / 3:36 (Terry: 2:30, then 3 min). Coach: the 10-min test pace (4:49/km) was too aggressive for 10 × 600 m today — even 5 reps with walk recoveries reached Z5 (max 196, near HRmax 200), and rep 4 drifted to 3:01. Re-evaluate rep pace, or keep 4:51/km with jog recoveries as the build target. Session totals: 49:36, 4.25 km / 2.64 mi Garmin (distance may be off vs the belt), HR 144 avg / 196 max (chest strap), 619 kcal. Zones (Garmin-set, from samples): below 100 0:26 · Z1 2:57 · Z2 25:54 · Z3 4:44 · Z4 7:06 · Z5 8:26.';
+    reps.meta = 'Done 11/13 · modified: 5 of 10 × 600 m · all set at 7.7 mph (4:51/km) · walk recoveries · LB 4:51/km';
+    reps.cues = 'Done Fri 11/13 on a treadmill (Week 5 Thursday interval moved to Friday). Terry: 5 × 600 m (not 10), all at 7.7 mph (12.4 km/h, 4:51/km, 7:48/mi, about 2:54 per rep); recoveries were walks, not jogs (2:30 after rep 1, then 3 min); stopped at 5 on purpose. Garmin laps 5/7/9/11/13 are the work reps, alternating with near-zero-distance walks; watch distances are short (0.41–0.48 km vs 600 m), so Garmin lap paces are not the running pace. Terry: rep 4 finished at the same time as the others; he pressed the lap button late, so the watch lap ran long (3:01) and is corrected to 2:54. Leaderboard uses corrected work-rep times 2:54 / 2:54 / 2:55 / 2:54 / 2:55 over 5 × 600 m belt: 4:51/km (7:48/mi). Per-rep (time · belt pace · HR avg/max): R1 2:54 · 4:49/km (7:46/mi) · 161/177; R2 2:54 · 4:50/km (7:47/mi) · 166/186; R3 2:55 · 4:52/km (7:51/mi) · 172/190; R4 2:54 · 4:50/km (7:47/mi) · 177/195 (watch lap 3:01, late button); R5 2:55 · 4:52/km (7:49/mi) · 177/196. Garmin recoveries: 2:13 / 2:35 / 3:13 / 3:36 (Terry: 2:30, then 3 min). Coach: the 10-min test pace (4:49/km) was too aggressive for 10 × 600 m today — even 5 reps with walk recoveries reached Z4/Z5 (max 196, near HRmax 200). Re-evaluate rep pace, or keep 4:51/km with jog recoveries as the build target. Session totals: 49:36, 4.25 km / 2.64 mi Garmin (distance may be off vs the belt), HR 144 avg / 196 max (chest strap), 619 kcal. Zones (Garmin-set, from samples): below 100 0:26 · Z1 2:57 · Z2 25:54 · Z3 4:44 · Z4 7:06 · Z5 8:26.';
     const work = {
       r1: 'Rep 1 · done 2:54 · 4:49/km (7:46/mi) · HR 161/177 · set 7.7 mph',
       j1: 'Recovery 1 · walk 2:13 Garmin (Terry: 2:30)',
@@ -1397,11 +1397,11 @@
       j2: 'Recovery 2 · walk 2:35 Garmin (Terry: 3 min)',
       r3: 'Rep 3 · done 2:55 · 4:52/km (7:51/mi) · HR 172/190 · set 7.7 mph',
       j3: 'Recovery 3 · walk 3:13 Garmin (Terry: 3 min)',
-      r4: 'Rep 4 · done 3:01 · 5:02/km (8:06/mi) · HR 177/195 · drifted vs 2:54',
+      r4: 'Rep 4 · done 2:54 · 4:50/km (7:47/mi) · HR 177/195 · set 7.7 mph (watch lap 3:01, late button)',
       j4: 'Recovery 4 · walk 3:36 Garmin (Terry: 3 min)',
       r5: 'Rep 5 · done 2:55 · 4:52/km (7:49/mi) · HR 177/196 · set 7.7 mph',
       j5: 'Recovery 5 · no separate jog · went to cool-down walk',
-      lb: 'Leaderboard · 4:53/km (7:51/mi) · avg of 5 work reps (Garmin times / 5 × 600 m belt)',
+      lb: 'Leaderboard · 4:51/km (7:48/mi) · avg of 5 work reps (2:54 / 2:54 / 2:55 / 2:54 / 2:55 over 5 × 600 m)',
     };
     reps.sets.forEach(set => {
       if (work[set.id]) set.label = work[set.id];
