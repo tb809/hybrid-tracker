@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.43 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.44 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.43';
+  const APP_VERSION = '2.1.44';
 
   function start(BOOT) {
 
@@ -67,14 +67,14 @@
     { id: 'w4_sat', date: '2026-11-07', dow: 'Sat', short: '11/07', title: 'No session (wedding)', subtitle: 'Wedding day · Mexico (Punta de Mita) · nothing logged', type: 'rest' },
     { id: 'w4_sun', date: '2026-11-08', dow: 'Sun', short: '11/08', title: 'Tempo Conditioning', subtitle: 'Planned / in progress · tonight at home (CA) · 10\' easy + 1/1.5/1.5/1 km tempo + 10\' easy', type: 'conditioning' },
   ];
-  // Phase 6 Week 5 (Mon Nov 9–Sun Nov 15, 2026). Ids prefixed w5_. Mon FB1 done (C/D skipped). Tue Easy Conditioning done (shortened). Wed FB2 done (Garmin; loads not auto-logged). Thu Interval Conditioning done Fri 11/13 (modified: 5 of 10). Fri is rest/moved. Sat Tempo Conditioning planned (run option, 54 min; may run outdoors Sat or Sun). Sun awaits screenshot.
+  // Phase 6 Week 5 (Mon Nov 9–Sun Nov 15, 2026). Ids prefixed w5_. Mon FB1 done (C/D skipped). Tue Easy Conditioning done (shortened). Wed FB2 done (Garmin; loads not auto-logged). Thu Interval Conditioning done Fri 11/13 (modified: 5 of 10). Fri is rest/moved. Sat Tempo Conditioning done Sun 11/15 (outdoor SF, LB 6:53/km). Sun's own session still awaits a screenshot.
   const WEEK5 = [
     { id: 'w5_mon', date: '2026-11-09', dow: 'Mon', short: '11/09', title: 'Full Body 1', subtitle: 'Squat Focused · ✓ Done 11/9 · squat 4 × 4 @ 124.7 kg · push-up 3 × 10 @ +20 kg · row 3 × 10 @ 38.6 kg · C/D skipped · G 25026807221', type: 'strength' },
     { id: 'w5_tue', date: '2026-11-10', dow: 'Tue', short: '11/10', title: 'Easy Conditioning', subtitle: 'Done 11/10 (shortened) · treadmill · 30:02 · HR 136/154 · no distance on Garmin · G 25038455131', type: 'conditioning' },
     { id: 'w5_wed', date: '2026-11-11', dow: 'Wed', short: '11/11', title: 'Full Body 2', subtitle: 'Press Focused · ✓ Garmin strength 42:44 · HR 103/162 · 306 kcal · G 25044757421 · loads not auto-logged', type: 'strength' },
     { id: 'w5_thu', date: '2026-11-12', dow: 'Thu', short: '11/12', title: 'Interval Conditioning', subtitle: 'Done Fri 11/13 (modified: 5 of 10, walk recoveries) · treadmill · 49:36 · HR 144/196 · LB 4:51/km · G 25071164087', type: 'conditioning' },
     { id: 'w5_fri', date: '2026-11-13', dow: 'Fri', short: '11/13', title: 'Rest', subtitle: 'Typical rest day · Thursday interval was moved and done today (see Thu / w5_thu)', type: 'rest' },
-    { id: 'w5_sat', date: '2026-11-14', dow: 'Sat', short: '11/14', title: 'Tempo Conditioning', subtitle: 'Planned · run option · 54 min · 10 min easy + 3×10 min tempo (2 min jog) + 10 min easy · may run outdoors Sat or Sun', type: 'conditioning' },
+    { id: 'w5_sat', date: '2026-11-14', dow: 'Sat', short: '11/14', title: 'Tempo Conditioning', subtitle: 'Done Sun 11/15 (moved) · outdoor SF · 7.20 km · 52:39 · HR 148/167 · LB 6:53/km · G 25092449899', type: 'conditioning' },
     { id: 'w5_sun', date: '2026-11-15', dow: 'Sun', short: '11/15', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
   ];
   WEEK.forEach(d => { d.week = 1; });
@@ -1436,45 +1436,45 @@
     }],
   };
 
-  // Sat 11/14 · Week 5 Tempo Conditioning Day (Marchon app). Planned. Run option chosen; may be run outdoors Sat or Sun.
+  // Sat 11/14 · Week 5 Tempo Conditioning Day (Marchon app). DONE Sun 11/15, moved; outdoor run, San Francisco.
   SESSIONS.w5_sat = {
     name: 'Tempo Conditioning Day',
     modality: true,
     hrCard: 'tempo3',
     tempoTimer: { work: 10, rest: 2, sets: 3 },
-    duration: 'Planned · run option · 54 min · 10 min easy + 3 × 10 min tempo (2 min easy jog) + 10 min easy · may run outdoors Sat or Sun',
+    duration: 'Done Sun 11/15 (moved from Sat) · outdoor · San Francisco · 7.20 km / 4.47 mi · 52:39 · HR 148/167 · LB 6:53/km · G 25092449899',
     blocksRun: [
       {
-        id: 'pogo', title: 'Warm up · Pogo Jump Series', meta: '1–2 rounds',
-        cues: 'Take yourself through 1–2 full rounds of the pogo jump series.',
-        sets: [{ id: 'pogo1', label: 'Pogo jumps', fields: ['notes'] }],
+        id: 'pogo', title: 'Warm up · Pogo Jump Series', meta: 'Not on Garmin · 1–2 rounds planned',
+        cues: 'Pogo jump series was prescribed (1–2 full rounds) but is not on the Garmin activity.',
+        sets: [{ id: 'pogo1', label: 'Pogo jumps · not on Garmin', fields: ['notes'] }],
       },
       {
-        id: 'wu', title: 'A. Tempo Conditioning (Run Option) · Easy Run', meta: '10 min easy · Z2 HR 119–138',
-        cues: 'Option A (run) is today\'s choice. May be run outdoors Sat 11/14 or Sun 11/15 if it is sunny. Easy: treadmill 5.8 mph (9.3 km/h, 6:26/km, 10:21/mi) · Z2, HR 119–138.',
-        sets: [{ id: 'wu10', label: '10 min easy · HR 119–138', fields: ['distance', 'avgHr', 'notes'] }],
+        id: 'wu', title: 'A. Tempo Conditioning (Run Option) · Easy Run', meta: '✓ Done 11/15 · 10:00 · 1.38 km · 7:16/km (11:41/mi) · HR 136/146',
+        cues: 'Done Sun 11/15 outdoor (San Francisco, start 15:16 PT). Garmin laps 1–2 are the 10 min easy: 1.38 km · 7:16/km (11:41/mi) · HR 136 avg / 146 max (Z2, with some Z3 toward the end).',
+        sets: [{ id: 'wu10', label: '10 min easy · done 10:00 · 1.38 km · 7:16/km · HR 136/146', fields: ['distance', 'avgHr', 'notes'] }],
       },
       {
-        id: 'tempo', title: 'Tempo Run', meta: 'MODERATE · repeat 3x · 10 min comfortable moderate effort · 2 min easy jog · 30 min work total · HR Z3 140–155',
-        cues: 'Coach (Marchon card): reps are longer than week 3; settle into a sustainable pace and keep the three efforts consistent. Aerobic and controlled; comfortable moderate work, not a test or threshold session; avoid chasing Thursday\'s test-pace intervals. Keep the recovery jog very easy. Finish feeling you could do more controlled work. Leaderboard is average pace across the 30 min of work only (exclude warm-up, recovery jogs, and cooldown). Guidance (not on the card): tempo by HR Z3 140–155 bpm. Treadmill: start 6.5 mph (10.5 km/h, 5:44/km, 9:14/mi); easy 5.8 mph (9.3 km/h, 6:26/km, 10:21/mi); jog 5.0 mph (8.0 km/h, 7:30/km, 12:04/mi). Outdoor expected tempo roughly 5:40–6:00/km (9:07–9:39/mi).',
+        id: 'tempo', title: 'Tempo Run', meta: '✓ Done 11/15 · 3 × 10 min · LB 6:53/km (11:05/mi) · work HR 153/152/154 (Z3, target 140–155)',
+        cues: 'Done Sun 11/15 outdoor (San Francisco). Garmin work reps are laps 3–4 / 6–7 / 9–10 (each exactly 10:00; auto-km splits inside the step). Per-rep (time · dist · pace · HR avg/max): T1 10:00 · 1.486 km · 6:44/km (10:50/mi) · 153/167; T2 10:00 · 1.469 km · 6:48/km (10:57/mi) · 152/160; T3 10:00 · 1.399 km · 7:09/km (11:30/mi) · 154/161. Leaderboard is average pace over the 30 min of work only: 4.35 km in 30:00 = 6:53/km (11:05/mi). Recoveries (laps 5 and 8): 2:06 · 0.21 km · 10:13/km · HR 138/157, then 2:01 · 0.23 km · 8:37/km · HR 141/151. Judge by HR Z3 139–158 (target 140–155): all three rep averages were in the 140–155 band and in Z3; maxes 167 / 160 / 161 briefly entered Z4 (mostly rep 1). Pace was slower than the 5:40–6:00/km outdoor expectation, and rep 3 faded to 7:09/km, but effort stayed consistent and moderate. Coach card still holds: aerobic and controlled, not a test. Avoid comparing this pace to Thursday\'s test-pace intervals.',
         sets: [
-          { id: 't1', label: 'Tempo 1 · 10 min · HR 140–155 (Z3)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
-          { id: 'tr1', label: 'Easy jog 2 min', fields: ['notes'] },
-          { id: 't2', label: 'Tempo 2 · 10 min · HR 140–155 (Z3)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
-          { id: 'tr2', label: 'Easy jog 2 min', fields: ['notes'] },
-          { id: 't3', label: 'Tempo 3 · 10 min · HR 140–155 (Z3)', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 't1', label: 'Tempo 1 · done 10:00 · 1.486 km · 6:44/km (10:50/mi) · HR 153/167', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'tr1', label: 'Easy jog 2 min · done 2:06 · 0.21 km · 10:13/km · HR 138/157', fields: ['notes'] },
+          { id: 't2', label: 'Tempo 2 · done 10:00 · 1.469 km · 6:48/km (10:57/mi) · HR 152/160', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
+          { id: 'tr2', label: 'Easy jog 2 min · done 2:01 · 0.23 km · 8:37/km · HR 141/151', fields: ['notes'] },
+          { id: 't3', label: 'Tempo 3 · done 10:00 · 1.399 km · 7:09/km (11:30/mi) · HR 154/161', fields: ['distance', 'time', 'avgHr', 'rpe', 'notes'] },
         ],
       },
       {
-        id: 'cd', title: 'Cool Down', meta: '10 min easy · Z2 HR 119–138',
-        cues: 'Easy: treadmill 5.8 mph (9.3 km/h, 6:26/km, 10:21/mi) · Z2, HR 119–138.',
-        sets: [{ id: 'cd10', label: '10 min easy · HR 119–138', fields: ['distance', 'avgHr', 'notes'] }],
+        id: 'cd', title: 'Cool Down', meta: '✓ Done 11/15 · 8:33 (short of 10 min planned) · 1.03 km · 8:18/km (13:22/mi) · HR 146/155',
+        cues: 'Garmin laps 11–12: 8:33 (planned 10 min), 1.03 km · 8:18/km (13:22/mi) · HR 146 avg / 155 max (still Z3, not fully easy Z2). Session total 52:39 vs 54 min planned.',
+        sets: [{ id: 'cd10', label: 'Cool-down · done 8:33 · 1.03 km · 8:18/km · HR 146/155', fields: ['distance', 'avgHr', 'notes'] }],
       },
     ],
     blocksRow: [
       {
-        id: 'alt_row', title: 'B. Tempo Conditioning (Row Option) · alternative', meta: 'Not the plan today · run option chosen · 10 min easy row 18–20 s/m',
-        cues: 'Choose run or row, not both. A row option exists (starts with 10 min easy row at 18–20 s/m); remaining row details were not fully captured. Listed as the alternative only.',
+        id: 'alt_row', title: 'B. Tempo Conditioning (Row Option) · alternative', meta: 'Not used · he ran',
+        cues: 'Choose run or row, not both. The row option was not used; this was completed as an outdoor run in San Francisco.',
         sets: [{ id: 'altr1', label: 'Notes', fields: ['notes'] }],
       },
     ],
