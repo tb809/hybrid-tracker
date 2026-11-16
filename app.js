@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.44 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.45 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.44';
+  const APP_VERSION = '2.1.45';
 
   function start(BOOT) {
 
@@ -3257,6 +3257,8 @@
     { id: 'seed-wi-2026-10-31', measuredAt: '2026-10-31T06:30:00-07:00', weightLb: 243.8, notes: 'Fasted · weekend (Fri–Sun readings run high)' },
     { id: 'seed-wi-2026-11-01', measuredAt: '2026-11-01T06:30:00-08:00', weightLb: 243.1, notes: 'Approximate (~243.1, exact number not certain) · assumed AM · weekend (Fri–Sun readings run high)' },
     { id: 'seed-wi-2026-11-08', measuredAt: '2026-11-08T18:30:00-08:00', weightLb: 243.3, notes: 'EVENING (~6:30 PM PT) · day he flew home from Mexico · NOT fasted morning · off-protocol (keep out of AM trend)' },
+    { id: 'seed-wi-2026-11-15', measuredAt: '2026-11-15T16:15:00-08:00', weightLb: 239.8, notes: 'POST-RUN (after the 3:16 PM PT outdoor tempo; run ended ~4:09 PM; exact clock not reported) · dehydrated · NOT fasted morning · off-protocol (keep out of AM trend)' },
+    { id: 'seed-wi-2026-11-16', measuredAt: '2026-11-16T06:30:00-08:00', weightLb: 244.2, notes: 'Fasted AM · first protocol morning reading since 11/1 (~243.1) · counts toward AM trend' },
   ];
   function seedWeighins() {
     const laDate = iso => { try { return new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' }); } catch (e) { return String(iso).slice(0, 10); } };
