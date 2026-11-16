@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.45 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.46 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.45';
+  const APP_VERSION = '2.1.46';
 
   function start(BOOT) {
 
@@ -77,19 +77,31 @@
     { id: 'w5_sat', date: '2026-11-14', dow: 'Sat', short: '11/14', title: 'Tempo Conditioning', subtitle: 'Done Sun 11/15 (moved) · outdoor SF · 7.20 km · 52:39 · HR 148/167 · LB 6:53/km · G 25092449899', type: 'conditioning' },
     { id: 'w5_sun', date: '2026-11-15', dow: 'Sun', short: '11/15', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
   ];
+  // Phase 6 Week 6 (Mon Nov 16–Sun Nov 22, 2026). Ids prefixed w6_. Mon FB1 planned from the Marchon screenshot (Terry 11/16). Tue–Thu and Sat–Sun await screenshots; Fri is the typical rest day.
+  const WEEK6 = [
+    { id: 'w6_mon', date: '2026-11-16', dow: 'Mon', short: '11/16', title: 'Full Body 1', subtitle: 'Squat Focused · Planned · 3 × 3 @ RPE 8 · suggested 129.3 kg (285 lb) on the Freedom Rack', type: 'strength' },
+    { id: 'w6_tue', date: '2026-11-17', dow: 'Tue', short: '11/17', title: 'Easy Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
+    { id: 'w6_wed', date: '2026-11-18', dow: 'Wed', short: '11/18', title: 'Full Body 2', subtitle: 'Session added once the app screenshot comes in', type: 'strength' },
+    { id: 'w6_thu', date: '2026-11-19', dow: 'Thu', short: '11/19', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
+    { id: 'w6_fri', date: '2026-11-20', dow: 'Fri', short: '11/20', title: 'Rest', subtitle: 'Typical rest day', type: 'rest' },
+    { id: 'w6_sat', date: '2026-11-21', dow: 'Sat', short: '11/21', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
+    { id: 'w6_sun', date: '2026-11-22', dow: 'Sun', short: '11/22', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
+  ];
   WEEK.forEach(d => { d.week = 1; });
   WEEK2.forEach(d => { d.week = 2; });
   WEEK3.forEach(d => { d.week = 3; });
   WEEK4.forEach(d => { d.week = 4; });
   WEEK5.forEach(d => { d.week = 5; });
+  WEEK6.forEach(d => { d.week = 6; });
   const WEEKS = {
     1: { label: 'Week 1', range: 'Oct 11–17, 2026', days: WEEK },
     2: { label: 'Week 2', range: 'Oct 19–25, 2026', days: WEEK2 },
     3: { label: 'Week 3', range: 'Oct 26–Nov 1, 2026', days: WEEK3 },
     4: { label: 'Week 4', range: 'Nov 2–8, 2026', days: WEEK4 },
     5: { label: 'Week 5', range: 'Nov 9–15, 2026', days: WEEK5 },
+    6: { label: 'Week 6', range: 'Nov 16–22, 2026', days: WEEK6 },
   };
-  const ALL_DAYS = WEEK.concat(WEEK2, WEEK3, WEEK4, WEEK5);
+  const ALL_DAYS = WEEK.concat(WEEK2, WEEK3, WEEK4, WEEK5, WEEK6);
 
   // Terry shifted: Thu Oct 15 → Interval / TT session (not calendar Deadlift day)
   const DEFAULT_SESSION_FOR_TODAY = 'wed';
@@ -1490,6 +1502,65 @@
     };
   });
 
+  // —— Week 6 sessions ——
+  // Mon 11/16 · Week 6 Full Body 1 (Squat Focused), from Terry's Marchon app screenshot 11/16. Planned.
+  SESSIONS.w6_mon = cloneSession('w2_mon');
+  (function () {
+    const s = SESSIONS.w6_mon;
+    const b = id => s.blocks.find(x => x.id === id);
+    s.duration = 'Planned · Full / 45 min options · squat 3 × 3 @ RPE 8 · suggested 129.3 kg (285 lb) on the Freedom Rack';
+    const wu = b('wu');
+    wu.meta = 'Circuit · repeat 2x · 1 min Bike Erg · 10/10 Split Stance Leaps · 6 reps 90/90 Hip Rotations';
+    wu.cues = 'Coach (Marchon card): can add load with a med ball to split stance leaps if you want to. Use a 20 kg plate to increase ROM on the leaps. Keep knees at a 90 degree angle throughout the 90/90 hip rotations. Rest as much as you need between rounds.';
+    wu.sets.forEach((x, i) => { x.label = 'Round ' + (i + 1) + ' · Bike Erg 1 min · Leaps 10/10 · 90/90 x6'; });
+    const bs = b('bs');
+    bs.sets = bs.sets.slice(0, 3);
+    bs.meta = 'Straight set · 3 × 3 Barbell Back Squat · RPE 8 all sets (~2 RIR) · 2 min rest · suggested 129.3 kg (285 lb) · Freedom Rack';
+    bs.cues = 'Coach (Marchon card): 3 x 3 @ RPE 8 (around 2 reps in reserve). Reps are lower than last week, so progress the load on one set or across multiple sets where possible while staying at RPE 8. Build up with progressively heavier warm-up sets. Use last week\'s working load as a guide and make small increases if technique stays consistent. Keep loads close together across the three working sets. Maintain consistent depth and a strong brace on every rep. Rest at least 2 minutes between sets; take longer if needed to maintain quality. Leaderboard: record the heaviest successful set of 3 reps. ' + 'Suggested (not on the card): 3 × 3 @ 129.3 kg (285 lb) on the Nautilus Freedom Rack (built-in 44 lb / 20 kg bar counted); go to 131.5 kg (290 lb) if set 1 is RPE 7–8. Last week (11/9): 4 × 4 @ 124.7 kg (275 lb) @ RPE 8, same rack. Freedom Rack loads are not directly comparable to a free barbell.';
+    bs.sets.forEach((x, i) => { x.label = 'Set ' + (i + 1) + ' · 3 reps · RPE 8 · suggested 129.3 kg (285 lb)'; });
+    const pp = b('pp');
+    pp.meta = 'Superset · 3 sets · Weighted Push Up 5–10 · Cable Seated Row 5–8 · 0–1 RIR · 2 min rest between supersets';
+    pp.cues = 'Coach (Marchon card): 0–1 reps in reserve. The rep range is lower this week, so progress loads where possible while keeping the same control and range of motion. Push-up: 5–10 reps. Use bodyweight or add a weight plate securely on your back. Push off dumbbells to increase chest range of motion if appropriate. Seated cable row: 5–8 reps. Keep the row lat-focused, finishing with the elbow in line with the body. Use a neutral grip and straps if needed. Rest 2 minutes between supersets, or longer if needed. ' + 'Suggested (not on the card): push-up +25 kg (55 lb) (last week +20 kg × 10); cable row 45.4–49.9 kg (100–110 lb) (last week 38.6 kg × 10).';
+    pp.sets.forEach((x) => {
+      if (x.id.startsWith('pu')) x.label = x.id.replace('pu', 'Weighted Push Up ') + ' · 5–10 · suggested +25 kg (55 lb)';
+      if (x.id.startsWith('csr')) x.label = x.id.replace('csr', 'Cable Seated Row ') + ' · 5–8 · suggested 45.4–49.9 kg (100–110 lb)';
+    });
+    const gl = b('gl');
+    gl.meta = 'Straight set · 3 × 5–8 Barbell Hip Thrust · 0–1 RIR · 2 min rest · suggested start 61.2 kg (135 lb)';
+    gl.cues = 'Coach (Marchon card): 0–1 reps in reserve. The rep range is lower this week, so progress loads where possible while keeping the same control and range of motion. Complete 5–8 reps per set. Keep ribs tucked down and drive hips towards the ceiling, squeezing the glutes without overextending your lower back. Rest 2 minutes between sets, or longer if needed. Option: use a Smith machine if available. ' + 'Suggested (not on the card): start 61.2 kg (135 lb), build toward 79.4 kg (175 lb). Last logged hip thrust was Mon 11/2: 3 × 12 @ 40.8 kg (90 lb); C was skipped last week (11/9).';
+    gl.sets.forEach((x, i) => { x.label = 'Hip Thrust ' + (i + 1) + ' · 5–8 · suggested start 61.2 kg (135 lb)'; });
+    const fin = b('fin');
+    fin.meta = 'Circuit · repeat 3x · EZ Bar Preacher Curl 5–10 · Cable Rope Push Down 5–10 · Rope Cable Crunch 5–10 · 0–1 RIR · 2 min rest between tri-sets';
+    fin.cues = 'Coach (Marchon card): 0–1 reps in reserve. The rep range is lower this week, so progress loads where possible while keeping the same control and range of motion. Complete 5–10 reps of each exercise. EZ bar preacher curl: fully straighten the arm at the bottom of each rep. Use a standing curl if no preacher bench is available. Rope triceps extension: bring the forearm towards the biceps at the top without letting the upper arm leave your side. Cable crunch: move through the spine rather than the hips. Rest 2 minutes between tri-sets, or longer if needed. ' + 'Suggested (not on the card): EZ preacher curl ~22.7–27.2 kg (50–60 lb) total. Arms + abs were skipped last week (11/9).';
+    fin.sets.forEach(x => {
+      x.label = x.label
+        .replace('Ez Bar Preacher Curl · 10–15', 'EZ Bar Preacher Curl · 5–10 · suggested 22.7–27.2 kg (50–60 lb)')
+        .replace('Cable Rope Push Down · 10–15', 'Cable Rope Push Down · 5–10')
+        .replace('Rope Cable Crunch · 10–15', 'Rope Cable Crunch · 5–10');
+    });
+  })();
+
+  ['w6_tue', 'w6_wed', 'w6_thu', 'w6_sat', 'w6_sun'].forEach(id => {
+    SESSIONS[id] = {
+      name: 'Awaiting screenshots',
+      blocks: [{
+        id: 'tbd', title: 'Session not added yet', meta: 'Added once the coach app screenshot comes in · notes only for now',
+        sets: [{ id: 'tbd1', label: 'Notes', fields: ['notes'] }],
+      }],
+    };
+  });
+
+  SESSIONS.w6_fri = {
+    name: 'Rest',
+    duration: 'Typical rest day',
+    blocks: [{
+      id: 'rest', title: 'Rest', meta: 'Typical rest day · no session prescribed',
+      cues: 'Friday is the typical rest day in this Hybrid week. Thursday interval and weekend tempo cards will be added once their screenshots come in.',
+      sets: [{ id: 'rest1', label: 'Rest', fields: ['notes'] }],
+    }],
+  };
+
+
   // —— v2: normalize set fields ——
   // RIR blocks log RIR (not RPE); every run/row segment gets a time field; fixed-distance
   // row pieces (500m, 2000m) get a distance field so pace shows in /km and /mi.
@@ -1528,10 +1599,10 @@
   let selectedSessionId = (TODAY_DAY && state.todayOverrideDate !== REAL_TODAY) ? TODAY_DAY.id : (
     (state.todayOverrideSession && SESSIONS[state.todayOverrideSession]) ? state.todayOverrideSession : (
     REAL_TODAY === '2026-10-15' ? DEFAULT_SESSION_FOR_TODAY :
-    (TODAY_DAY || {}).id || (REAL_TODAY >= WEEK5[0].date ? WEEK5[0].id : REAL_TODAY >= WEEK4[0].date ? WEEK4[0].id : REAL_TODAY >= WEEK3[0].date ? WEEK3[0].id : REAL_TODAY >= WEEK2[0].date ? WEEK2[0].id : DEFAULT_SESSION_FOR_TODAY)
+    (TODAY_DAY || {}).id || (REAL_TODAY >= WEEK6[0].date ? WEEK6[0].id : REAL_TODAY >= WEEK5[0].date ? WEEK5[0].id : REAL_TODAY >= WEEK4[0].date ? WEEK4[0].id : REAL_TODAY >= WEEK3[0].date ? WEEK3[0].id : REAL_TODAY >= WEEK2[0].date ? WEEK2[0].id : DEFAULT_SESSION_FOR_TODAY)
   ));
   function dayFor(id) { return ALL_DAYS.find(d => d.id === id); }
-  let selectedWeek = (dayFor(selectedSessionId) || {}).week || 5;
+  let selectedWeek = (dayFor(selectedSessionId) || {}).week || 6;
   function weightUnitFor(sessionId) { return (SESSIONS[sessionId] && SESSIONS[sessionId].weightUnit) || 'lb'; }
   function kgToLbLabel(v) {
     const n = parseNum(v);
@@ -2325,7 +2396,7 @@
 
   // —— Targets / prefill ——
   // Week 2 sessions → the Week 1 session they repeat (for "last week's load" prefill)
-  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed', w4_fri: 'w3_thu', w4_sun: 'w3_sat', w5_mon: 'w4_mon', w5_tue: 'w4_tue', w5_wed: 'w4_wed', w5_thu: 'w4_fri', w5_sat: 'w4_sun' };
+  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed', w4_fri: 'w3_thu', w4_sun: 'w3_sat', w5_mon: 'w4_mon', w5_tue: 'w4_tue', w5_wed: 'w4_wed', w5_thu: 'w4_fri', w5_sat: 'w4_sun', w6_mon: 'w5_mon' };
 
   function setStem(setId) { return String(setId).replace(/\d+$/, ''); }
 
