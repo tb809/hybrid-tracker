@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.47 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.48 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.47';
+  const APP_VERSION = '2.1.48';
 
   function start(BOOT) {
 
@@ -79,7 +79,7 @@
   ];
   // Phase 6 Week 6 (Mon Nov 16–Sun Nov 22, 2026). Ids prefixed w6_. Mon FB1 planned from the Marchon screenshot (Terry 11/16). Tue–Thu and Sat–Sun await screenshots; Fri is the typical rest day.
   const WEEK6 = [
-    { id: 'w6_mon', date: '2026-11-16', dow: 'Mon', short: '11/16', title: 'Full Body 1', subtitle: 'Squat Focused · ✓ Done 11/16 evening · regular gym · squat 129.3 / 133.8 / 138.3 kg (set 3 pending) · B done (row swapped) · C/D skipped', type: 'strength' },
+    { id: 'w6_mon', date: '2026-11-16', dow: 'Mon', short: '11/16', title: 'Full Body 1', subtitle: 'Squat Focused · ✓ Done 11/16 evening · regular gym · squat 129.3 / 133.8 / 138.3 kg (set 3 pending) · B done (row swapped) · C/D skipped · Garmin strength 53:25 (moving 15:26) · HR 101/149 · Z1 19:51 · Z2 8:02 · Z3 1:41 · 357 kcal · G 25104157546', type: 'strength' },
     { id: 'w6_tue', date: '2026-11-17', dow: 'Tue', short: '11/17', title: 'Easy Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
     { id: 'w6_wed', date: '2026-11-18', dow: 'Wed', short: '11/18', title: 'Full Body 2', subtitle: 'Session added once the app screenshot comes in', type: 'strength' },
     { id: 'w6_thu', date: '2026-11-19', dow: 'Thu', short: '11/19', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
@@ -1508,7 +1508,7 @@
   (function () {
     const s = SESSIONS.w6_mon;
     const b = id => s.blocks.find(x => x.id === id);
-    s.duration = 'Done 11/16 evening ~7 PM PT · regular gym (45 lb bar assumed, not the apartment Freedom Rack) · squat 129.3 / 133.8 / 138.3 kg (set 3 pending confirmation) · B done (row swapped) · C/D skipped · no Garmin activity at pull';
+    s.duration = 'Done 11/16 evening ~7 PM PT · regular gym (45 lb bar assumed, not the apartment Freedom Rack) · squat 129.3 / 133.8 / 138.3 kg (set 3 pending confirmation) · B done (row swapped) · C/D skipped · Garmin strength 53:25 (moving 15:26) · HR 101/149 · Z1 19:51 · Z2 8:02 · Z3 1:41 · 357 kcal · G 25104157546';
     const wu = b('wu');
     wu.meta = 'Circuit · repeat 2x · not separately reported';
     wu.cues = 'Warm-up (1 min Bike Erg · 10/10 Split Stance Leaps · 6 reps 90/90 Hip Rotations, repeat 2x) was not separately reported. Session was at the regular gym, evening ~7 PM PT.';
