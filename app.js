@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.46 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.47 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.46';
+  const APP_VERSION = '2.1.47';
 
   function start(BOOT) {
 
@@ -79,7 +79,7 @@
   ];
   // Phase 6 Week 6 (Mon Nov 16–Sun Nov 22, 2026). Ids prefixed w6_. Mon FB1 planned from the Marchon screenshot (Terry 11/16). Tue–Thu and Sat–Sun await screenshots; Fri is the typical rest day.
   const WEEK6 = [
-    { id: 'w6_mon', date: '2026-11-16', dow: 'Mon', short: '11/16', title: 'Full Body 1', subtitle: 'Squat Focused · Planned · 3 × 3 @ RPE 8 · suggested 129.3 kg (285 lb) on the Freedom Rack', type: 'strength' },
+    { id: 'w6_mon', date: '2026-11-16', dow: 'Mon', short: '11/16', title: 'Full Body 1', subtitle: 'Squat Focused · ✓ Done 11/16 evening · regular gym · squat 129.3 / 133.8 / 138.3 kg (set 3 pending) · B done (row swapped) · C/D skipped', type: 'strength' },
     { id: 'w6_tue', date: '2026-11-17', dow: 'Tue', short: '11/17', title: 'Easy Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
     { id: 'w6_wed', date: '2026-11-18', dow: 'Wed', short: '11/18', title: 'Full Body 2', subtitle: 'Session added once the app screenshot comes in', type: 'strength' },
     { id: 'w6_thu', date: '2026-11-19', dow: 'Thu', short: '11/19', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
@@ -1508,36 +1508,37 @@
   (function () {
     const s = SESSIONS.w6_mon;
     const b = id => s.blocks.find(x => x.id === id);
-    s.duration = 'Planned · Full / 45 min options · squat 3 × 3 @ RPE 8 · suggested 129.3 kg (285 lb) on the Freedom Rack';
+    s.duration = 'Done 11/16 evening ~7 PM PT · regular gym (45 lb bar assumed, not the apartment Freedom Rack) · squat 129.3 / 133.8 / 138.3 kg (set 3 pending confirmation) · B done (row swapped) · C/D skipped · no Garmin activity at pull';
     const wu = b('wu');
-    wu.meta = 'Circuit · repeat 2x · 1 min Bike Erg · 10/10 Split Stance Leaps · 6 reps 90/90 Hip Rotations';
-    wu.cues = 'Coach (Marchon card): can add load with a med ball to split stance leaps if you want to. Use a 20 kg plate to increase ROM on the leaps. Keep knees at a 90 degree angle throughout the 90/90 hip rotations. Rest as much as you need between rounds.';
-    wu.sets.forEach((x, i) => { x.label = 'Round ' + (i + 1) + ' · Bike Erg 1 min · Leaps 10/10 · 90/90 x6'; });
+    wu.meta = 'Circuit · repeat 2x · not separately reported';
+    wu.cues = 'Warm-up (1 min Bike Erg · 10/10 Split Stance Leaps · 6 reps 90/90 Hip Rotations, repeat 2x) was not separately reported. Session was at the regular gym, evening ~7 PM PT.';
+    wu.sets.forEach((x, i) => { x.label = 'Round ' + (i + 1) + ' · Bike Erg 1 min · Leaps 10/10 · 90/90 x6 · not separately reported'; });
     const bs = b('bs');
     bs.sets = bs.sets.slice(0, 3);
-    bs.meta = 'Straight set · 3 × 3 Barbell Back Squat · RPE 8 all sets (~2 RIR) · 2 min rest · suggested 129.3 kg (285 lb) · Freedom Rack';
-    bs.cues = 'Coach (Marchon card): 3 x 3 @ RPE 8 (around 2 reps in reserve). Reps are lower than last week, so progress the load on one set or across multiple sets where possible while staying at RPE 8. Build up with progressively heavier warm-up sets. Use last week\'s working load as a guide and make small increases if technique stays consistent. Keep loads close together across the three working sets. Maintain consistent depth and a strong brace on every rep. Rest at least 2 minutes between sets; take longer if needed to maintain quality. Leaderboard: record the heaviest successful set of 3 reps. ' + 'Suggested (not on the card): 3 × 3 @ 129.3 kg (285 lb) on the Nautilus Freedom Rack (built-in 44 lb / 20 kg bar counted); go to 131.5 kg (290 lb) if set 1 is RPE 7–8. Last week (11/9): 4 × 4 @ 124.7 kg (275 lb) @ RPE 8, same rack. Freedom Rack loads are not directly comparable to a free barbell.';
-    bs.sets.forEach((x, i) => { x.label = 'Set ' + (i + 1) + ' · 3 reps · RPE 8 · suggested 129.3 kg (285 lb)'; });
+    bs.meta = 'Done 11/16 · 3 × 3 · regular gym (45 lb bar assumed) · 129.3 / 133.8 / 138.3 kg (285 / 295 / 305 lb) · set 3 pending confirmation of all 3 reps · LB candidate 138.3 kg (305 lb) × 3';
+    bs.cues = 'Done 11/16 evening at the regular gym (not the apartment Nautilus Freedom Rack). Bar weight assumed to be a standard 45 lb / 20.4 kg bar unless told otherwise — not comparable to last week\'s Freedom Rack numbers (44 lb / 20 kg built-in bar counted). Set 1: 129.3 kg (285 lb) × 3, solid. Set 2: 133.8 kg (295 lb) × 3, good. Set 3: 138.3 kg (305 lb) planned/reported — pending confirmation of all 3 reps. Leaderboard candidate: 138.3 kg (305 lb) × 3, pending that confirmation. Last free-bar squat (Mon 11/2, Irving, barefoot): 102.1 / 111.1 / 120.2 / 120.2 kg (225 / 245 / 265 / 265 lb) × 5. Last Freedom Rack squat (Mon 11/9): 4 × 4 @ 124.7 kg (275 lb) @ RPE 8 — not directly comparable.';
+    bs.sets[0].label = 'Set 1 · done 3 @ 129.3 kg (285 lb) · solid · regular gym (45 lb bar assumed)';
+    bs.sets[1].label = 'Set 2 · done 3 @ 133.8 kg (295 lb) · good · regular gym (45 lb bar assumed)';
+    bs.sets[2].label = 'Set 3 · reported 138.3 kg (305 lb) · pending confirmation of all 3 reps · leaderboard candidate';
     const pp = b('pp');
-    pp.meta = 'Superset · 3 sets · Weighted Push Up 5–10 · Cable Seated Row 5–8 · 0–1 RIR · 2 min rest between supersets';
-    pp.cues = 'Coach (Marchon card): 0–1 reps in reserve. The rep range is lower this week, so progress loads where possible while keeping the same control and range of motion. Push-up: 5–10 reps. Use bodyweight or add a weight plate securely on your back. Push off dumbbells to increase chest range of motion if appropriate. Seated cable row: 5–8 reps. Keep the row lat-focused, finishing with the elbow in line with the body. Use a neutral grip and straps if needed. Rest 2 minutes between supersets, or longer if needed. ' + 'Suggested (not on the card): push-up +25 kg (55 lb) (last week +20 kg × 10); cable row 45.4–49.9 kg (100–110 lb) (last week 38.6 kg × 10).';
+    pp.meta = 'Done 11/16 · 3 supersets · Weighted Push Up 15 / 15 / 12 @ +20 kg (44 lb) · row swapped to DB single-arm row 3 × 8 @ 27 kg (60 lb)';
+    pp.cues = 'Done 11/16 (app screenshot, 7:26 PM PT). Weighted push-up 15, 15, 12 @ +20 kg (44 lb) — no heavier plate available (suggested was +25 kg / 55 lb). Cable seated row was swapped (cables unavailable) to DB single-arm row 8, 8, 8 @ 27 kg (60 lb).';
     pp.sets.forEach((x) => {
-      if (x.id.startsWith('pu')) x.label = x.id.replace('pu', 'Weighted Push Up ') + ' · 5–10 · suggested +25 kg (55 lb)';
-      if (x.id.startsWith('csr')) x.label = x.id.replace('csr', 'Cable Seated Row ') + ' · 5–8 · suggested 45.4–49.9 kg (100–110 lb)';
+      if (x.id === 'pu1') x.label = 'Weighted Push Up 1 · done 15 @ +20 kg (44 lb) · no heavier plate available';
+      if (x.id === 'pu2') x.label = 'Weighted Push Up 2 · done 15 @ +20 kg (44 lb)';
+      if (x.id === 'pu3') x.label = 'Weighted Push Up 3 · done 12 @ +20 kg (44 lb)';
+      if (x.id === 'csr1') x.label = 'DB single-arm row 1 · swap (cables unavailable) · done 8 @ 27 kg (60 lb)';
+      if (x.id === 'csr2') x.label = 'DB single-arm row 2 · swap · done 8 @ 27 kg (60 lb)';
+      if (x.id === 'csr3') x.label = 'DB single-arm row 3 · swap · done 8 @ 27 kg (60 lb)';
     });
     const gl = b('gl');
-    gl.meta = 'Straight set · 3 × 5–8 Barbell Hip Thrust · 0–1 RIR · 2 min rest · suggested start 61.2 kg (135 lb)';
-    gl.cues = 'Coach (Marchon card): 0–1 reps in reserve. The rep range is lower this week, so progress loads where possible while keeping the same control and range of motion. Complete 5–8 reps per set. Keep ribs tucked down and drive hips towards the ceiling, squeezing the glutes without overextending your lower back. Rest 2 minutes between sets, or longer if needed. Option: use a Smith machine if available. ' + 'Suggested (not on the card): start 61.2 kg (135 lb), build toward 79.4 kg (175 lb). Last logged hip thrust was Mon 11/2: 3 × 12 @ 40.8 kg (90 lb); C was skipped last week (11/9).';
-    gl.sets.forEach((x, i) => { x.label = 'Hip Thrust ' + (i + 1) + ' · 5–8 · suggested start 61.2 kg (135 lb)'; });
+    gl.meta = 'Skipped 11/16 · Barbell Hip Thrust · 3 × 5–8';
+    gl.cues = 'Skipped 11/16: Terry called the session after block B. Last logged hip thrust was Mon 11/2: 3 × 12 @ 40.8 kg (90 lb).';
+    gl.sets.forEach((x, i) => { x.label = 'Hip Thrust ' + (i + 1) + ' · skipped (called it after B)'; });
     const fin = b('fin');
-    fin.meta = 'Circuit · repeat 3x · EZ Bar Preacher Curl 5–10 · Cable Rope Push Down 5–10 · Rope Cable Crunch 5–10 · 0–1 RIR · 2 min rest between tri-sets';
-    fin.cues = 'Coach (Marchon card): 0–1 reps in reserve. The rep range is lower this week, so progress loads where possible while keeping the same control and range of motion. Complete 5–10 reps of each exercise. EZ bar preacher curl: fully straighten the arm at the bottom of each rep. Use a standing curl if no preacher bench is available. Rope triceps extension: bring the forearm towards the biceps at the top without letting the upper arm leave your side. Cable crunch: move through the spine rather than the hips. Rest 2 minutes between tri-sets, or longer if needed. ' + 'Suggested (not on the card): EZ preacher curl ~22.7–27.2 kg (50–60 lb) total. Arms + abs were skipped last week (11/9).';
-    fin.sets.forEach(x => {
-      x.label = x.label
-        .replace('Ez Bar Preacher Curl · 10–15', 'EZ Bar Preacher Curl · 5–10 · suggested 22.7–27.2 kg (50–60 lb)')
-        .replace('Cable Rope Push Down · 10–15', 'Cable Rope Push Down · 5–10')
-        .replace('Rope Cable Crunch · 10–15', 'Rope Cable Crunch · 5–10');
-    });
+    fin.meta = 'Skipped 11/16 · Arms + Abs · repeat 3x';
+    fin.cues = 'Skipped 11/16: EZ bar preacher curl, cable rope pushdown and rope cable crunch not done — Terry called the session after block B.';
+    fin.sets.forEach(x => { x.label = x.label.replace(' · 10–15', ' · skipped (called it after B)'); });
   })();
 
   ['w6_tue', 'w6_wed', 'w6_thu', 'w6_sat', 'w6_sun'].forEach(id => {
