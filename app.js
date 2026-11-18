@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.49 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.50 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.49';
+  const APP_VERSION = '2.1.50';
 
   function start(BOOT) {
 
@@ -77,10 +77,10 @@
     { id: 'w5_sat', date: '2026-11-14', dow: 'Sat', short: '11/14', title: 'Tempo Conditioning', subtitle: 'Done Sun 11/15 (moved) · outdoor SF · 7.20 km · 52:39 · HR 148/167 · LB 6:53/km · G 25092449899', type: 'conditioning' },
     { id: 'w5_sun', date: '2026-11-15', dow: 'Sun', short: '11/15', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
   ];
-  // Phase 6 Week 6 (Mon Nov 16–Sun Nov 22, 2026). Ids prefixed w6_. Mon FB1 planned from the Marchon screenshot (Terry 11/16). Tue–Thu and Sat–Sun await screenshots; Fri is the typical rest day.
+  // Phase 6 Week 6 (Mon Nov 16–Sun Nov 22, 2026). Ids prefixed w6_. Mon FB1 done 11/16 (C/D skipped). Tue Easy Conditioning done 11/17 (50:07 of the 60 min plan). Wed–Thu and Sat–Sun await screenshots; Fri is the typical rest day.
   const WEEK6 = [
     { id: 'w6_mon', date: '2026-11-16', dow: 'Mon', short: '11/16', title: 'Full Body 1', subtitle: 'Squat Focused · ✓ Done 11/16 evening · regular gym · squat 129.3 / 133.8 / 138.3 kg (set 3 pending) · B done (row swapped) · C/D skipped · Garmin strength 53:25 (moving 15:26) · HR 101/149 · Z1 19:51 · Z2 8:02 · Z3 1:41 · 357 kcal · G 25104157546', type: 'strength' },
-    { id: 'w6_tue', date: '2026-11-17', dow: 'Tue', short: '11/17', title: 'Easy Conditioning',  subtitle: 'Card not added yet · Garmin '+"Run 6.09 km / 3.79 mi in 50:07 (8:13/km, 13:14/mi, 4.54 mph) · HR 128/148 · Z1 9:26 · Z2 31:49 · Z3 8:27 · 547 kcal · G 25115527210"+'', type: 'conditioning' },
+    { id: 'w6_tue', date: '2026-11-17', dow: 'Tue', short: '11/17', title: 'Easy Conditioning', subtitle: '✓ Done 11/17 · 50:07 of 60 · 6.09 km / 3.79 mi · 8:13/km · HR 128/148 · Z1 9:26 · Z2 31:49 · Z3 8:27 · 547 kcal · G 25115527210', type: 'conditioning' },
     { id: 'w6_wed', date: '2026-11-18', dow: 'Wed', short: '11/18', title: 'Full Body 2', subtitle: 'Session added once the app screenshot comes in', type: 'strength' },
     { id: 'w6_thu', date: '2026-11-19', dow: 'Thu', short: '11/19', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
     { id: 'w6_fri', date: '2026-11-20', dow: 'Fri', short: '11/20', title: 'Rest', subtitle: 'Typical rest day', type: 'rest' },
@@ -1541,7 +1541,45 @@
     fin.sets.forEach(x => { x.label = x.label.replace(' · 10–15', ' · skipped (called it after B)'); });
   })();
 
-  ['w6_tue', 'w6_wed', 'w6_thu', 'w6_sat', 'w6_sun'].forEach(id => {
+
+  SESSIONS.w6_tue = {
+    name: 'Easy Conditioning',
+    modality: true,
+    hrCard: 'easy3',
+    duration: 'Done 11/17 · 50:07 of the 60 min plan · 6.09 km / 3.79 mi · 8:13/km · HR 128/148 · Z1 9:26 · Z2 31:49 · Z3 8:27 · 547 kcal · G 25115527210',
+    blocksRun: [
+      {
+        id: 'pogo', title: 'Warm up · Pogo Jump Series', meta: 'Not on Garmin',
+        cues: 'Pogo not recorded on Garmin (common — the watch activity starts with the run). Planned: Pogo Jump Series.',
+        sets: [{ id: 'pogo1', label: 'Pogo Jump Series · not on Garmin', fields: ['notes'] }],
+      },
+      {
+        id: 'easy', title: 'A. Easy Conditioning (Run Option)', meta: '✓ Done 11/17 · for time · 50:07 of the 60 min progressive run · 6.09 km / 3.79 mi · HR 128/148',
+        cues: 'Done 11/17, start 6:56 PM PT. Garmin 25115527210 (nightly pull 9:35 PM PT): 6.09 km / 3.79 mi in 50:07 of the 60 min prescribed (8:13/km, 13:14/mi, 4.54 mph), HR 128 avg / 148 max, Z1 9:26 · Z2 31:49 · Z3 8:27, km splits 8:22, 8:29, 8:13, 8:11, 8:15, 7:52, 547 kcal. HR progressed 114 to 142–147, which fits the gears (Easy low Z2 through Aerobic low Z3). Coach (Marchon card, Terry 11/17): choose the run OR row option, not both. Execution: 60 min progressive run; no rest from Easy to Base etc.; go through the gears here but keep it still conversational. Effort: Easy Run (low Z2), Base Run (High Z2), Aerobic Run (Low Z3); remainder of the Effort line was cut off in the screenshot. Individual gear splits were not marked on Garmin, so the shortfall versus 60 min is not assigned to a specific block.',
+        sets: [
+          { id: 'easy20', label: '20 min Easy Run (low Z2) · prescribed · no rest into Base', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'base20', label: '20 min Base Run (high Z2) · prescribed · no rest into Aerobic', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'aero15', label: '15 min Aerobic Run (low Z3) · prescribed · no rest into Easy', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'easy5', label: '5 min Easy Run · prescribed', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'total', label: 'Total · done 50:07 of 60 · 6.09 km / 3.79 mi · 8:13/km (13:14/mi, 4.54 mph) · HR 128/148 · G 25115527210', fields: ['distance', 'avgHr', 'notes'] },
+        ],
+      },
+    ],
+    blocksRow: [
+      {
+        id: 'pogo_r', title: 'Warm up · Pogo Jump Series', meta: 'Not used · he ran',
+        cues: 'Pogo Jump Series. Row option was not used.',
+        sets: [{ id: 'pogo_r1', label: 'Pogo jumps · not used (he ran)', fields: ['notes'] }],
+      },
+      {
+        id: 'alt_row', title: 'B. Easy Conditioning (Row Option) · alternative', meta: 'Not used · he ran · row structure not visible in the screenshot',
+        cues: 'Coach (Marchon card): choose the run OR row option, not both. The row option exists, but its structure was not visible in the screenshot (the card was scrolled on the Run option).',
+        sets: [{ id: 'altr1', label: 'Row option · not used (he ran) · structure not visible', fields: ['notes'] }],
+      },
+    ],
+  };
+
+  ['w6_wed', 'w6_thu', 'w6_sat', 'w6_sun'].forEach(id => {
     SESSIONS[id] = {
       name: 'Awaiting screenshots',
       blocks: [{
