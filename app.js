@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.48 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.49 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.48';
+  const APP_VERSION = '2.1.49';
 
   function start(BOOT) {
 
@@ -80,7 +80,7 @@
   // Phase 6 Week 6 (Mon Nov 16–Sun Nov 22, 2026). Ids prefixed w6_. Mon FB1 planned from the Marchon screenshot (Terry 11/16). Tue–Thu and Sat–Sun await screenshots; Fri is the typical rest day.
   const WEEK6 = [
     { id: 'w6_mon', date: '2026-11-16', dow: 'Mon', short: '11/16', title: 'Full Body 1', subtitle: 'Squat Focused · ✓ Done 11/16 evening · regular gym · squat 129.3 / 133.8 / 138.3 kg (set 3 pending) · B done (row swapped) · C/D skipped · Garmin strength 53:25 (moving 15:26) · HR 101/149 · Z1 19:51 · Z2 8:02 · Z3 1:41 · 357 kcal · G 25104157546', type: 'strength' },
-    { id: 'w6_tue', date: '2026-11-17', dow: 'Tue', short: '11/17', title: 'Easy Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
+    { id: 'w6_tue', date: '2026-11-17', dow: 'Tue', short: '11/17', title: 'Easy Conditioning',  subtitle: 'Card not added yet · Garmin '+"Run 6.09 km / 3.79 mi in 50:07 (8:13/km, 13:14/mi, 4.54 mph) · HR 128/148 · Z1 9:26 · Z2 31:49 · Z3 8:27 · 547 kcal · G 25115527210"+'', type: 'conditioning' },
     { id: 'w6_wed', date: '2026-11-18', dow: 'Wed', short: '11/18', title: 'Full Body 2', subtitle: 'Session added once the app screenshot comes in', type: 'strength' },
     { id: 'w6_thu', date: '2026-11-19', dow: 'Thu', short: '11/19', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
     { id: 'w6_fri', date: '2026-11-20', dow: 'Fri', short: '11/20', title: 'Rest', subtitle: 'Typical rest day', type: 'rest' },
