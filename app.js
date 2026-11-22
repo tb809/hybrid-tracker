@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.50 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.51 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.50';
+  const APP_VERSION = '2.1.51';
 
   function start(BOOT) {
 
@@ -77,15 +77,15 @@
     { id: 'w5_sat', date: '2026-11-14', dow: 'Sat', short: '11/14', title: 'Tempo Conditioning', subtitle: 'Done Sun 11/15 (moved) · outdoor SF · 7.20 km · 52:39 · HR 148/167 · LB 6:53/km · G 25092449899', type: 'conditioning' },
     { id: 'w5_sun', date: '2026-11-15', dow: 'Sun', short: '11/15', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
   ];
-  // Phase 6 Week 6 (Mon Nov 16–Sun Nov 22, 2026). Ids prefixed w6_. Mon FB1 done 11/16 (C/D skipped). Tue Easy Conditioning done 11/17 (50:07 of the 60 min plan). Wed–Thu and Sat–Sun await screenshots; Fri is the typical rest day.
+  // Phase 6 Week 6 (Mon Nov 16–Sun Nov 22, 2026). Ids prefixed w6_. Mon FB1 done 11/16 (C/D skipped). Tue Easy Conditioning done 11/17 (50:07 of the 60 min plan). Wed FB2, Thu intervals, and Sat/Sun tempo skipped (family trip to AZ + short sleep; Wed 11/18 had 17.8k steps). Fri is the typical rest day. AM weigh-in Sun 11/22: 239.4 lb.
   const WEEK6 = [
     { id: 'w6_mon', date: '2026-11-16', dow: 'Mon', short: '11/16', title: 'Full Body 1', subtitle: 'Squat Focused · ✓ Done 11/16 evening · regular gym · squat 129.3 / 133.8 / 138.3 kg (set 3 pending) · B done (row swapped) · C/D skipped · Garmin strength 53:25 (moving 15:26) · HR 101/149 · Z1 19:51 · Z2 8:02 · Z3 1:41 · 357 kcal · G 25104157546', type: 'strength' },
     { id: 'w6_tue', date: '2026-11-17', dow: 'Tue', short: '11/17', title: 'Easy Conditioning', subtitle: '✓ Done 11/17 · 50:07 of 60 · 6.09 km / 3.79 mi · 8:13/km · HR 128/148 · Z1 9:26 · Z2 31:49 · Z3 8:27 · 547 kcal · G 25115527210', type: 'conditioning' },
-    { id: 'w6_wed', date: '2026-11-18', dow: 'Wed', short: '11/18', title: 'Full Body 2', subtitle: 'Session added once the app screenshot comes in', type: 'strength' },
-    { id: 'w6_thu', date: '2026-11-19', dow: 'Thu', short: '11/19', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
-    { id: 'w6_fri', date: '2026-11-20', dow: 'Fri', short: '11/20', title: 'Rest', subtitle: 'Typical rest day', type: 'rest' },
-    { id: 'w6_sat', date: '2026-11-21', dow: 'Sat', short: '11/21', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
-    { id: 'w6_sun', date: '2026-11-22', dow: 'Sun', short: '11/22', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
+    { id: 'w6_wed', date: '2026-11-18', dow: 'Wed', short: '11/18', title: 'Full Body 2', subtitle: 'Skipped · family trip upcoming · 17.8k steps walking (~9.2 mi) · short sleep', type: 'strength' },
+    { id: 'w6_thu', date: '2026-11-19', dow: 'Thu', short: '11/19', title: 'Interval Conditioning', subtitle: 'Skipped · flight SFO→PHX (UA 2019, 6:55 PM PT) · short sleep', type: 'conditioning' },
+    { id: 'w6_fri', date: '2026-11-20', dow: 'Fri', short: '11/20', title: 'Rest', subtitle: 'Typical rest day · in AZ (Mom morning appointment)', type: 'rest' },
+    { id: 'w6_sat', date: '2026-11-21', dow: 'Sat', short: '11/21', title: 'Tempo Conditioning', subtitle: 'Skipped · family trip in AZ (Peoria / Mom care)', type: 'conditioning' },
+    { id: 'w6_sun', date: '2026-11-22', dow: 'Sun', short: '11/22', title: 'Tempo Conditioning', subtitle: 'Skipped · travel day PHX→SFO (UA 2449) · AM weigh-in 239.4 lb at home', type: 'conditioning' },
   ];
   WEEK.forEach(d => { d.week = 1; });
   WEEK2.forEach(d => { d.week = 2; });
@@ -3369,6 +3369,7 @@
     { id: 'seed-wi-2026-11-08', measuredAt: '2026-11-08T18:30:00-08:00', weightLb: 243.3, notes: 'EVENING (~6:30 PM PT) · day he flew home from Mexico · NOT fasted morning · off-protocol (keep out of AM trend)' },
     { id: 'seed-wi-2026-11-15', measuredAt: '2026-11-15T16:15:00-08:00', weightLb: 239.8, notes: 'POST-RUN (after the 3:16 PM PT outdoor tempo; run ended ~4:09 PM; exact clock not reported) · dehydrated · NOT fasted morning · off-protocol (keep out of AM trend)' },
     { id: 'seed-wi-2026-11-16', measuredAt: '2026-11-16T06:30:00-08:00', weightLb: 244.2, notes: 'Fasted AM · first protocol morning reading since 11/1 (~243.1) · counts toward AM trend' },
+    { id: 'seed-wi-2026-11-22', measuredAt: '2026-11-22T10:00:00-08:00', weightLb: 239.4, notes: 'AM · home after AZ trip (UA 2449 landed ~9:12 AM PT) · late dinner + pre-sleep hydration so AM weights include residual food/water · counts toward AM trend · use 7-day trend, not single readings · −4.8 lb vs 11/16 AM 244.2 (part likely water after a hectic travel week)' },
   ];
   function seedWeighins() {
     const laDate = iso => { try { return new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' }); } catch (e) { return String(iso).slice(0, 10); } };
