@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.51 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.52 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.51';
+  const APP_VERSION = '2.1.52';
 
   function start(BOOT) {
 
@@ -87,12 +87,23 @@
     { id: 'w6_sat', date: '2026-11-21', dow: 'Sat', short: '11/21', title: 'Tempo Conditioning', subtitle: 'Skipped · family trip in AZ (Peoria / Mom care)', type: 'conditioning' },
     { id: 'w6_sun', date: '2026-11-22', dow: 'Sun', short: '11/22', title: 'Tempo Conditioning', subtitle: 'Skipped · travel day PHX→SFO (UA 2449) · AM weigh-in 239.4 lb at home', type: 'conditioning' },
   ];
+  // Phase 6 Week 7 (Mon Nov 23–Sun Nov 29, 2026). Ids prefixed w7_. Mon FB1 planned from the Marchon screenshot (Terry 11/23). Tue–Thu and Sat–Sun await screenshots; Fri is the typical rest day.
+  const WEEK7 = [
+    { id: 'w7_mon', date: '2026-11-23', dow: 'Mon', short: '11/23', title: 'Full Body 1', subtitle: 'Squat Focused · Planned · build to a 3RM, then 3 reps at 80–90% of today\'s 3RM, twice', type: 'strength' },
+    { id: 'w7_tue', date: '2026-11-24', dow: 'Tue', short: '11/24', title: 'Easy Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
+    { id: 'w7_wed', date: '2026-11-25', dow: 'Wed', short: '11/25', title: 'Full Body 2', subtitle: 'Session added once the app screenshot comes in', type: 'strength' },
+    { id: 'w7_thu', date: '2026-11-26', dow: 'Thu', short: '11/26', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
+    { id: 'w7_fri', date: '2026-11-27', dow: 'Fri', short: '11/27', title: 'Rest', subtitle: 'Typical rest day', type: 'rest' },
+    { id: 'w7_sat', date: '2026-11-28', dow: 'Sat', short: '11/28', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
+    { id: 'w7_sun', date: '2026-11-29', dow: 'Sun', short: '11/29', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
+  ];
   WEEK.forEach(d => { d.week = 1; });
   WEEK2.forEach(d => { d.week = 2; });
   WEEK3.forEach(d => { d.week = 3; });
   WEEK4.forEach(d => { d.week = 4; });
   WEEK5.forEach(d => { d.week = 5; });
   WEEK6.forEach(d => { d.week = 6; });
+  WEEK7.forEach(d => { d.week = 7; });
   const WEEKS = {
     1: { label: 'Week 1', range: 'Oct 11–17, 2026', days: WEEK },
     2: { label: 'Week 2', range: 'Oct 19–25, 2026', days: WEEK2 },
@@ -100,8 +111,9 @@
     4: { label: 'Week 4', range: 'Nov 2–8, 2026', days: WEEK4 },
     5: { label: 'Week 5', range: 'Nov 9–15, 2026', days: WEEK5 },
     6: { label: 'Week 6', range: 'Nov 16–22, 2026', days: WEEK6 },
+    7: { label: 'Week 7', range: 'Nov 23–29, 2026', days: WEEK7 },
   };
-  const ALL_DAYS = WEEK.concat(WEEK2, WEEK3, WEEK4, WEEK5, WEEK6);
+  const ALL_DAYS = WEEK.concat(WEEK2, WEEK3, WEEK4, WEEK5, WEEK6, WEEK7);
 
   // Terry shifted: Thu Oct 15 → Interval / TT session (not calendar Deadlift day)
   const DEFAULT_SESSION_FOR_TODAY = 'wed';
@@ -1600,6 +1612,68 @@
   };
 
 
+
+  // —— Week 7 sessions ——
+  // Mon 11/23 · Week 7 Full Body 1 (Squat Focused), from Terry's Marchon app screenshot 11/23. Planned.
+  SESSIONS.w7_mon = cloneSession('w2_mon');
+  (function () {
+    const s = SESSIONS.w7_mon;
+    const b = id => s.blocks.find(x => x.id === id);
+    s.duration = 'Planned · squat: build to a 3RM, then 3 reps at 80–90% of today\'s 3RM, twice · 2 min rest';
+    const wu = b('wu');
+    wu.meta = 'Circuit · repeat 2x · 1 min Bike Erg · 10/10 Split Stance Leaps · 6/6 90/90 Hip Rotations';
+    wu.cues = 'From the Marchon app screenshot (Terry 11/23): 1 min Bike Erg, 10/10 Split Stance Leaps, 6/6 90/90 Hip Rotations, repeat 2x.';
+    wu.sets.forEach((x, i) => { x.label = 'Round ' + (i + 1) + ' · Bike Erg 1 min · Leaps 10/10 · 90/90 6/6'; });
+    const bs = b('bs');
+    bs.sets = bs.sets.slice(0, 3);
+    bs.meta = 'Straight set · 3 sets · build to a 3RM, then 3 reps at 80–90% of today\'s 3RM, twice · 2 min rest';
+    bs.cues = 'From the Marchon app screenshot (Terry 11/23): 3 straight sets. Build to a 3-rep max, then do 3 reps at 80–90% of today\'s 3RM, twice. Rest 2 minutes between sets. Last Monday (11/16) he built to 138.3 kg (305 lb) × 3 at the regular gym (45 lb bar assumed), pending confirmation of all 3 reps. If today\'s 3RM is around that, 80–90% is roughly 111–125 kg (245–275 lb) — use today\'s 3RM, not last week\'s number. Last Freedom Rack squat (Mon 11/9): 4 × 4 @ 124.7 kg (275 lb) @ RPE 8, not directly comparable.';
+    bs.sets[0].label = 'Set 1 · 3RM · 3 reps';
+    bs.sets[1].label = 'Set 2 · 3 reps at 80–90% of today\'s 3RM';
+    bs.sets[2].label = 'Set 3 · 3 reps at 80–90% of today\'s 3RM';
+    const pp = b('pp');
+    pp.meta = 'Superset · 3 sets · Weighted Push Up 5–10 · Cable Seated Row 5–10 · 2 min rest between supersets';
+    pp.cues = 'From the Marchon app screenshot (Terry 11/23): 3 supersets of Weighted Push Up 5–10 and Cable Seated Row 5–10, 2 min rest between supersets. Last Monday (11/16): push-up 15 / 15 / 12 @ +20 kg (44 lb) (no heavier plate available); cable row swapped to DB single-arm row 3 × 8 @ 27 kg (60 lb) because cables were unavailable. Last cable seated row (Mon 11/9): 3 × 10 @ 38.6 kg (85 lb).';
+    pp.sets.forEach((x) => {
+      if (x.id.startsWith('pu')) x.label = x.id.replace('pu', 'Weighted Push Up ') + ' · 5–10';
+      if (x.id.startsWith('csr')) x.label = x.id.replace('csr', 'Cable Seated Row ') + ' · 5–10';
+    });
+    const gl = b('gl');
+    gl.meta = 'Straight set · 3 × 5–8 Barbell Hip Thrust · 2 min rest';
+    gl.cues = 'From the Marchon app screenshot (Terry 11/23): Barbell Hip Thrust, 3 sets of 5–8, 2 min rest. Skipped last Monday (11/16). Last logged hip thrust was Mon 11/2: 3 × 12 @ 40.8 kg (90 lb).';
+    gl.sets.forEach((x, i) => { x.label = 'Hip Thrust ' + (i + 1) + ' · 5–8'; });
+    const fin = b('fin');
+    fin.meta = 'Circuit · repeat 3x · EZ Bar Preacher Curl 5–10 · Cable Rope Push Down 5–10 · Rope Cable Crunch 5–10 · 2 min rest between tri-sets';
+    fin.cues = 'From the Marchon app screenshot (Terry 11/23): 3 rounds of EZ Bar Preacher Curl 5–10, Cable Rope Push Down 5–10, and Rope Cable Crunch 5–10, 2 min rest between rounds. Arms + abs were skipped last Monday (11/16) and the week before (11/9).';
+    fin.sets.forEach(x => {
+      x.label = x.label
+        .replace('Ez Bar Preacher Curl · 10–15', 'EZ Bar Preacher Curl · 5–10')
+        .replace('Cable Rope Push Down · 10–15', 'Cable Rope Push Down · 5–10')
+        .replace('Rope Cable Crunch · 10–15', 'Rope Cable Crunch · 5–10');
+    });
+  })();
+
+  ['w7_tue', 'w7_wed', 'w7_thu', 'w7_sat', 'w7_sun'].forEach(id => {
+    SESSIONS[id] = {
+      name: 'Awaiting screenshots',
+      blocks: [{
+        id: 'tbd', title: 'Session not added yet', meta: 'Added once the coach app screenshot comes in · notes only for now',
+        sets: [{ id: 'tbd1', label: 'Notes', fields: ['notes'] }],
+      }],
+    };
+  });
+
+  SESSIONS.w7_fri = {
+    name: 'Rest',
+    duration: 'Typical rest day',
+    blocks: [{
+      id: 'rest', title: 'Rest', meta: 'Typical rest day · no session prescribed',
+      cues: 'Friday is the typical rest day in this Hybrid week. Thursday interval and weekend tempo cards will be added once their screenshots come in.',
+      sets: [{ id: 'rest1', label: 'Rest', fields: ['notes'] }],
+    }],
+  };
+
+
   // —— v2: normalize set fields ——
   // RIR blocks log RIR (not RPE); every run/row segment gets a time field; fixed-distance
   // row pieces (500m, 2000m) get a distance field so pace shows in /km and /mi.
@@ -1638,10 +1712,10 @@
   let selectedSessionId = (TODAY_DAY && state.todayOverrideDate !== REAL_TODAY) ? TODAY_DAY.id : (
     (state.todayOverrideSession && SESSIONS[state.todayOverrideSession]) ? state.todayOverrideSession : (
     REAL_TODAY === '2026-10-15' ? DEFAULT_SESSION_FOR_TODAY :
-    (TODAY_DAY || {}).id || (REAL_TODAY >= WEEK6[0].date ? WEEK6[0].id : REAL_TODAY >= WEEK5[0].date ? WEEK5[0].id : REAL_TODAY >= WEEK4[0].date ? WEEK4[0].id : REAL_TODAY >= WEEK3[0].date ? WEEK3[0].id : REAL_TODAY >= WEEK2[0].date ? WEEK2[0].id : DEFAULT_SESSION_FOR_TODAY)
+    (TODAY_DAY || {}).id || (REAL_TODAY >= WEEK7[0].date ? WEEK7[0].id : REAL_TODAY >= WEEK6[0].date ? WEEK6[0].id : REAL_TODAY >= WEEK5[0].date ? WEEK5[0].id : REAL_TODAY >= WEEK4[0].date ? WEEK4[0].id : REAL_TODAY >= WEEK3[0].date ? WEEK3[0].id : REAL_TODAY >= WEEK2[0].date ? WEEK2[0].id : DEFAULT_SESSION_FOR_TODAY)
   ));
   function dayFor(id) { return ALL_DAYS.find(d => d.id === id); }
-  let selectedWeek = (dayFor(selectedSessionId) || {}).week || 6;
+  let selectedWeek = (dayFor(selectedSessionId) || {}).week || 7;
   function weightUnitFor(sessionId) { return (SESSIONS[sessionId] && SESSIONS[sessionId].weightUnit) || 'lb'; }
   function kgToLbLabel(v) {
     const n = parseNum(v);
@@ -2435,7 +2509,7 @@
 
   // —— Targets / prefill ——
   // Week 2 sessions → the Week 1 session they repeat (for "last week's load" prefill)
-  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed', w4_fri: 'w3_thu', w4_sun: 'w3_sat', w5_mon: 'w4_mon', w5_tue: 'w4_tue', w5_wed: 'w4_wed', w5_thu: 'w4_fri', w5_sat: 'w4_sun', w6_mon: 'w5_mon' };
+  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed', w4_fri: 'w3_thu', w4_sun: 'w3_sat', w5_mon: 'w4_mon', w5_tue: 'w4_tue', w5_wed: 'w4_wed', w5_thu: 'w4_fri', w5_sat: 'w4_sun', w6_mon: 'w5_mon', w7_mon: 'w6_mon' };
 
   function setStem(setId) { return String(setId).replace(/\d+$/, ''); }
 
