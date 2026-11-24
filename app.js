@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.53 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.54 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.53';
+  const APP_VERSION = '2.1.54';
 
   function start(BOOT) {
 
@@ -89,7 +89,7 @@
   ];
   // Phase 6 Week 7 (Mon Nov 23–Sun Nov 29, 2026). Ids prefixed w7_. Mon FB1 planned from the Marchon screenshot (Terry 11/23). Tue–Thu and Sat–Sun await screenshots; Fri is the typical rest day.
   const WEEK7 = [
-    { id: 'w7_mon', date: '2026-11-23', dow: 'Mon', short: '11/23', title: 'Full Body 1', subtitle: 'Squat Focused · Planned · target 3RM about 138–143 kg, then 3 reps at 80–90% of today\'s 3RM, twice', type: 'strength' },
+    { id: 'w7_mon', date: '2026-11-23', dow: 'Mon', short: '11/23', title: 'Full Body 1', subtitle: 'Squat Focused · Garmin strength 36:41 · HR 92/130 · 219 kcal · Z1 13:24, Z2 2:52 · G 25179727838 · loads pending · target 3RM about 138–143 kg, then 3 reps at 80–90% of today\'s 3RM, twice', type: 'strength' },
     { id: 'w7_tue', date: '2026-11-24', dow: 'Tue', short: '11/24', title: 'Easy Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
     { id: 'w7_wed', date: '2026-11-25', dow: 'Wed', short: '11/25', title: 'Full Body 2', subtitle: 'Session added once the app screenshot comes in', type: 'strength' },
     { id: 'w7_thu', date: '2026-11-26', dow: 'Thu', short: '11/26', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
