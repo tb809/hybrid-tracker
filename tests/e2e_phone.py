@@ -134,7 +134,7 @@ with sync_playwright() as p:
     page.wait_for_timeout(200)
     h = page.text_content('#view-root')
     check('history renders summaries + weigh-ins', 'Weigh-ins' in h and 'Top:' in h, h[:300])
-    check('history: pre-Phase 6 Remy lifts', 'Pre-Phase 6 lifts' in h and '142.9 kg (315 lb) × 3 @9' in h, h[:300])
+    check('history: pre-Phase 6 Remy lifts', 'Pre-Phase 6 lifts' in h and '142.88 kg (315 lb) × 3 @9' in h, h[:300])
     page.tap('.tab[data-view="more"]')
     m = page.text_content('#view-root')
     check('more: local-only notice', 'Local-only mode' in m)
@@ -142,7 +142,7 @@ with sync_playwright() as p:
     # --- offline: SW installed, reload with network off ---
     page.wait_for_function("navigator.serviceWorker && navigator.serviceWorker.controller", timeout=10000)
     caches = page.evaluate("caches.keys()")
-    check('SW cache v2-1-52 installed', 'hybrid-tracker-v2-1-52' in caches, caches)
+    check('SW cache v2-1-53 installed', 'hybrid-tracker-v2-1-53' in caches, caches)
     ctx.set_offline(True)
     page.reload()
     page.wait_for_function("window.__HT && window.__HT.boot", timeout=10000)

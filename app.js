@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.52 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.53 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.52';
+  const APP_VERSION = '2.1.53';
 
   function start(BOOT) {
 
@@ -38,7 +38,7 @@
 
   // Phase 6 Week 2 (Mon Oct 19–Sun Oct 25, 2026; same order as Week 1 as executed, starting FB1 Mon). Session ids are prefixed w2_ so Week 1 logs (keyed by sun..sat) stay untouched.
   const WEEK2 = [
-    { id: 'w2_mon', date: '2026-10-19', dow: 'Mon', short: '10/19', title: 'Full Body 1', subtitle: 'Squat Focused · ~45 min', type: 'strength' },
+    { id: 'w2_mon', date: '2026-10-19', dow: 'Mon', short: '10/19', title: 'Full Body 1', subtitle: 'Squat Focused · done 10/19 · squat 4×6 @ 100 kg (confirmed Marchon history 11/23)', type: 'strength' },
     { id: 'w2_tue', date: '2026-10-20', dow: 'Tue', short: '10/20', title: 'Easy Conditioning', subtitle: 'Run or Row', type: 'conditioning' },
     { id: 'w2_wed', date: '2026-10-21', dow: 'Wed', short: '10/21', title: 'Full Body 2', subtitle: 'Press Focused', type: 'strength' },
     // 10/22 schedule change (tentative): Thu = rest (NYC conference) / FB3 optional; Interval moved to Fri. Ids unchanged so logs stay keyed.
@@ -79,7 +79,7 @@
   ];
   // Phase 6 Week 6 (Mon Nov 16–Sun Nov 22, 2026). Ids prefixed w6_. Mon FB1 done 11/16 (C/D skipped). Tue Easy Conditioning done 11/17 (50:07 of the 60 min plan). Wed FB2, Thu intervals, and Sat/Sun tempo skipped (family trip to AZ + short sleep; Wed 11/18 had 17.8k steps). Fri is the typical rest day. AM weigh-in Sun 11/22: 239.4 lb.
   const WEEK6 = [
-    { id: 'w6_mon', date: '2026-11-16', dow: 'Mon', short: '11/16', title: 'Full Body 1', subtitle: 'Squat Focused · ✓ Done 11/16 evening · regular gym · squat 129.3 / 133.8 / 138.3 kg (set 3 pending) · B done (row swapped) · C/D skipped · Garmin strength 53:25 (moving 15:26) · HR 101/149 · Z1 19:51 · Z2 8:02 · Z3 1:41 · 357 kcal · G 25104157546', type: 'strength' },
+    { id: 'w6_mon', date: '2026-11-16', dow: 'Mon', short: '11/16', title: 'Full Body 1', subtitle: 'Squat Focused · ✓ Done 11/16 evening · regular gym · squat 129.3 / 133.8 / 138.3 kg (305 lb × 3 confirmed) · B done (row swapped) · C/D skipped · Garmin strength 53:25 (moving 15:26) · HR 101/149 · Z1 19:51 · Z2 8:02 · Z3 1:41 · 357 kcal · G 25104157546', type: 'strength' },
     { id: 'w6_tue', date: '2026-11-17', dow: 'Tue', short: '11/17', title: 'Easy Conditioning', subtitle: '✓ Done 11/17 · 50:07 of 60 · 6.09 km / 3.79 mi · 8:13/km · HR 128/148 · Z1 9:26 · Z2 31:49 · Z3 8:27 · 547 kcal · G 25115527210', type: 'conditioning' },
     { id: 'w6_wed', date: '2026-11-18', dow: 'Wed', short: '11/18', title: 'Full Body 2', subtitle: 'Skipped · family trip upcoming · 17.8k steps walking (~9.2 mi) · short sleep', type: 'strength' },
     { id: 'w6_thu', date: '2026-11-19', dow: 'Thu', short: '11/19', title: 'Interval Conditioning', subtitle: 'Skipped · flight SFO→PHX (UA 2019, 6:55 PM PT) · short sleep', type: 'conditioning' },
@@ -89,7 +89,7 @@
   ];
   // Phase 6 Week 7 (Mon Nov 23–Sun Nov 29, 2026). Ids prefixed w7_. Mon FB1 planned from the Marchon screenshot (Terry 11/23). Tue–Thu and Sat–Sun await screenshots; Fri is the typical rest day.
   const WEEK7 = [
-    { id: 'w7_mon', date: '2026-11-23', dow: 'Mon', short: '11/23', title: 'Full Body 1', subtitle: 'Squat Focused · Planned · build to a 3RM, then 3 reps at 80–90% of today\'s 3RM, twice', type: 'strength' },
+    { id: 'w7_mon', date: '2026-11-23', dow: 'Mon', short: '11/23', title: 'Full Body 1', subtitle: 'Squat Focused · Planned · target 3RM about 138–143 kg, then 3 reps at 80–90% of today\'s 3RM, twice', type: 'strength' },
     { id: 'w7_tue', date: '2026-11-24', dow: 'Tue', short: '11/24', title: 'Easy Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
     { id: 'w7_wed', date: '2026-11-25', dow: 'Wed', short: '11/25', title: 'Full Body 2', subtitle: 'Session added once the app screenshot comes in', type: 'strength' },
     { id: 'w7_thu', date: '2026-11-26', dow: 'Thu', short: '11/26', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
@@ -133,7 +133,7 @@
         },
         {
           id: 'bs', title: 'Back Squat', meta: 'KPI: build to 3RM, then back-off', kpi: '3rm_back_squat',
-          cues: "Done Mon 10/12: 142.9 kg (315 lb) × 3 @ RPE 9 (Remy's log, workout 867). Back-off sets not logged.",
+          cues: "Done Mon 10/12: 142.88 kg (315 lb) × 3 @ RPE 9 (Marchon history 11/23; previously rounded 142.9 kg. Remy's log, workout 867, has the RPE). One work set of 3. Back-off sets not logged.",
           sets: [
             { id: 'bs_build', label: '3RM build / result', fields: ['weight', 'reps', 'rpe'], kpiField: true },
             { id: 'bs_bo1', label: 'Back-off set 1', fields: ['weight', 'reps', 'rpe'] },
@@ -1520,18 +1520,18 @@
   (function () {
     const s = SESSIONS.w6_mon;
     const b = id => s.blocks.find(x => x.id === id);
-    s.duration = 'Done 11/16 evening ~7 PM PT · regular gym (45 lb bar assumed, not the apartment Freedom Rack) · squat 129.3 / 133.8 / 138.3 kg (set 3 pending confirmation) · B done (row swapped) · C/D skipped · Garmin strength 53:25 (moving 15:26) · HR 101/149 · Z1 19:51 · Z2 8:02 · Z3 1:41 · 357 kcal · G 25104157546';
+    s.duration = 'Done 11/16 evening ~7 PM PT · regular gym (45 lb bar assumed, not the apartment Freedom Rack) · squat 129.3 / 133.8 / 138.3 kg (305 lb × 3 confirmed by Marchon history 11/23) · B done (row swapped) · C/D skipped · Garmin strength 53:25 (moving 15:26) · HR 101/149 · Z1 19:51 · Z2 8:02 · Z3 1:41 · 357 kcal · G 25104157546';
     const wu = b('wu');
     wu.meta = 'Circuit · repeat 2x · not separately reported';
     wu.cues = 'Warm-up (1 min Bike Erg · 10/10 Split Stance Leaps · 6 reps 90/90 Hip Rotations, repeat 2x) was not separately reported. Session was at the regular gym, evening ~7 PM PT.';
     wu.sets.forEach((x, i) => { x.label = 'Round ' + (i + 1) + ' · Bike Erg 1 min · Leaps 10/10 · 90/90 x6 · not separately reported'; });
     const bs = b('bs');
     bs.sets = bs.sets.slice(0, 3);
-    bs.meta = 'Done 11/16 · 3 × 3 · regular gym (45 lb bar assumed) · 129.3 / 133.8 / 138.3 kg (285 / 295 / 305 lb) · set 3 pending confirmation of all 3 reps · LB candidate 138.3 kg (305 lb) × 3';
-    bs.cues = 'Done 11/16 evening at the regular gym (not the apartment Nautilus Freedom Rack). Bar weight assumed to be a standard 45 lb / 20.4 kg bar unless told otherwise — not comparable to last week\'s Freedom Rack numbers (44 lb / 20 kg built-in bar counted). Set 1: 129.3 kg (285 lb) × 3, solid. Set 2: 133.8 kg (295 lb) × 3, good. Set 3: 138.3 kg (305 lb) planned/reported — pending confirmation of all 3 reps. Leaderboard candidate: 138.3 kg (305 lb) × 3, pending that confirmation. Last free-bar squat (Mon 11/2, Irving, barefoot): 102.1 / 111.1 / 120.2 / 120.2 kg (225 / 245 / 265 / 265 lb) × 5. Last Freedom Rack squat (Mon 11/9): 4 × 4 @ 124.7 kg (275 lb) @ RPE 8 — not directly comparable.';
+    bs.meta = 'Done 11/16 · 3 × 3 · regular gym (45 lb bar assumed) · 129.3 / 133.8 / 138.3 kg (285 / 295 / 305 lb) · set 3 confirmed 138.3 kg (305 lb) × 3 · LB 138.3 kg (305 lb) × 3';
+    bs.cues = 'Done 11/16 evening at the regular gym (not the apartment Nautilus Freedom Rack). Bar weight assumed to be a standard 45 lb / 20.4 kg bar unless told otherwise — not comparable to last week\'s Freedom Rack numbers (44 lb / 20 kg built-in bar counted). Set 1: 129.3 kg (285 lb) × 3, solid. Set 2: 133.8 kg (295 lb) × 3, good. Set 3: 138.3 kg (305 lb) × 3, confirmed by Marchon history 11/23 (all 3 reps). Leaderboard: 138.3 kg (305 lb) × 3. Last free-bar squat (Mon 11/2, Irving, barefoot): 102.1 / 111.1 / 120.2 / 120.2 kg (225 / 245 / 265 / 265 lb) × 5. Last Freedom Rack squat (Mon 11/9): 4 × 4 @ 124.7 kg (275 lb) @ RPE 8 — not directly comparable.';
     bs.sets[0].label = 'Set 1 · done 3 @ 129.3 kg (285 lb) · solid · regular gym (45 lb bar assumed)';
     bs.sets[1].label = 'Set 2 · done 3 @ 133.8 kg (295 lb) · good · regular gym (45 lb bar assumed)';
-    bs.sets[2].label = 'Set 3 · reported 138.3 kg (305 lb) · pending confirmation of all 3 reps · leaderboard candidate';
+    bs.sets[2].label = 'Set 3 · done 3 @ 138.3 kg (305 lb) · confirmed (Marchon history 11/23) · leaderboard';
     const pp = b('pp');
     pp.meta = 'Done 11/16 · 3 supersets · Weighted Push Up 15 / 15 / 12 @ +20 kg (44 lb) · row swapped to DB single-arm row 3 × 8 @ 27 kg (60 lb)';
     pp.cues = 'Done 11/16 (app screenshot, 7:26 PM PT). Weighted push-up 15, 15, 12 @ +20 kg (44 lb) — no heavier plate available (suggested was +25 kg / 55 lb). Cable seated row was swapped (cables unavailable) to DB single-arm row 8, 8, 8 @ 27 kg (60 lb).';
@@ -1619,16 +1619,16 @@
   (function () {
     const s = SESSIONS.w7_mon;
     const b = id => s.blocks.find(x => x.id === id);
-    s.duration = 'Planned · squat: build to a 3RM, then 3 reps at 80–90% of today\'s 3RM, twice · 2 min rest';
+    s.duration = 'Planned · squat: build to a 3RM of about 138–143 kg (304–315 lb), then 3 reps at 80–90% of today\'s 3RM, twice · 2 min rest';
     const wu = b('wu');
     wu.meta = 'Circuit · repeat 2x · 1 min Bike Erg · 10/10 Split Stance Leaps · 6/6 90/90 Hip Rotations';
     wu.cues = 'From the Marchon app screenshot (Terry 11/23): 1 min Bike Erg, 10/10 Split Stance Leaps, 6/6 90/90 Hip Rotations, repeat 2x.';
     wu.sets.forEach((x, i) => { x.label = 'Round ' + (i + 1) + ' · Bike Erg 1 min · Leaps 10/10 · 90/90 6/6'; });
     const bs = b('bs');
     bs.sets = bs.sets.slice(0, 3);
-    bs.meta = 'Straight set · 3 sets · build to a 3RM, then 3 reps at 80–90% of today\'s 3RM, twice · 2 min rest';
-    bs.cues = 'From the Marchon app screenshot (Terry 11/23): 3 straight sets. Build to a 3-rep max, then do 3 reps at 80–90% of today\'s 3RM, twice. Rest 2 minutes between sets. Last Monday (11/16) he built to 138.3 kg (305 lb) × 3 at the regular gym (45 lb bar assumed), pending confirmation of all 3 reps. If today\'s 3RM is around that, 80–90% is roughly 111–125 kg (245–275 lb) — use today\'s 3RM, not last week\'s number. Last Freedom Rack squat (Mon 11/9): 4 × 4 @ 124.7 kg (275 lb) @ RPE 8, not directly comparable.';
-    bs.sets[0].label = 'Set 1 · 3RM · 3 reps';
+    bs.meta = 'Straight set · 3 sets · build to a 3RM of about 138–143 kg (304–315 lb), then 3 reps at 80–90% of today\'s 3RM, twice · 2 min rest';
+    bs.cues = 'From the Marchon app screenshot (Terry 11/23): 3 straight sets. Today\'s target: build to a 3RM of about 138–143 kg (304–315 lb), then do 3 reps at 80–90% of today\'s 3RM, twice. Rest 2 minutes between sets. Last Monday (11/16) he built to 138.3 kg (305 lb) × 3 at the regular gym (45 lb bar assumed), confirmed by Marchon history 11/23 (all 3 reps). Phase 6 KPI on 10/12 was 142.88 kg (315 lb) × 3. If the 3RM lands in that 138–143 kg range, 80–90% is about 110–129 kg (243–284 lb) — use today\'s 3RM. Last Freedom Rack squat (Mon 11/9): 4 × 4 @ 124.7 kg (275 lb) @ RPE 8, not directly comparable.';
+    bs.sets[0].label = 'Set 1 · 3RM · about 138–143 kg (304–315 lb) · 3 reps';
     bs.sets[1].label = 'Set 2 · 3 reps at 80–90% of today\'s 3RM';
     bs.sets[2].label = 'Set 3 · 3 reps at 80–90% of today\'s 3RM';
     const pp = b('pp');
@@ -1673,6 +1673,16 @@
     }],
   };
 
+
+  // Week 2 Mon 10/19 actuals (applied after later weeks clone the w2_mon template).
+  (function () {
+    const s = SESSIONS.w2_mon;
+    const bs = s.blocks.find(x => x.id === 'bs');
+    s.duration = 'Done 10/19 · squat 4 × 6 @ 100 kg (220 lb) · barefoot, hotel · confirmed by Marchon history 11/23';
+    bs.meta = 'Done 10/19 · 4 × 6 @ 100 kg (220 lb) · confirmed by Marchon history 11/23';
+    bs.cues = 'Done 10/19: 4 × 6 @ 100 kg (220 lb), confirmed by Marchon history 11/23. Barefoot, hotel. That history also showed another 4 × 6 @ 100 kg whose date was unclear (possibly Oct 26 or Nov 2); only this dated Oct 19 session was used as a new confirmation. Oct 26 already has 4 × 6 @ 100 kg logged on the Freedom Rack, and Nov 2 was left unchanged (4 × 5 at 102.1 / 111.1 / 120.2 / 120.2 kg). Hotel swap (not used): goblet / DB front squat 4x8–10.';
+    bs.sets.forEach((x, i) => { x.label = 'Set ' + (i + 1) + ' · done 6 @ 100 kg (220 lb)'; });
+  })();
 
   // —— v2: normalize set fields ——
   // RIR blocks log RIR (not RPE); every run/row segment gets a time field; fixed-distance
@@ -3001,12 +3011,20 @@
       html += `<div class="kpi-card"><div class="label">${escapeHtml(def.label)}</div><div class="${valueCls}">${escapeHtml(value)}</div><div class="sub">${escapeHtml(sub)}</div></div>`;
     });
     html += `</div>`;
+    html += `<div class="card"><h2>All-time back squat PRs</h2><p class="muted" style="margin:0">From the Marchon app history (Terry 11/23). These are all-time PRs, not current Phase 6 working maxes.</p>
+      <p style="margin:10px 0 0"><strong>2RM</strong> 159 kg (350.5 lb)</p>
+      <p style="margin:4px 0 0"><strong>3RM</strong> 163.3 kg (360 lb) · also on file from 2026-05-08</p>
+      <p style="margin:4px 0 0"><strong>5RM</strong> 150 kg (330.7 lb)</p>
+      <p style="margin:10px 0 0"><strong>Phase 6 KPI</strong> (Mon 10/12): 142.88 kg (315 lb) × 3 @ RPE 9 (previously rounded 142.9 kg)</p>
+      <p style="margin:4px 0 0"><strong>Most recent confirmed 3</strong> (Mon 11/16): 138.3 kg (305 lb) × 3 · regular gym</p>
+      <p class="muted" style="margin:10px 0 0">Today (11/23) target: build to a 3RM of about 138–143 kg (304–315 lb), then 3 reps at 80–90% of today's 3RM, twice.</p>
+    </div>`;
     root.innerHTML = html;
   }
 
   // Pre-Phase 6 completed sets from Remy's Training Log (imported 2026-10-30; read-only, not synced).
   // Source: fitness repo data/imports/remy_2026-10-30/sets.csv. Reps '?' = set marked done without reps.
-  const PRE_PHASE6_SETS = [{"date": "2026-09-23", "title": "Remy workout 1 · bench loads confirmed by Terrance 10/30", "items": [["Barbell Bench Press", "115.7 kg (255 lb) × 2 @8 (×2), 124.7 kg (275 lb) × 2 @8 (×3)"], ["Front Foot Elevated Barbell Split Squat", "56.7 kg (125 lb) × 7 (×3)"], ["Narrow Grip Cable Lat Pulldown", "40.8 kg (90 lb) × 10, 45.4 kg (100 lb) × 7, 47.6 kg (105 lb) × 7"], ["Cable Lean-Away Lateral Raise", "4.5 kg (10 lb) × 7 (×3)"], ["DB Skull Crusher", "20.4 kg (45 lb) × 7 (×3)"], ["Barbell Curl", "27.2 kg (60 lb) × 7, 29.5 kg (65 lb) × ?, 29.5 kg (65 lb) × 7"], ["Machine Calf Raise", "40.8 kg (90 lb) × 8, 20.4 kg (45 lb) × 8 (×2)"]]}, {"date": "2026-09-28", "title": "Remy workout 860 · front squat test", "items": [["Barbell Front Squat", "20 kg (44 lb) × 10, 60 kg (132 lb) × 8, 74.8 kg (165 lb) × 5, 100 kg (220 lb) × 3, 115.7 kg (255 lb) × 1, 120.2 kg (265 lb) × 3 @10"], ["Smith Machine Behind-the-Neck Press", "43.1 kg (95 lb) × 5, 52.2 kg (115 lb) × 5 (×2)"], ["DB Chest-Supported Upper Back Row", "27.2 kg (60 lb) × 7, 27.2 kg (60 lb) × ? (×2)"], ["Machine Lying Prone Hamstring Curl", "60 kg (132 lb) × 10 (×3)"], ["DB Preacher Curl", "13.6 kg (30 lb) × 7 (×2), 15.9 kg (35 lb) × 7"], ["Strict Dip", "BW × 7 (×3)"]]}, {"date": "2026-09-30", "title": "Remy workout 858 · bench test", "items": [["Barbell Bench Press", "20 kg (44 lb) × 10, 61.2 kg (135 lb) × 8, 79.4 kg (175 lb) × 5, 102.1 kg (225 lb) × 3, 111.1 kg (245 lb) × 1, 122.5 kg (270 lb) × 5 @10"], ["Front Foot Elevated Barbell Split Squat", "61.2 kg (135 lb) × ? (×3)"], ["Narrow Grip Cable Lat Pulldown", "45.4 kg (100 lb) × 7, 45.4 kg (100 lb) × ? (×2)"], ["Cable Lean-Away Lateral Raise", "4.5 kg (10 lb) × ? (×2)"], ["DB Skull Crusher", "20.4 kg (45 lb) × 7, 20.4 kg (45 lb) × 5 (×2)"], ["Barbell Curl", "11.3 kg (25 lb) × 7, 13.6 kg (30 lb) × 7 (×2)"], ["Machine Leg Press Calf Raise", "31.8 kg (70 lb) × 10, 49.9 kg (110 lb) × 10 (×2)"]]}, {"date": "2026-10-05", "title": "Remy workout 863 · deload", "items": [["Barbell Front Squat", "100 kg (220 lb) × 5 (×2)"], ["Smith Machine Behind the Neck Press", "43.1 kg (95 lb) × 5 (×2)"], ["DB Chest Supported Upper Back Row", "20.4 kg (45 lb) × 7 (×2)"], ["Machine Lying Prone Hamstring Curl", "40.8 kg (90 lb) × 7 (×2)"], ["DB Preacher Curl", "13.6 kg (30 lb) × 5 (×2)"], ["Strict Dip", "BW × 5 (×2)"]]}, {"date": "2026-10-08", "title": "Remy workout 864 · bench + split squat", "items": [["Barbell Bench Press", "102.1 kg (225 lb) × 5 (×2)"], ["Front Foot Elevated Barbell Split Squat", "52.2 kg (115 lb) × 7 (×2)"]]}, {"date": "2026-10-12", "title": "Remy workout 867 · FB1 back squat 3RM (done Mon 10/12)", "items": [["Barbell Back Squat", "142.9 kg (315 lb) × 3 @9"], ["Weighted Push Up", "20.4 kg (45 lb) × 10 (×3)"], ["Cable Seated Row", "36.3 kg (80 lb) × 10, 40.8 kg (90 lb) × 12 (×2)"]]}];
+  const PRE_PHASE6_SETS = [{"date": "2026-09-23", "title": "Remy workout 1 · bench loads confirmed by Terrance 10/30", "items": [["Barbell Bench Press", "115.7 kg (255 lb) × 2 @8 (×2), 124.7 kg (275 lb) × 2 @8 (×3)"], ["Front Foot Elevated Barbell Split Squat", "56.7 kg (125 lb) × 7 (×3)"], ["Narrow Grip Cable Lat Pulldown", "40.8 kg (90 lb) × 10, 45.4 kg (100 lb) × 7, 47.6 kg (105 lb) × 7"], ["Cable Lean-Away Lateral Raise", "4.5 kg (10 lb) × 7 (×3)"], ["DB Skull Crusher", "20.4 kg (45 lb) × 7 (×3)"], ["Barbell Curl", "27.2 kg (60 lb) × 7, 29.5 kg (65 lb) × ?, 29.5 kg (65 lb) × 7"], ["Machine Calf Raise", "40.8 kg (90 lb) × 8, 20.4 kg (45 lb) × 8 (×2)"]]}, {"date": "2026-09-28", "title": "Remy workout 860 · front squat test", "items": [["Barbell Front Squat", "20 kg (44 lb) × 10, 60 kg (132 lb) × 8, 74.8 kg (165 lb) × 5, 100 kg (220 lb) × 3, 115.7 kg (255 lb) × 1, 120.2 kg (265 lb) × 3 @10"], ["Smith Machine Behind-the-Neck Press", "43.1 kg (95 lb) × 5, 52.2 kg (115 lb) × 5 (×2)"], ["DB Chest-Supported Upper Back Row", "27.2 kg (60 lb) × 7, 27.2 kg (60 lb) × ? (×2)"], ["Machine Lying Prone Hamstring Curl", "60 kg (132 lb) × 10 (×3)"], ["DB Preacher Curl", "13.6 kg (30 lb) × 7 (×2), 15.9 kg (35 lb) × 7"], ["Strict Dip", "BW × 7 (×3)"]]}, {"date": "2026-09-30", "title": "Remy workout 858 · bench test", "items": [["Barbell Bench Press", "20 kg (44 lb) × 10, 61.2 kg (135 lb) × 8, 79.4 kg (175 lb) × 5, 102.1 kg (225 lb) × 3, 111.1 kg (245 lb) × 1, 122.5 kg (270 lb) × 5 @10"], ["Front Foot Elevated Barbell Split Squat", "61.2 kg (135 lb) × ? (×3)"], ["Narrow Grip Cable Lat Pulldown", "45.4 kg (100 lb) × 7, 45.4 kg (100 lb) × ? (×2)"], ["Cable Lean-Away Lateral Raise", "4.5 kg (10 lb) × ? (×2)"], ["DB Skull Crusher", "20.4 kg (45 lb) × 7, 20.4 kg (45 lb) × 5 (×2)"], ["Barbell Curl", "11.3 kg (25 lb) × 7, 13.6 kg (30 lb) × 7 (×2)"], ["Machine Leg Press Calf Raise", "31.8 kg (70 lb) × 10, 49.9 kg (110 lb) × 10 (×2)"]]}, {"date": "2026-10-05", "title": "Remy workout 863 · deload", "items": [["Barbell Front Squat", "100 kg (220 lb) × 5 (×2)"], ["Smith Machine Behind the Neck Press", "43.1 kg (95 lb) × 5 (×2)"], ["DB Chest Supported Upper Back Row", "20.4 kg (45 lb) × 7 (×2)"], ["Machine Lying Prone Hamstring Curl", "40.8 kg (90 lb) × 7 (×2)"], ["DB Preacher Curl", "13.6 kg (30 lb) × 5 (×2)"], ["Strict Dip", "BW × 5 (×2)"]]}, {"date": "2026-10-08", "title": "Remy workout 864 · bench + split squat", "items": [["Barbell Bench Press", "102.1 kg (225 lb) × 5 (×2)"], ["Front Foot Elevated Barbell Split Squat", "52.2 kg (115 lb) × 7 (×2)"]]}, {"date": "2026-10-12", "title": "Remy workout 867 · FB1 back squat 3RM (done Mon 10/12)", "items": [["Barbell Back Squat", "142.88 kg (315 lb) × 3 @9 (Marchon history 11/23; was 142.9 kg)"], ["Weighted Push Up", "20.4 kg (45 lb) × 10 (×3)"], ["Cable Seated Row", "36.3 kg (80 lb) × 10, 40.8 kg (90 lb) × 12 (×2)"]]}];
 
   function renderHistory() {
     const items = ALL_DAYS.map(d => {
