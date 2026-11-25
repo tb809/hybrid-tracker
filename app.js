@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.56 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.57 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.56';
+  const APP_VERSION = '2.1.57';
 
   function start(BOOT) {
 
@@ -87,11 +87,11 @@
     { id: 'w6_sat', date: '2026-11-21', dow: 'Sat', short: '11/21', title: 'Tempo Conditioning', subtitle: 'Skipped · family trip in AZ (Peoria / Mom care)', type: 'conditioning' },
     { id: 'w6_sun', date: '2026-11-22', dow: 'Sun', short: '11/22', title: 'Tempo Conditioning', subtitle: 'Skipped · travel day PHX→SFO (UA 2449) · AM weigh-in 239.4 lb at home', type: 'conditioning' },
   ];
-  // Phase 6 Week 7 (Mon Nov 23–Sun Nov 29, 2026). Ids prefixed w7_. Mon FB1 partial: squat top 152 kg (335 lb), presumably 3 reps (unconfirmed); back-off 1 124.7 kg (275 lb); back-off 2 and accessories pending; Garmin 25179727838. Tue Easy Conditioning done (run option, treadmill 0%): LB 3.21 mi / 5.17 km in 50:07, HR 127/142, G 25190971876. Wed–Thu and Sat–Sun await screenshots; Fri is the typical rest day.
+  // Phase 6 Week 7 (Mon Nov 23–Sun Nov 29, 2026). Ids prefixed w7_. Mon FB1 partial: squat top 152 kg (335 lb), presumably 3 reps (unconfirmed); back-off 1 124.7 kg (275 lb); back-off 2 and accessories pending; Garmin 25179727838. Tue Easy Conditioning done (run option, treadmill 0%): LB 3.21 mi / 5.17 km in 50:07, HR 127/142, G 25190971876. AM weigh-in Wed 11/25: 241.2 lb (109.4 kg) at 7:00 AM PT; 7-day AM average 240.3 from 2 readings. Wed–Thu and Sat–Sun await screenshots; Fri is the typical rest day.
   const WEEK7 = [
     { id: 'w7_mon', date: '2026-11-23', dow: 'Mon', short: '11/23', title: 'Full Body 1', subtitle: 'Squat Focused · Partial · top 152 kg (335 lb), presumably 3 reps (unconfirmed) · back-off 1 124.7 kg (275 lb) · back-off 2 and accessories pending · Garmin strength 36:41 · HR 92/130 · 219 kcal · G 25179727838', type: 'strength' },
     { id: 'w7_tue', date: '2026-11-24', dow: 'Tue', short: '11/24', title: 'Easy Conditioning', subtitle: '✓ Done 11/24 · treadmill 0% · LB 3.21 mi / 5.17 km in 50:07 · 15:37/mi · 9:42/km · HR 127/142 · Z1 7:32 · Z2 40:48 · Z3 1:30 · 523 kcal · G 25190971876', type: 'conditioning' },
-    { id: 'w7_wed', date: '2026-11-25', dow: 'Wed', short: '11/25', title: 'Full Body 2', subtitle: 'Session added once the app screenshot comes in', type: 'strength' },
+    { id: 'w7_wed', date: '2026-11-25', dow: 'Wed', short: '11/25', title: 'Full Body 2', subtitle: 'Session added once the app screenshot comes in · AM weigh-in 241.2 lb (109.4 kg) at 7:00 AM PT · 7-day AM avg 240.3 (2 readings)', type: 'strength' },
     { id: 'w7_thu', date: '2026-11-26', dow: 'Thu', short: '11/26', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
     { id: 'w7_fri', date: '2026-11-27', dow: 'Fri', short: '11/27', title: 'Rest', subtitle: 'Typical rest day', type: 'rest' },
     { id: 'w7_sat', date: '2026-11-28', dow: 'Sat', short: '11/28', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
@@ -3495,6 +3495,7 @@
     { id: 'seed-wi-2026-11-15', measuredAt: '2026-11-15T16:15:00-08:00', weightLb: 239.8, notes: 'POST-RUN (after the 3:16 PM PT outdoor tempo; run ended ~4:09 PM; exact clock not reported) · dehydrated · NOT fasted morning · off-protocol (keep out of AM trend)' },
     { id: 'seed-wi-2026-11-16', measuredAt: '2026-11-16T06:30:00-08:00', weightLb: 244.2, notes: 'Fasted AM · first protocol morning reading since 11/1 (~243.1) · counts toward AM trend' },
     { id: 'seed-wi-2026-11-22', measuredAt: '2026-11-22T10:00:00-08:00', weightLb: 239.4, notes: 'AM · home after AZ trip (UA 2449 landed ~9:12 AM PT) · late dinner + pre-sleep hydration so AM weights include residual food/water · counts toward AM trend · use 7-day trend, not single readings · −4.8 lb vs 11/16 AM 244.2 (part likely water after a hectic travel week)' },
+    { id: 'seed-wi-2026-11-25', measuredAt: '2026-11-25T07:00:00-08:00', weightLb: 241.2, notes: 'AM · 7:00 AM PT · +1.8 lb vs Sun 11/22 AM 239.4 · 7-day AM average 240.3 from 2 readings (11/22, 11/25) · counts toward AM trend' },
   ];
   function seedWeighins() {
     const laDate = iso => { try { return new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' }); } catch (e) { return String(iso).slice(0, 10); } };
