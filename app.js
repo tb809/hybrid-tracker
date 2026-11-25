@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.55 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.56 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.55';
+  const APP_VERSION = '2.1.56';
 
   function start(BOOT) {
 
@@ -87,10 +87,10 @@
     { id: 'w6_sat', date: '2026-11-21', dow: 'Sat', short: '11/21', title: 'Tempo Conditioning', subtitle: 'Skipped · family trip in AZ (Peoria / Mom care)', type: 'conditioning' },
     { id: 'w6_sun', date: '2026-11-22', dow: 'Sun', short: '11/22', title: 'Tempo Conditioning', subtitle: 'Skipped · travel day PHX→SFO (UA 2449) · AM weigh-in 239.4 lb at home', type: 'conditioning' },
   ];
-  // Phase 6 Week 7 (Mon Nov 23–Sun Nov 29, 2026). Ids prefixed w7_. Mon FB1 partial: squat top 152 kg (335 lb), presumably 3 reps (unconfirmed); back-off 1 124.7 kg (275 lb); back-off 2 and accessories pending; Garmin 25179727838. Tue Easy Conditioning planned / in progress (run option, treadmill 0%, tonight ~7 PM PT). Wed–Thu and Sat–Sun await screenshots; Fri is the typical rest day.
+  // Phase 6 Week 7 (Mon Nov 23–Sun Nov 29, 2026). Ids prefixed w7_. Mon FB1 partial: squat top 152 kg (335 lb), presumably 3 reps (unconfirmed); back-off 1 124.7 kg (275 lb); back-off 2 and accessories pending; Garmin 25179727838. Tue Easy Conditioning done (run option, treadmill 0%): LB 3.21 mi / 5.17 km in 50:07, HR 127/142, G 25190971876. Wed–Thu and Sat–Sun await screenshots; Fri is the typical rest day.
   const WEEK7 = [
     { id: 'w7_mon', date: '2026-11-23', dow: 'Mon', short: '11/23', title: 'Full Body 1', subtitle: 'Squat Focused · Partial · top 152 kg (335 lb), presumably 3 reps (unconfirmed) · back-off 1 124.7 kg (275 lb) · back-off 2 and accessories pending · Garmin strength 36:41 · HR 92/130 · 219 kcal · G 25179727838', type: 'strength' },
-    { id: 'w7_tue', date: '2026-11-24', dow: 'Tue', short: '11/24', title: 'Easy Conditioning', subtitle: 'Planned / in progress · run option · treadmill 0% · tonight ~7 PM PT · 50 min (10 easy + 4× (6 base + 2 easy jog) + 8 easy) · actuals pending', type: 'conditioning' },
+    { id: 'w7_tue', date: '2026-11-24', dow: 'Tue', short: '11/24', title: 'Easy Conditioning', subtitle: '✓ Done 11/24 · treadmill 0% · LB 3.21 mi / 5.17 km in 50:07 · 15:37/mi · 9:42/km · HR 127/142 · Z1 7:32 · Z2 40:48 · Z3 1:30 · 523 kcal · G 25190971876', type: 'conditioning' },
     { id: 'w7_wed', date: '2026-11-25', dow: 'Wed', short: '11/25', title: 'Full Body 2', subtitle: 'Session added once the app screenshot comes in', type: 'strength' },
     { id: 'w7_thu', date: '2026-11-26', dow: 'Thu', short: '11/26', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
     { id: 'w7_fri', date: '2026-11-27', dow: 'Fri', short: '11/27', title: 'Rest', subtitle: 'Typical rest day', type: 'rest' },
@@ -1657,31 +1657,31 @@
     name: 'Easy Conditioning',
     modality: true,
     hrCard: 'easy3',
-    duration: 'Planned / in progress · treadmill 0% incline · tonight ~7 PM PT · 50 min · actuals pending',
+    duration: 'Done 11/24 · treadmill 0% · start 6:58 PM PT · 50:07 · LB 3.21 mi / 5.17 km (15:37/mi, 9:42/km) · Garmin 5.29 km / 3.29 mi · HR 127/142 · Z1 7:32 · Z2 40:48 · Z3 1:30 · 523 kcal · moving 44:52 · G 25190971876',
     blocksRun: [
       {
-        id: 'easy', title: 'A. Easy Conditioning (Run Option)', meta: 'Planned / in progress · for time · 50 min · treadmill 0% · tonight ~7 PM PT · actuals pending',
-        cues: 'From the Marchon app screenshot (Terry 11/24): Easy Conditioning, Run Option, for time, 50 min total. 10 min easy run; 4 rounds of 6 min base run (comfortable, conversational) + 2 min very easy jog; 8 min easy run. Coach: choose the run OR the row option, not both; keep the base work comfortable and conversational; ease right off for each recovery; record total distance over the full 50 min for the leaderboard. Terry is doing this indoors on a treadmill at 0% incline tonight (~7 PM PT). The plan he was given is HR-guided: easy Z2 119–138, base 130–138, very easy jog Z1 100–118. Marked planned / in progress; actuals pending.',
+        id: 'easy', title: 'A. Easy Conditioning (Run Option)', meta: '✓ Done 11/24 · for time · 50:07 · treadmill 0% · LB 3.21 mi / 5.17 km · HR 127/142',
+        cues: 'Done 11/24, start 6:58 PM PT, indoor treadmill at 0% incline. Terry leaderboard (total distance over the 50 min): 3.21 mi / 5.17 km (15:37/mi, 9:42/km, 3.84 mph). Garmin 25190971876 (activity name Hybrid: Easy Conditioning Day - , type running): 5.29 km / 3.29 mi in 50:07 (moving 44:52), HR 127 avg / 142 max, 523 kcal. Coach zones from samples (Z1 100–118, Z2 119–138, Z3 139–158, Z4 159–178, Z5 179+): Z1 7:32 · Z2 40:48 · Z3 1:30 · Z4/Z5 0 · plus 0:18 below 100. Garmin marked 12 laps matching the plan (10 min easy split as 8:37 + 1:23; then 6:00/2:00 × 4; 8:00 easy + 0:07). Base avgs all in 130–138: 130 / 131 / 131 / 134 (maxes 136 / 139 / 140 / 142; bases 2–4 briefly over 138). Recoveries were walks (Garmin 0.13 / 0.08 / 0.03 / 0.06 km in 2:00; avg HR 114 / 112 / 117 / 115, in Z1). He had said beforehand the very easy jog blocks might be walks.',
         sets: [
-          { id: 'easy10', label: '10 min easy run · Z2 119–138', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
-          { id: 'base1', label: 'Base 1 · 6 min base run (comfortable, conversational) · HR 130–138', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
-          { id: 'jog1', label: 'Jog 1 · 2 min very easy jog · Z1 100–118', fields: ['distance', 'avgHr', 'notes'] },
-          { id: 'base2', label: 'Base 2 · 6 min base run (comfortable, conversational) · HR 130–138', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
-          { id: 'jog2', label: 'Jog 2 · 2 min very easy jog · Z1 100–118', fields: ['distance', 'avgHr', 'notes'] },
-          { id: 'base3', label: 'Base 3 · 6 min base run (comfortable, conversational) · HR 130–138', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
-          { id: 'jog3', label: 'Jog 3 · 2 min very easy jog · Z1 100–118', fields: ['distance', 'avgHr', 'notes'] },
-          { id: 'base4', label: 'Base 4 · 6 min base run (comfortable, conversational) · HR 130–138', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
-          { id: 'jog4', label: 'Jog 4 · 2 min very easy jog · Z1 100–118', fields: ['distance', 'avgHr', 'notes'] },
-          { id: 'easy8', label: '8 min easy run · Z2 119–138', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
-          { id: 'total', label: 'Total · 50 min · leaderboard = total distance over the full 50 min', fields: ['distance', 'avgHr', 'notes'] },
+          { id: 'easy10', label: '10 min easy · done 10:00 · Garmin laps 1–2 1.16 km · HR 123/133 then 126/130', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'base1', label: 'Base 1 · done 6:00 · 0.73 km · 8:14/km · HR 130/136 · avg in 130–138, max in band', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'jog1', label: 'Recovery 1 · walk 2:00 · 0.13 km · HR 114/132', fields: ['distance', 'avgHr', 'notes'] },
+          { id: 'base2', label: 'Base 2 · done 6:00 · 0.72 km · 8:23/km · HR 131/139 · avg in 130–138, max 1 over', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'jog2', label: 'Recovery 2 · walk 2:00 · 0.08 km · HR 112/132', fields: ['distance', 'avgHr', 'notes'] },
+          { id: 'base3', label: 'Base 3 · done 6:00 · 0.72 km · 8:18/km · HR 131/140 · avg in 130–138, max 2 over', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'jog3', label: 'Recovery 3 · walk 2:00 · 0.03 km · HR 117/139', fields: ['distance', 'avgHr', 'notes'] },
+          { id: 'base4', label: 'Base 4 · done 6:00 · 0.73 km · 8:15/km · HR 134/142 · avg in 130–138, max 4 over', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'jog4', label: 'Recovery 4 · walk 2:00 · 0.06 km · HR 115/135', fields: ['distance', 'avgHr', 'notes'] },
+          { id: 'easy8', label: '8 min easy · done 8:00 · 0.92 km · 8:42/km · HR 131/138 · plus 0:07 leftover', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'total', label: 'Total · done 50:07 · LB 3.21 mi / 5.17 km (15:37/mi, 9:42/km) · Garmin 5.29 km / 3.29 mi · HR 127/142 · G 25190971876', fields: ['distance', 'avgHr', 'notes'] },
         ],
       },
     ],
     blocksRow: [
       {
-        id: 'alt_row', title: 'B. Easy Conditioning (Row Option) · alternative', meta: 'Choose one, not both · row structure not captured in this update',
-        cues: 'Coach (Marchon card): choose the run OR the row option, not both. Terry is doing the run option tonight on a treadmill at 0% incline. The row option exists on the card, but its structure was not captured in this update.',
-        sets: [{ id: 'altr1', label: 'Row option · not used tonight (he is running) · structure not captured', fields: ['notes'] }],
+        id: 'alt_row', title: 'B. Easy Conditioning (Row Option) · alternative', meta: 'Not used · he ran',
+        cues: 'Coach (Marchon card): choose the run OR the row option, not both. The row option was not used; he ran on the treadmill at 0% incline. Row structure was not captured in the earlier card update.',
+        sets: [{ id: 'altr1', label: 'Row option · not used (he ran)', fields: ['notes'] }],
       },
     ],
   };
