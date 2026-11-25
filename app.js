@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.54 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.55 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.54';
+  const APP_VERSION = '2.1.55';
 
   function start(BOOT) {
 
@@ -87,10 +87,10 @@
     { id: 'w6_sat', date: '2026-11-21', dow: 'Sat', short: '11/21', title: 'Tempo Conditioning', subtitle: 'Skipped · family trip in AZ (Peoria / Mom care)', type: 'conditioning' },
     { id: 'w6_sun', date: '2026-11-22', dow: 'Sun', short: '11/22', title: 'Tempo Conditioning', subtitle: 'Skipped · travel day PHX→SFO (UA 2449) · AM weigh-in 239.4 lb at home', type: 'conditioning' },
   ];
-  // Phase 6 Week 7 (Mon Nov 23–Sun Nov 29, 2026). Ids prefixed w7_. Mon FB1 planned from the Marchon screenshot (Terry 11/23). Tue–Thu and Sat–Sun await screenshots; Fri is the typical rest day.
+  // Phase 6 Week 7 (Mon Nov 23–Sun Nov 29, 2026). Ids prefixed w7_. Mon FB1 partial: squat top 152 kg (335 lb), presumably 3 reps (unconfirmed); back-off 1 124.7 kg (275 lb); back-off 2 and accessories pending; Garmin 25179727838. Tue Easy Conditioning planned / in progress (run option, treadmill 0%, tonight ~7 PM PT). Wed–Thu and Sat–Sun await screenshots; Fri is the typical rest day.
   const WEEK7 = [
-    { id: 'w7_mon', date: '2026-11-23', dow: 'Mon', short: '11/23', title: 'Full Body 1', subtitle: 'Squat Focused · Garmin strength 36:41 · HR 92/130 · 219 kcal · Z1 13:24, Z2 2:52 · G 25179727838 · loads pending · target 3RM about 138–143 kg, then 3 reps at 80–90% of today\'s 3RM, twice', type: 'strength' },
-    { id: 'w7_tue', date: '2026-11-24', dow: 'Tue', short: '11/24', title: 'Easy Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
+    { id: 'w7_mon', date: '2026-11-23', dow: 'Mon', short: '11/23', title: 'Full Body 1', subtitle: 'Squat Focused · Partial · top 152 kg (335 lb), presumably 3 reps (unconfirmed) · back-off 1 124.7 kg (275 lb) · back-off 2 and accessories pending · Garmin strength 36:41 · HR 92/130 · 219 kcal · G 25179727838', type: 'strength' },
+    { id: 'w7_tue', date: '2026-11-24', dow: 'Tue', short: '11/24', title: 'Easy Conditioning', subtitle: 'Planned / in progress · run option · treadmill 0% · tonight ~7 PM PT · 50 min (10 easy + 4× (6 base + 2 easy jog) + 8 easy) · actuals pending', type: 'conditioning' },
     { id: 'w7_wed', date: '2026-11-25', dow: 'Wed', short: '11/25', title: 'Full Body 2', subtitle: 'Session added once the app screenshot comes in', type: 'strength' },
     { id: 'w7_thu', date: '2026-11-26', dow: 'Thu', short: '11/26', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
     { id: 'w7_fri', date: '2026-11-27', dow: 'Fri', short: '11/27', title: 'Rest', subtitle: 'Typical rest day', type: 'rest' },
@@ -1614,23 +1614,23 @@
 
 
   // —— Week 7 sessions ——
-  // Mon 11/23 · Week 7 Full Body 1 (Squat Focused), from Terry's Marchon app screenshot 11/23. Planned.
+  // Mon 11/23 · Week 7 Full Body 1 (Squat Focused). Partial actuals: top set and back-off 1 in; back-off 2 and accessories pending.
   SESSIONS.w7_mon = cloneSession('w2_mon');
   (function () {
     const s = SESSIONS.w7_mon;
     const b = id => s.blocks.find(x => x.id === id);
-    s.duration = 'Planned · squat: build to a 3RM of about 138–143 kg (304–315 lb), then 3 reps at 80–90% of today\'s 3RM, twice · 2 min rest';
+    s.duration = 'Partial · squat top 152 kg (335 lb), presumably 3 reps (unconfirmed) · back-off 1 124.7 kg (275 lb) · back-off 2 and accessories pending · Garmin strength 36:41 · HR 92/130 · 219 kcal · Z1 13:24, Z2 2:52 · G 25179727838';
     const wu = b('wu');
     wu.meta = 'Circuit · repeat 2x · 1 min Bike Erg · 10/10 Split Stance Leaps · 6/6 90/90 Hip Rotations';
     wu.cues = 'From the Marchon app screenshot (Terry 11/23): 1 min Bike Erg, 10/10 Split Stance Leaps, 6/6 90/90 Hip Rotations, repeat 2x.';
     wu.sets.forEach((x, i) => { x.label = 'Round ' + (i + 1) + ' · Bike Erg 1 min · Leaps 10/10 · 90/90 6/6'; });
     const bs = b('bs');
     bs.sets = bs.sets.slice(0, 3);
-    bs.meta = 'Straight set · 3 sets · build to a 3RM of about 138–143 kg (304–315 lb), then 3 reps at 80–90% of today\'s 3RM, twice · 2 min rest';
-    bs.cues = 'From the Marchon app screenshot (Terry 11/23): 3 straight sets. Today\'s target: build to a 3RM of about 138–143 kg (304–315 lb), then do 3 reps at 80–90% of today\'s 3RM, twice. Rest 2 minutes between sets. Last Monday (11/16) he built to 138.3 kg (305 lb) × 3 at the regular gym (45 lb bar assumed), confirmed by Marchon history 11/23 (all 3 reps). Phase 6 KPI on 10/12 was 142.88 kg (315 lb) × 3. If the 3RM lands in that 138–143 kg range, 80–90% is about 110–129 kg (243–284 lb) — use today\'s 3RM. Last Freedom Rack squat (Mon 11/9): 4 × 4 @ 124.7 kg (275 lb) @ RPE 8, not directly comparable.';
-    bs.sets[0].label = 'Set 1 · 3RM · about 138–143 kg (304–315 lb) · 3 reps';
-    bs.sets[1].label = 'Set 2 · 3 reps at 80–90% of today\'s 3RM';
-    bs.sets[2].label = 'Set 3 · 3 reps at 80–90% of today\'s 3RM';
+    bs.meta = 'Partial · top 152 kg (335 lb), presumably 3 reps (unconfirmed) · back-off 1 124.7 kg (275 lb) · back-off 2 pending · 2 min rest';
+    bs.cues = 'Partial actuals (Terry 11/24): top set 152 kg (335 lb), presumably 3 reps — reps unconfirmed, so this is not logged as a confirmed 3RM. Back-off 1: 124.7 kg (275 lb), about 82% of the 335 lb top set (in the prescribed 80–90% band); reps not separately confirmed (plan was 3). Back-off 2 pending. This top set is above the planned 138–143 kg (304–315 lb) window and above last Monday\'s confirmed 138.3 kg (305 lb) × 3 and the 10/12 Phase 6 KPI of 142.88 kg (315 lb) × 3; it is still below the all-time 3RM of 163.3 kg (360 lb). Accessories (B–D) still pending. Garmin 25179727838: strength 36:41, HR 92/130, 219 kcal, Z1 13:24 · Z2 2:52 (19:21 PT).';
+    bs.sets[0].label = 'Set 1 · top 152 kg (335 lb) · presumably 3 reps (unconfirmed)';
+    bs.sets[1].label = 'Set 2 · back-off 1 · 124.7 kg (275 lb) · reps not confirmed (plan was 3)';
+    bs.sets[2].label = 'Set 3 · back-off 2 · pending';
     const pp = b('pp');
     pp.meta = 'Superset · 3 sets · Weighted Push Up 5–10 · Cable Seated Row 5–10 · 2 min rest between supersets';
     pp.cues = 'From the Marchon app screenshot (Terry 11/23): 3 supersets of Weighted Push Up 5–10 and Cable Seated Row 5–10, 2 min rest between supersets. Last Monday (11/16): push-up 15 / 15 / 12 @ +20 kg (44 lb) (no heavier plate available); cable row swapped to DB single-arm row 3 × 8 @ 27 kg (60 lb) because cables were unavailable. Last cable seated row (Mon 11/9): 3 × 10 @ 38.6 kg (85 lb).';
@@ -1653,7 +1653,40 @@
     });
   })();
 
-  ['w7_tue', 'w7_wed', 'w7_thu', 'w7_sat', 'w7_sun'].forEach(id => {
+  SESSIONS.w7_tue = {
+    name: 'Easy Conditioning',
+    modality: true,
+    hrCard: 'easy3',
+    duration: 'Planned / in progress · treadmill 0% incline · tonight ~7 PM PT · 50 min · actuals pending',
+    blocksRun: [
+      {
+        id: 'easy', title: 'A. Easy Conditioning (Run Option)', meta: 'Planned / in progress · for time · 50 min · treadmill 0% · tonight ~7 PM PT · actuals pending',
+        cues: 'From the Marchon app screenshot (Terry 11/24): Easy Conditioning, Run Option, for time, 50 min total. 10 min easy run; 4 rounds of 6 min base run (comfortable, conversational) + 2 min very easy jog; 8 min easy run. Coach: choose the run OR the row option, not both; keep the base work comfortable and conversational; ease right off for each recovery; record total distance over the full 50 min for the leaderboard. Terry is doing this indoors on a treadmill at 0% incline tonight (~7 PM PT). The plan he was given is HR-guided: easy Z2 119–138, base 130–138, very easy jog Z1 100–118. Marked planned / in progress; actuals pending.',
+        sets: [
+          { id: 'easy10', label: '10 min easy run · Z2 119–138', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'base1', label: 'Base 1 · 6 min base run (comfortable, conversational) · HR 130–138', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'jog1', label: 'Jog 1 · 2 min very easy jog · Z1 100–118', fields: ['distance', 'avgHr', 'notes'] },
+          { id: 'base2', label: 'Base 2 · 6 min base run (comfortable, conversational) · HR 130–138', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'jog2', label: 'Jog 2 · 2 min very easy jog · Z1 100–118', fields: ['distance', 'avgHr', 'notes'] },
+          { id: 'base3', label: 'Base 3 · 6 min base run (comfortable, conversational) · HR 130–138', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'jog3', label: 'Jog 3 · 2 min very easy jog · Z1 100–118', fields: ['distance', 'avgHr', 'notes'] },
+          { id: 'base4', label: 'Base 4 · 6 min base run (comfortable, conversational) · HR 130–138', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'jog4', label: 'Jog 4 · 2 min very easy jog · Z1 100–118', fields: ['distance', 'avgHr', 'notes'] },
+          { id: 'easy8', label: '8 min easy run · Z2 119–138', fields: ['distance', 'avgHr', 'rpe', 'notes'] },
+          { id: 'total', label: 'Total · 50 min · leaderboard = total distance over the full 50 min', fields: ['distance', 'avgHr', 'notes'] },
+        ],
+      },
+    ],
+    blocksRow: [
+      {
+        id: 'alt_row', title: 'B. Easy Conditioning (Row Option) · alternative', meta: 'Choose one, not both · row structure not captured in this update',
+        cues: 'Coach (Marchon card): choose the run OR the row option, not both. Terry is doing the run option tonight on a treadmill at 0% incline. The row option exists on the card, but its structure was not captured in this update.',
+        sets: [{ id: 'altr1', label: 'Row option · not used tonight (he is running) · structure not captured', fields: ['notes'] }],
+      },
+    ],
+  };
+
+  ['w7_wed', 'w7_thu', 'w7_sat', 'w7_sun'].forEach(id => {
     SESSIONS[id] = {
       name: 'Awaiting screenshots',
       blocks: [{
@@ -2519,7 +2552,7 @@
 
   // —— Targets / prefill ——
   // Week 2 sessions → the Week 1 session they repeat (for "last week's load" prefill)
-  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed', w4_fri: 'w3_thu', w4_sun: 'w3_sat', w5_mon: 'w4_mon', w5_tue: 'w4_tue', w5_wed: 'w4_wed', w5_thu: 'w4_fri', w5_sat: 'w4_sun', w6_mon: 'w5_mon', w7_mon: 'w6_mon' };
+  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed', w4_fri: 'w3_thu', w4_sun: 'w3_sat', w5_mon: 'w4_mon', w5_tue: 'w4_tue', w5_wed: 'w4_wed', w5_thu: 'w4_fri', w5_sat: 'w4_sun', w6_mon: 'w5_mon', w7_mon: 'w6_mon', w7_tue: 'w6_tue' };
 
   function setStem(setId) { return String(setId).replace(/\d+$/, ''); }
 
@@ -3017,7 +3050,7 @@
       <p style="margin:4px 0 0"><strong>5RM</strong> 150 kg (330.7 lb)</p>
       <p style="margin:10px 0 0"><strong>Phase 6 KPI</strong> (Mon 10/12): 142.88 kg (315 lb) × 3 @ RPE 9 (previously rounded 142.9 kg)</p>
       <p style="margin:4px 0 0"><strong>Most recent confirmed 3</strong> (Mon 11/16): 138.3 kg (305 lb) × 3 · regular gym</p>
-      <p class="muted" style="margin:10px 0 0">Today (11/23) target: build to a 3RM of about 138–143 kg (304–315 lb), then 3 reps at 80–90% of today's 3RM, twice.</p>
+      <p class="muted" style="margin:10px 0 0">Mon 11/23 (unconfirmed): top set 152 kg (335 lb), presumably 3 reps; back-off 1 at 124.7 kg (275 lb). Back-off 2 and accessories pending. Above the planned 138–143 kg window; not a confirmed 3RM until reps are confirmed.</p>
     </div>`;
     root.innerHTML = html;
   }
