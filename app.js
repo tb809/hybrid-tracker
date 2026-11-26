@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.58 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.59 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.58';
+  const APP_VERSION = '2.1.59';
 
   function start(BOOT) {
 
@@ -91,7 +91,7 @@
   const WEEK7 = [
     { id: 'w7_mon', date: '2026-11-23', dow: 'Mon', short: '11/23', title: 'Full Body 1', subtitle: 'Squat Focused · Partial · top 152 kg (335 lb), presumably 3 reps (unconfirmed) · back-off 1 124.7 kg (275 lb) · back-off 2 and accessories pending · Garmin strength 36:41 · HR 92/130 · 219 kcal · G 25179727838', type: 'strength' },
     { id: 'w7_tue', date: '2026-11-24', dow: 'Tue', short: '11/24', title: 'Easy Conditioning', subtitle: '✓ Done 11/24 · treadmill 0% · LB 3.21 mi / 5.17 km in 50:07 · 15:37/mi · 9:42/km · HR 127/142 · Z1 7:32 · Z2 40:48 · Z3 1:30 · 523 kcal · G 25190971876', type: 'conditioning' },
-    { id: 'w7_wed', date: '2026-11-25', dow: 'Wed', short: '11/25', title: 'Full Body 2', subtitle: 'Press Focused · ✓ Done 11/25 (D skipped) · 3RM 83.9 kg (185 lb) × 3 (hard, ties 10/14 KPI) · back-offs 70.3 kg (155 lb) × 3 × 2 (set 2 assumed) · chins/dips 3 × 8 BW · AM weigh-in 241.2 lb · Garmin pending', type: 'strength' },
+    { id: 'w7_wed', date: '2026-11-25', dow: 'Wed', short: '11/25', title: 'Full Body 2', subtitle: 'Press Focused · ✓ Done 11/25 (D skipped) · 3RM 83.9 kg (185 lb) × 3 (hard, ties 10/14 KPI) · back-offs 70.3 kg (155 lb) × 3 × 2 (set 2 assumed) · chins/dips 3 × 8 BW · AM weigh-in 241.2 lb · Garmin strength 91:43 · moving 33:35 · HR 103/167 · Z1 26:13 · Z2 14:50 · Z3 5:15 · Z4 1:45 · Z5 0 · 595 kcal · G 25201166918', type: 'strength' },
     { id: 'w7_thu', date: '2026-11-26', dow: 'Thu', short: '11/26', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
     { id: 'w7_fri', date: '2026-11-27', dow: 'Fri', short: '11/27', title: 'Rest', subtitle: 'Typical rest day', type: 'rest' },
     { id: 'w7_sat', date: '2026-11-28', dow: 'Sat', short: '11/28', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
@@ -1686,12 +1686,12 @@
     ],
   };
 
-  // Wed 11/25 · Week 7 Full Body 2 (Press Focused). Done (D skipped). Garmin not synced yet at log time.
+  // Wed 11/25 · Week 7 Full Body 2 (Press Focused). Done (D skipped). Garmin 25201166918 synced.
   SESSIONS.w7_wed = cloneSession('w2_wed');
   (function () {
     const s = SESSIONS.w7_wed;
     const b = id => s.blocks.find(x => x.id === id);
-    s.duration = 'Done 11/25 (D skipped) · start ~3:50–4:00 PM PT · press 3RM 83.9 kg (185 lb) × 3 (hard, ties 10/14 KPI) · back-offs 70.3 kg (155 lb) × 3, twice (set 2 assumed) · AM weigh-in 241.2 lb · Garmin pending';
+    s.duration = 'Done 11/25 (D skipped) · start ~3:50–4:00 PM PT · press 3RM 83.9 kg (185 lb) × 3 (hard, ties 10/14 KPI) · back-offs 70.3 kg (155 lb) × 3, twice (set 2 assumed) · AM weigh-in 241.2 lb · Garmin strength 91:43 · moving 33:35 · HR 103/167 · Z1 26:13 · Z2 14:50 · Z3 5:15 · Z4 1:45 · Z5 0 · 595 kcal · G 25201166918';
     const sm = b('sm');
     sm.meta = 'Done · circuit · repeat 2x · 1 min Ski Erg · 5/5 KB Arm Bar · 10–15 Cable Face Pull';
     sm.cues = 'Done 11/25 (Terry). From the Marchon card: 1 min Ski Erg, 5/5 KB Arm Bar, 10–15 Cable Face Pull, repeat 2x.';
@@ -1699,7 +1699,7 @@
     const sp = b('sp');
     sp.sets = sp.sets.slice(0, 3);
     sp.meta = 'Done 11/25 · 3RM 83.9 kg (185 lb) × 3 (hard, ties 10/14 KPI) · back-offs 70.3 kg (155 lb) × 3, twice (set 2 assumed)';
-    sp.cues = 'Done 11/25. Card: build to a 3RM, then 2 sets of 3 at 80–90% of today\'s 3RM. Top set 83.9 kg (185 lb) × 3, hard — ties the Phase 6 KPI 3RM from Wed 10/14 (83.9 kg / 185 lb × 3). Back-off 1: 70.3 kg (155 lb) × 3, about 84% of 185 (in the 80–90% band). Back-off 2 was not reported separately; logged as 70.3 kg (155 lb) × 3, assumed. Garmin not synced yet at log time (session started roughly 3:50–4:00 PM PT).';
+    sp.cues = 'Done 11/25. Card: build to a 3RM, then 2 sets of 3 at 80–90% of today\'s 3RM. Top set 83.9 kg (185 lb) × 3, hard — ties the Phase 6 KPI 3RM from Wed 10/14 (83.9 kg / 185 lb × 3). Back-off 1: 70.3 kg (155 lb) × 3, about 84% of 185 (in the 80–90% band). Back-off 2 was not reported separately; logged as 70.3 kg (155 lb) × 3, assumed. Garmin 25201166918 "Strength" (strength_training), start 4:04 PM PT (00:04 UTC 11/26): total 91:43, moving 33:35, HR avg 103 / max 167 (chest strap; max consistent with the hard 3RM press set), 595 kcal. Garmin own HR zones (boundaries 97/116/136/155/175, not coach zones): Z1 26:13 · Z2 14:50 · Z3 5:15 · Z4 1:45 · Z5 0. No distance or laps.';
     sp.sets[0].label = 'Set 1 · 3RM · done 83.9 kg (185 lb) × 3 · hard · ties 10/14 KPI';
     sp.sets[1].label = 'Set 2 · back-off 1 · done 70.3 kg (155 lb) × 3';
     sp.sets[2].label = 'Set 3 · back-off 2 · 70.3 kg (155 lb) × 3 · assumed (not reported separately)';
