@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.57 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.58 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.57';
+  const APP_VERSION = '2.1.58';
 
   function start(BOOT) {
 
@@ -87,11 +87,11 @@
     { id: 'w6_sat', date: '2026-11-21', dow: 'Sat', short: '11/21', title: 'Tempo Conditioning', subtitle: 'Skipped · family trip in AZ (Peoria / Mom care)', type: 'conditioning' },
     { id: 'w6_sun', date: '2026-11-22', dow: 'Sun', short: '11/22', title: 'Tempo Conditioning', subtitle: 'Skipped · travel day PHX→SFO (UA 2449) · AM weigh-in 239.4 lb at home', type: 'conditioning' },
   ];
-  // Phase 6 Week 7 (Mon Nov 23–Sun Nov 29, 2026). Ids prefixed w7_. Mon FB1 partial: squat top 152 kg (335 lb), presumably 3 reps (unconfirmed); back-off 1 124.7 kg (275 lb); back-off 2 and accessories pending; Garmin 25179727838. Tue Easy Conditioning done (run option, treadmill 0%): LB 3.21 mi / 5.17 km in 50:07, HR 127/142, G 25190971876. AM weigh-in Wed 11/25: 241.2 lb (109.4 kg) at 7:00 AM PT; 7-day AM average 240.3 from 2 readings. Wed–Thu and Sat–Sun await screenshots; Fri is the typical rest day.
+  // Phase 6 Week 7 (Mon Nov 23–Sun Nov 29, 2026). Ids prefixed w7_. Mon FB1 partial: squat top 152 kg (335 lb), presumably 3 reps (unconfirmed); back-off 1 124.7 kg (275 lb); back-off 2 and accessories pending; Garmin 25179727838. Tue Easy Conditioning done (run option, treadmill 0%): LB 3.21 mi / 5.17 km in 50:07, HR 127/142, G 25190971876. AM weigh-in Wed 11/25: 241.2 lb (109.4 kg) at 7:00 AM PT; 7-day AM average 240.3 from 2 readings. Wed FB2 done (D skipped): press 3RM 83.9 kg (185 lb) × 3 (hard, ties 10/14 KPI); back-offs 70.3 kg (155 lb) × 3, twice (set 2 assumed); lunges 3 sets @ 18.1 kg (40 lb) DBs (reps NR); chins/dips 3 × 8 BW; curls 27.2 kg × 5/7/7; pushdowns 22.7 kg × 10, then 25 kg × 10, × 10. Garmin pending (started ~3:50–4:00 PM PT). Thu and Sat–Sun await screenshots; Fri is the typical rest day.
   const WEEK7 = [
     { id: 'w7_mon', date: '2026-11-23', dow: 'Mon', short: '11/23', title: 'Full Body 1', subtitle: 'Squat Focused · Partial · top 152 kg (335 lb), presumably 3 reps (unconfirmed) · back-off 1 124.7 kg (275 lb) · back-off 2 and accessories pending · Garmin strength 36:41 · HR 92/130 · 219 kcal · G 25179727838', type: 'strength' },
     { id: 'w7_tue', date: '2026-11-24', dow: 'Tue', short: '11/24', title: 'Easy Conditioning', subtitle: '✓ Done 11/24 · treadmill 0% · LB 3.21 mi / 5.17 km in 50:07 · 15:37/mi · 9:42/km · HR 127/142 · Z1 7:32 · Z2 40:48 · Z3 1:30 · 523 kcal · G 25190971876', type: 'conditioning' },
-    { id: 'w7_wed', date: '2026-11-25', dow: 'Wed', short: '11/25', title: 'Full Body 2', subtitle: 'Session added once the app screenshot comes in · AM weigh-in 241.2 lb (109.4 kg) at 7:00 AM PT · 7-day AM avg 240.3 (2 readings)', type: 'strength' },
+    { id: 'w7_wed', date: '2026-11-25', dow: 'Wed', short: '11/25', title: 'Full Body 2', subtitle: 'Press Focused · ✓ Done 11/25 (D skipped) · 3RM 83.9 kg (185 lb) × 3 (hard, ties 10/14 KPI) · back-offs 70.3 kg (155 lb) × 3 × 2 (set 2 assumed) · chins/dips 3 × 8 BW · AM weigh-in 241.2 lb · Garmin pending', type: 'strength' },
     { id: 'w7_thu', date: '2026-11-26', dow: 'Thu', short: '11/26', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
     { id: 'w7_fri', date: '2026-11-27', dow: 'Fri', short: '11/27', title: 'Rest', subtitle: 'Typical rest day', type: 'rest' },
     { id: 'w7_sat', date: '2026-11-28', dow: 'Sat', short: '11/28', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
@@ -1686,7 +1686,53 @@
     ],
   };
 
-  ['w7_wed', 'w7_thu', 'w7_sat', 'w7_sun'].forEach(id => {
+  // Wed 11/25 · Week 7 Full Body 2 (Press Focused). Done (D skipped). Garmin not synced yet at log time.
+  SESSIONS.w7_wed = cloneSession('w2_wed');
+  (function () {
+    const s = SESSIONS.w7_wed;
+    const b = id => s.blocks.find(x => x.id === id);
+    s.duration = 'Done 11/25 (D skipped) · start ~3:50–4:00 PM PT · press 3RM 83.9 kg (185 lb) × 3 (hard, ties 10/14 KPI) · back-offs 70.3 kg (155 lb) × 3, twice (set 2 assumed) · AM weigh-in 241.2 lb · Garmin pending';
+    const sm = b('sm');
+    sm.meta = 'Done · circuit · repeat 2x · 1 min Ski Erg · 5/5 KB Arm Bar · 10–15 Cable Face Pull';
+    sm.cues = 'Done 11/25 (Terry). From the Marchon card: 1 min Ski Erg, 5/5 KB Arm Bar, 10–15 Cable Face Pull, repeat 2x.';
+    sm.sets.forEach((x, i) => { x.label = 'Round ' + (i + 1) + ' · done · Ski Erg 1 min · KB Arm Bar 5/5 · Face Pull 10–15'; });
+    const sp = b('sp');
+    sp.sets = sp.sets.slice(0, 3);
+    sp.meta = 'Done 11/25 · 3RM 83.9 kg (185 lb) × 3 (hard, ties 10/14 KPI) · back-offs 70.3 kg (155 lb) × 3, twice (set 2 assumed)';
+    sp.cues = 'Done 11/25. Card: build to a 3RM, then 2 sets of 3 at 80–90% of today\'s 3RM. Top set 83.9 kg (185 lb) × 3, hard — ties the Phase 6 KPI 3RM from Wed 10/14 (83.9 kg / 185 lb × 3). Back-off 1: 70.3 kg (155 lb) × 3, about 84% of 185 (in the 80–90% band). Back-off 2 was not reported separately; logged as 70.3 kg (155 lb) × 3, assumed. Garmin not synced yet at log time (session started roughly 3:50–4:00 PM PT).';
+    sp.sets[0].label = 'Set 1 · 3RM · done 83.9 kg (185 lb) × 3 · hard · ties 10/14 KPI';
+    sp.sets[1].label = 'Set 2 · back-off 1 · done 70.3 kg (155 lb) × 3';
+    sp.sets[2].label = 'Set 3 · back-off 2 · 70.3 kg (155 lb) × 3 · assumed (not reported separately)';
+    const qg = b('qg');
+    qg.meta = 'Done 11/25 · 3 sets @ 18.1 kg (40 lb) DBs · reps not reported (card 5–8/leg)';
+    qg.cues = 'Done 11/25: 3 sets of deficit DB reverse lunge with 18.1 kg (40 lb) DBs. Reps were not reported; the card says 5–8/leg.';
+    qg.sets.forEach((x, i) => { x.label = 'Set ' + (i + 1) + ' · done 18.1 kg (40 lb) DBs · reps not reported (card 5–8/leg)'; });
+    const pu = b('pu');
+    pu.meta = 'Done 11/25 · chin-up 3 × 8 BW + strict dip 3 × 8 BW';
+    pu.cues = 'Done 11/25: chin-up 3 × 8 bodyweight and strict dip 3 × 8 bodyweight (Terry: 8 and 8 on all chin and dip sets). Last logged (10/28): chin-up 3 × 6 BW, dip 3 × 10 BW. Week 5 (11/11) loads were not reported.';
+    pu.sets.forEach(x => {
+      if (x.id.startsWith('chin')) x.label = x.id.replace('chin', 'R') + ' · Chin Up · done 8 · bodyweight';
+      if (x.id.startsWith('dip')) x.label = x.id.replace('dip', 'R') + ' · Strict Dip · done 8 · bodyweight';
+    });
+    const dc = b('dc');
+    dc.meta = 'Skipped';
+    dc.cues = 'Skipped 11/25. Terry said this was the complete workout: warm-up, press, lunges, chin-ups and dips, and arms (E). D (rear delt fly + seated calf raise) was not done.';
+    dc.sets.forEach(x => { x.label = x.label.replace(' · 10–15', ' · skipped'); });
+    const arms = b('arms');
+    arms.meta = 'Done 11/25 · curl 27.2 kg (60 lb) × 5, 7, 7 · pushdown 22.7 kg (50 lb) × 10, then 25 kg (55 lb) × 10, × 10';
+    arms.cues = 'Done 11/25. Cable standing curl: 27.2 kg (60 lb) × 5, 7, 7. Cable tricep pushdown: 22.7 kg (50 lb) × 10, then 25 kg (55 lb) × 10, × 10.';
+    const armLabels = {
+      bi1: 'R1 · Cable Standing Curl · done 27.2 kg (60 lb) × 5',
+      tr1: 'R1 · Cable Tricep Pushdown · done 22.7 kg (50 lb) × 10',
+      bi2: 'R2 · Cable Standing Curl · done 27.2 kg (60 lb) × 7',
+      tr2: 'R2 · Cable Tricep Pushdown · done 25 kg (55 lb) × 10',
+      bi3: 'R3 · Cable Standing Curl · done 27.2 kg (60 lb) × 7',
+      tr3: 'R3 · Cable Tricep Pushdown · done 25 kg (55 lb) × 10',
+    };
+    arms.sets.forEach(x => { if (armLabels[x.id]) x.label = armLabels[x.id]; });
+  })();
+
+  ['w7_thu', 'w7_sat', 'w7_sun'].forEach(id => {
     SESSIONS[id] = {
       name: 'Awaiting screenshots',
       blocks: [{
@@ -2552,7 +2598,7 @@
 
   // —— Targets / prefill ——
   // Week 2 sessions → the Week 1 session they repeat (for "last week's load" prefill)
-  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed', w4_fri: 'w3_thu', w4_sun: 'w3_sat', w5_mon: 'w4_mon', w5_tue: 'w4_tue', w5_wed: 'w4_wed', w5_thu: 'w4_fri', w5_sat: 'w4_sun', w6_mon: 'w5_mon', w7_mon: 'w6_mon', w7_tue: 'w6_tue' };
+  const PREV_SESSION = { w2_mon: 'sun', w2_tue: 'mon', w2_wed: 'tue', w2_fri: 'thu', w2_thu: 'wed', w2_sat: 'fri', w3_mon: 'w2_mon', w3_wed: 'w2_wed', w4_mon: 'w3_mon', w4_tue: 'w3_tue', w4_wed: 'w3_wed', w4_fri: 'w3_thu', w4_sun: 'w3_sat', w5_mon: 'w4_mon', w5_tue: 'w4_tue', w5_wed: 'w4_wed', w5_thu: 'w4_fri', w5_sat: 'w4_sun', w6_mon: 'w5_mon', w7_mon: 'w6_mon', w7_tue: 'w6_tue', w7_wed: 'w6_wed' };
 
   function setStem(setId) { return String(setId).replace(/\d+$/, ''); }
 
@@ -3051,6 +3097,10 @@
       <p style="margin:10px 0 0"><strong>Phase 6 KPI</strong> (Mon 10/12): 142.88 kg (315 lb) × 3 @ RPE 9 (previously rounded 142.9 kg)</p>
       <p style="margin:4px 0 0"><strong>Most recent confirmed 3</strong> (Mon 11/16): 138.3 kg (305 lb) × 3 · regular gym</p>
       <p class="muted" style="margin:10px 0 0">Mon 11/23 (unconfirmed): top set 152 kg (335 lb), presumably 3 reps; back-off 1 at 124.7 kg (275 lb). Back-off 2 and accessories pending. Above the planned 138–143 kg window; not a confirmed 3RM until reps are confirmed.</p>
+    </div>`;
+    html += `<div class="card"><h2>Phase 6 strict press KPI</h2>
+      <p style="margin:10px 0 0"><strong>3RM</strong> 83.9 kg (185 lb) × 3 · Wed 10/14 (KPI) · tied Wed 11/25 (hard)</p>
+      <p class="muted" style="margin:4px 0 0">11/25 back-offs: 70.3 kg (155 lb) × 3, twice (set 2 assumed). About 84% of 185, in the 80–90% band.</p>
     </div>`;
     root.innerHTML = html;
   }
