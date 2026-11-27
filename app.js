@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.60 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.61 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.60';
+  const APP_VERSION = '2.1.61';
 
   function start(BOOT) {
 
@@ -87,12 +87,12 @@
     { id: 'w6_sat', date: '2026-11-21', dow: 'Sat', short: '11/21', title: 'Tempo Conditioning', subtitle: 'Skipped · family trip in AZ (Peoria / Mom care)', type: 'conditioning' },
     { id: 'w6_sun', date: '2026-11-22', dow: 'Sun', short: '11/22', title: 'Tempo Conditioning', subtitle: 'Skipped · travel day PHX→SFO (UA 2449) · AM weigh-in 239.4 lb at home', type: 'conditioning' },
   ];
-  // Phase 6 Week 7 (Mon Nov 23–Sun Nov 29, 2026). Ids prefixed w7_. Mon FB1 partial: squat top 152 kg (335 lb), presumably 3 reps (unconfirmed); back-off 1 124.7 kg (275 lb); back-off 2 and accessories pending; Garmin 25179727838. Tue Easy Conditioning done (run option, treadmill 0%): LB 3.21 mi / 5.17 km in 50:07, HR 127/142, G 25190971876. AM weigh-in Wed 11/25: 241.2 lb (109.4 kg) at 7:00 AM PT; 7-day AM average 240.3 from 2 readings. Wed FB2 done (D skipped): press 3RM 83.9 kg (185 lb) × 3 (hard, ties 10/14 KPI); back-offs 70.3 kg (155 lb) × 3, twice (set 2 assumed); lunges 3 sets @ 18.1 kg (40 lb) DBs (reps NR); chins/dips 3 × 8 BW; curls 27.2 kg × 5/7/7; pushdowns 22.7 kg × 10, then 25 kg × 10, × 10. Garmin pending (started ~3:50–4:00 PM PT). Thu and Sat–Sun await screenshots; Fri is the typical rest day.
+  // Phase 6 Week 7 (Mon Nov 23–Sun Nov 29, 2026). Ids prefixed w7_. Mon FB1 partial: squat top 152 kg (335 lb), presumably 3 reps (unconfirmed); back-off 1 124.7 kg (275 lb); back-off 2 and accessories pending; Garmin 25179727838. Tue Easy Conditioning done (run option, treadmill 0%): LB 3.21 mi / 5.17 km in 50:07, HR 127/142, G 25190971876. AM weigh-in Wed 11/25: 241.2 lb (109.4 kg) at 7:00 AM PT; 7-day AM average 240.3 from 2 readings. Wed FB2 done (D skipped): press 3RM 83.9 kg (185 lb) × 3 (hard, ties 10/14 KPI); back-offs 70.3 kg (155 lb) × 3, twice (set 2 assumed); lunges 3 sets @ 18.1 kg (40 lb) DBs (reps NR); chins/dips 3 × 8 BW; curls 27.2 kg × 5/7/7; pushdowns 22.7 kg × 10, then 25 kg × 10, × 10. Garmin pending (started ~3:50–4:00 PM PT). Thu Interval Conditioning done (7 of 8 × 400 m, treadmill 0%): reps 1–5 at 7.9 mph (1:53/400 m, computed from belt speed), reps 6–7 at 7.7 mph (1:56/400 m); LB 7.86 mph (4:45/km, 7:38/mi) over 7 × 400 m in 13:17. Garmin work laps included pre-rep rest; G 25209122991 totals unchanged (5.35 km, 52:56, HR 145/189, 681 kcal). Sat–Sun await screenshots; Fri is the typical rest day.
   const WEEK7 = [
     { id: 'w7_mon', date: '2026-11-23', dow: 'Mon', short: '11/23', title: 'Full Body 1', subtitle: 'Squat Focused · Partial · top 152 kg (335 lb), presumably 3 reps (unconfirmed) · back-off 1 124.7 kg (275 lb) · back-off 2 and accessories pending · Garmin strength 36:41 · HR 92/130 · 219 kcal · G 25179727838', type: 'strength' },
     { id: 'w7_tue', date: '2026-11-24', dow: 'Tue', short: '11/24', title: 'Easy Conditioning', subtitle: '✓ Done 11/24 · treadmill 0% · LB 3.21 mi / 5.17 km in 50:07 · 15:37/mi · 9:42/km · HR 127/142 · Z1 7:32 · Z2 40:48 · Z3 1:30 · 523 kcal · G 25190971876', type: 'conditioning' },
     { id: 'w7_wed', date: '2026-11-25', dow: 'Wed', short: '11/25', title: 'Full Body 2', subtitle: 'Press Focused · ✓ Done 11/25 (D skipped) · 3RM 83.9 kg (185 lb) × 3 (hard, ties 10/14 KPI) · back-offs 70.3 kg (155 lb) × 3 × 2 (set 2 assumed) · chins/dips 3 × 8 BW · AM weigh-in 241.2 lb · Garmin strength 91:43 · moving 33:35 · HR 103/167 · Z1 26:13 · Z2 14:50 · Z3 5:15 · Z4 1:45 · Z5 0 · 595 kcal · G 25201166918', type: 'strength' },
-    { id: 'w7_thu', date: '2026-11-26', dow: 'Thu', short: '11/26', title: 'Interval Conditioning', subtitle: 'Prescription pending Marchon screenshot · Garmin run 5.35 km / 3.32 mi · 52:56 · moving 38:12 · 9:53/km · 15:55/mi · 3.77 mph · HR 145/189 · Z1 4:13 · Z2 19:10 · Z3 14:18 · Z4 8:31 · Z5 6:15 · 681 kcal · 6 m gain · reps 5:39/km on rep 1 fading to 10:58/km on rep 7 · G 25209122991', type: 'conditioning' },
+    { id: 'w7_thu', date: '2026-11-26', dow: 'Thu', short: '11/26', title: 'Interval Conditioning', subtitle: '✓ Done 11/26 · treadmill 0% · 7 of 8 × 400 m · LB 7.86 mph (4:45/km, 7:38/mi) in 13:17 · reps 1–5 @ 7.9 mph (1:53) · reps 6–7 @ 7.7 mph (1:56) · Garmin 5.35 km / 3.32 mi · 52:56 · HR 145/189 · Z1 4:13 · Z2 19:10 · Z3 14:18 · Z4 8:31 · Z5 6:15 · 681 kcal · G 25209122991', type: 'conditioning' },
     { id: 'w7_fri', date: '2026-11-27', dow: 'Fri', short: '11/27', title: 'Rest', subtitle: 'Typical rest day', type: 'rest' },
     { id: 'w7_sat', date: '2026-11-28', dow: 'Sat', short: '11/28', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
     { id: 'w7_sun', date: '2026-11-29', dow: 'Sun', short: '11/29', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
@@ -1732,15 +1732,52 @@
     arms.sets.forEach(x => { if (armLabels[x.id]) x.label = armLabels[x.id]; });
   })();
 
-  // Thu 11/26 · Week 7 Interval Conditioning. Garmin 25209122991 logged; Marchon prescription not received yet.
+  // Thu 11/26 · Week 7 Interval Conditioning. Corrected 11/26 evening: Garmin work laps included pre-rep rest; treadmill 0% speeds are the true run paces. Marchon screenshot still not received.
   SESSIONS.w7_thu = {
     name: 'Interval Conditioning',
-    duration: 'Garmin run 52:56 · start 10:03 AM PT · 5.35 km / 3.32 mi',
-    blocks: [{
-      id: 'tbd', title: 'Prescription pending', meta: 'Marchon screenshot not received yet · Garmin 25209122991 · HR 145/189 (max 200) · 681 kcal · notes only',
-      cues: 'Garmin 25209122991 (chest strap): 5.35 km / 3.32 mi, total 52:56, moving 38:12, 9:53/km (15:55/mi, 3.77 mph) overall. HR avg 145 / max 189. Zones (Z1 100–118 … Z5 179+): Z1 4:13 · Z2 19:10 · Z3 14:18 · Z4 8:31 · Z5 6:15. Laps: 1.00 km warm-up 8:44/km (HR 120/128), 0.63 km 9:56/km (124/130), then 7 work reps with 60 s rests: rep 1 362 m in 123 s (5:39/km, 9:06/mi, HR 151/172); rep 2 359 m/133 s (6:10/km, 154/180); rep 3 339 m/136 s (6:41/km, 161/185); rep 4 339 m/139 s (6:50/km, 163/187); rep 5 337 m/177 s (8:45/km, 157/188); rep 6 331 m/187 s (9:24/km, 158/189); rep 7 390 m/257 s (10:58/km, 150/189); cooldown 1.00 km 9:26/km (146/157). HR peaked 189 (Z5 6:15) on the work reps, consistent with an interval day.',
-      sets: [{ id: 'tbd1', label: 'Notes', fields: ['notes'] }],
-    }],
+    duration: 'Done 11/26 · treadmill 0% · start 10:03 AM PT · 7 of 8 × 400 m · LB 7.86 mph (4:45/km, 7:38/mi) in 13:17 · Garmin 5.35 km / 3.32 mi · 52:56 · moving 38:12 · HR 145/189 · 681 kcal · G 25209122991',
+    blocks: [
+      {
+        id: 'wu', title: 'Warm-up (Garmin)', meta: 'Done · 1.00 km 8:44/km (HR 120/128) + 0.63 km 9:56/km (HR 124/130)',
+        cues: 'Garmin laps 1–2, unchanged. Marchon prescription not received (not invented).',
+        sets: [
+          { id: 'wu1', label: 'Lap 1 · 1.00 km · 8:44/km (14:03/mi, 4.27 mph) · HR 120/128', fields: ['distance', 'time', 'avgHr', 'notes'] },
+          { id: 'wu2', label: 'Lap 2 · 0.63 km · 9:56/km · HR 124/130', fields: ['distance', 'time', 'avgHr', 'notes'] },
+        ],
+      },
+      {
+        id: 'reps', title: 'Work reps · 7 of 8 × 400 m', meta: '✓ Done 11/26 · treadmill 0% · stopped at 7 · LB 7.86 mph (4:45/km, 7:38/mi)',
+        cues: 'Terry: plan was 8 × 400 m at 7.9 mph on a flat treadmill (0%); he did 7 and stopped at 7. Reps 1–5 at 7.9 mph (12.7 km/h, ~4:43/km, ~7:36/mi), 400 m ≈ 1:53 (113 s). Reps 6–7 at 7.7 mph (12.4 km/h, ~4:51/km, ~7:48/mi), 400 m ≈ 1:56 (116 s). Those 1:53/1:56 times are computed from the treadmill speed; each Garmin work lap ended exactly when he stopped running. The Garmin work laps (123, 133, 136, 139, 177, 187, 257 s) include extra rest he took before starting each rep, and each is followed by a 60 s rest lap. For each rep, rest = 60 s plus (lap time − run time). Total rest: 1:10, 1:20, 1:23, 1:26, 2:04, 2:11, 3:21. He recalled about 15 s of extra rest on reps 1–3, about an extra minute on reps 4–5, and more (2–3 min) on reps 6–7; the logged splits use the formula, not those estimates. Garmin lap distances (331–390 m) are watch estimates; the treadmill 400 m is the true distance. Leaderboard is average work pace over 7 × 400 m in 13:17 (797 s): 7.86 mph (exactly 7.859 mph; 12.65 km/h; 4:45/km; 7:38/mi). Marchon screenshot not received; no card details invented.',
+        sets: [
+          { id: 'r1', label: 'Rep 1 · 400 m · 1:53 @ 7.9 mph (12.7 km/h, ~4:43/km, ~7:36/mi) · computed · HR 151/172', fields: ['distance', 'time', 'avgHr', 'notes'] },
+          { id: 'j1', label: 'Rest 1 · total 1:10 (60 s lap + 0:10 pre-rep from 123 s work lap)', fields: ['time', 'notes'] },
+          { id: 'r2', label: 'Rep 2 · 400 m · 1:53 @ 7.9 mph · computed · HR 154/180', fields: ['distance', 'time', 'avgHr', 'notes'] },
+          { id: 'j2', label: 'Rest 2 · total 1:20 (60 s + 0:20 from 133 s lap)', fields: ['time', 'notes'] },
+          { id: 'r3', label: 'Rep 3 · 400 m · 1:53 @ 7.9 mph · computed · HR 161/185', fields: ['distance', 'time', 'avgHr', 'notes'] },
+          { id: 'j3', label: 'Rest 3 · total 1:23 (60 s + 0:23 from 136 s lap)', fields: ['time', 'notes'] },
+          { id: 'r4', label: 'Rep 4 · 400 m · 1:53 @ 7.9 mph · computed · HR 163/187', fields: ['distance', 'time', 'avgHr', 'notes'] },
+          { id: 'j4', label: 'Rest 4 · total 1:26 (60 s + 0:26 from 139 s lap)', fields: ['time', 'notes'] },
+          { id: 'r5', label: 'Rep 5 · 400 m · 1:53 @ 7.9 mph · computed · HR 157/188', fields: ['distance', 'time', 'avgHr', 'notes'] },
+          { id: 'j5', label: 'Rest 5 · total 2:04 (60 s + 1:04 from 177 s lap)', fields: ['time', 'notes'] },
+          { id: 'r6', label: 'Rep 6 · 400 m · 1:56 @ 7.7 mph (12.4 km/h, ~4:51/km, ~7:48/mi) · computed · HR 158/189', fields: ['distance', 'time', 'avgHr', 'notes'] },
+          { id: 'j6', label: 'Rest 6 · total 2:11 (60 s + 1:11 from 187 s lap)', fields: ['time', 'notes'] },
+          { id: 'r7', label: 'Rep 7 · 400 m · 1:56 @ 7.7 mph · computed · HR 150/189', fields: ['distance', 'time', 'avgHr', 'notes'] },
+          { id: 'j7', label: 'Rest 7 · total 3:21 (60 s + 2:21 from 257 s lap)', fields: ['time', 'notes'] },
+          { id: 'r8', label: 'Rep 8 · not done · stopped at 7', fields: ['notes'] },
+          { id: 'lb', label: 'Leaderboard · 7.86 mph (7.859 mph; 12.65 km/h; 4:45/km; 7:38/mi) · 7 × 400 m in 13:17', fields: ['time', 'notes'] },
+        ],
+      },
+      {
+        id: 'cd', title: 'Cooldown (Garmin)', meta: 'Done · 1.00 km 9:26/km (HR 146/157) · plus tiny laps 63 m/34 s and 65 m/33 s',
+        cues: 'Garmin lap 19 cooldown, unchanged. Laps 20/21 are tiny end laps.',
+        sets: [{ id: 'cd1', label: 'Cooldown · 1.00 km · 9:26/km (15:10/mi) · HR 146/157', fields: ['distance', 'time', 'avgHr', 'notes'] }],
+      },
+      {
+        id: 'g', title: 'Garmin totals (unchanged)', meta: '5.35 km / 3.32 mi · 52:56 · moving 38:12 · HR 145/189 · 681 kcal · G 25209122991',
+        cues: 'Session totals kept as recorded: 5.35 km / 3.32 mi, total 52:56, moving 38:12, overall 9:53/km (15:55/mi, 3.77 mph), HR avg 145 / max 189 (chest strap, max HR 200), 681 kcal, +6 m. Coach zones (Z1 100–118, Z2 119–138, Z3 139–158, Z4 159–178, Z5 179+): Z1 4:13 · Z2 19:10 · Z3 14:18 · Z4 8:31 · Z5 6:15.',
+        sets: [{ id: 'gt', label: 'Totals · 5.35 km / 3.32 mi · 52:56 · HR 145/189 · Z1 4:13 · Z2 19:10 · Z3 14:18 · Z4 8:31 · Z5 6:15 · 681 kcal', fields: ['distance', 'time', 'avgHr', 'notes'] }],
+      },
+    ],
   };
 
   ['w7_sat', 'w7_sun'].forEach(id => {
