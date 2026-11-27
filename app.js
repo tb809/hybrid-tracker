@@ -1,10 +1,10 @@
-/* Hybrid Tracker v2.1.59 — Phase 6 Weeks 1–3 — Terry Baggett
+/* Hybrid Tracker v2.1.60 — Phase 6 Weeks 1–3 — Terry Baggett
    Local-first: every tap is written to IndexedDB (db.js) + a localStorage mirror,
    queued in an outbox and synced to Supabase when configured (sync.js).
    Distances stored as km; always displayed as km · /km · mi · /mi. */
 (function () {
   'use strict';
-  const APP_VERSION = '2.1.59';
+  const APP_VERSION = '2.1.60';
 
   function start(BOOT) {
 
@@ -92,7 +92,7 @@
     { id: 'w7_mon', date: '2026-11-23', dow: 'Mon', short: '11/23', title: 'Full Body 1', subtitle: 'Squat Focused · Partial · top 152 kg (335 lb), presumably 3 reps (unconfirmed) · back-off 1 124.7 kg (275 lb) · back-off 2 and accessories pending · Garmin strength 36:41 · HR 92/130 · 219 kcal · G 25179727838', type: 'strength' },
     { id: 'w7_tue', date: '2026-11-24', dow: 'Tue', short: '11/24', title: 'Easy Conditioning', subtitle: '✓ Done 11/24 · treadmill 0% · LB 3.21 mi / 5.17 km in 50:07 · 15:37/mi · 9:42/km · HR 127/142 · Z1 7:32 · Z2 40:48 · Z3 1:30 · 523 kcal · G 25190971876', type: 'conditioning' },
     { id: 'w7_wed', date: '2026-11-25', dow: 'Wed', short: '11/25', title: 'Full Body 2', subtitle: 'Press Focused · ✓ Done 11/25 (D skipped) · 3RM 83.9 kg (185 lb) × 3 (hard, ties 10/14 KPI) · back-offs 70.3 kg (155 lb) × 3 × 2 (set 2 assumed) · chins/dips 3 × 8 BW · AM weigh-in 241.2 lb · Garmin strength 91:43 · moving 33:35 · HR 103/167 · Z1 26:13 · Z2 14:50 · Z3 5:15 · Z4 1:45 · Z5 0 · 595 kcal · G 25201166918', type: 'strength' },
-    { id: 'w7_thu', date: '2026-11-26', dow: 'Thu', short: '11/26', title: 'Interval Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
+    { id: 'w7_thu', date: '2026-11-26', dow: 'Thu', short: '11/26', title: 'Interval Conditioning', subtitle: 'Prescription pending Marchon screenshot · Garmin run 5.35 km / 3.32 mi · 52:56 · moving 38:12 · 9:53/km · 15:55/mi · 3.77 mph · HR 145/189 · Z1 4:13 · Z2 19:10 · Z3 14:18 · Z4 8:31 · Z5 6:15 · 681 kcal · 6 m gain · reps 5:39/km on rep 1 fading to 10:58/km on rep 7 · G 25209122991', type: 'conditioning' },
     { id: 'w7_fri', date: '2026-11-27', dow: 'Fri', short: '11/27', title: 'Rest', subtitle: 'Typical rest day', type: 'rest' },
     { id: 'w7_sat', date: '2026-11-28', dow: 'Sat', short: '11/28', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
     { id: 'w7_sun', date: '2026-11-29', dow: 'Sun', short: '11/29', title: 'Tempo Conditioning', subtitle: 'Session added once the app screenshot comes in', type: 'conditioning' },
@@ -1732,7 +1732,18 @@
     arms.sets.forEach(x => { if (armLabels[x.id]) x.label = armLabels[x.id]; });
   })();
 
-  ['w7_thu', 'w7_sat', 'w7_sun'].forEach(id => {
+  // Thu 11/26 · Week 7 Interval Conditioning. Garmin 25209122991 logged; Marchon prescription not received yet.
+  SESSIONS.w7_thu = {
+    name: 'Interval Conditioning',
+    duration: 'Garmin run 52:56 · start 10:03 AM PT · 5.35 km / 3.32 mi',
+    blocks: [{
+      id: 'tbd', title: 'Prescription pending', meta: 'Marchon screenshot not received yet · Garmin 25209122991 · HR 145/189 (max 200) · 681 kcal · notes only',
+      cues: 'Garmin 25209122991 (chest strap): 5.35 km / 3.32 mi, total 52:56, moving 38:12, 9:53/km (15:55/mi, 3.77 mph) overall. HR avg 145 / max 189. Zones (Z1 100–118 … Z5 179+): Z1 4:13 · Z2 19:10 · Z3 14:18 · Z4 8:31 · Z5 6:15. Laps: 1.00 km warm-up 8:44/km (HR 120/128), 0.63 km 9:56/km (124/130), then 7 work reps with 60 s rests: rep 1 362 m in 123 s (5:39/km, 9:06/mi, HR 151/172); rep 2 359 m/133 s (6:10/km, 154/180); rep 3 339 m/136 s (6:41/km, 161/185); rep 4 339 m/139 s (6:50/km, 163/187); rep 5 337 m/177 s (8:45/km, 157/188); rep 6 331 m/187 s (9:24/km, 158/189); rep 7 390 m/257 s (10:58/km, 150/189); cooldown 1.00 km 9:26/km (146/157). HR peaked 189 (Z5 6:15) on the work reps, consistent with an interval day.',
+      sets: [{ id: 'tbd1', label: 'Notes', fields: ['notes'] }],
+    }],
+  };
+
+  ['w7_sat', 'w7_sun'].forEach(id => {
     SESSIONS[id] = {
       name: 'Awaiting screenshots',
       blocks: [{
